@@ -82,7 +82,7 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.limeStrong : AppColors.textSecondary;
+    final color = isActive ? AppColors.onLime : AppColors.textSecondary;
     final badge = item.badge ?? 0;
     return Semantics(
       selected: isActive,
