@@ -24,6 +24,9 @@ abstract final class AppRoutes {
   /// Tab Komunitas.
   static const String community = '/community';
 
+  /// Tab Chat.
+  static const String chat = '/chat';
+
   /// Tab Profil.
   static const String profile = '/profile';
 
