@@ -59,11 +59,14 @@ class _AppTitle extends StatelessWidget {
             children: [
               TextSpan(
                 text: AppConstants.appNameAccent,
-                style: AppTextStyles.display.copyWith(color: AppColors.primary),
+                style: AppTextStyles.display.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ],
           ),
-          style: AppTextStyles.display,
+          style: AppTextStyles.display.copyWith(fontWeight: FontWeight.w600),
         ),
         const Padding(
           padding: EdgeInsets.only(left: 4, top: 6),
