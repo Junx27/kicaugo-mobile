@@ -37,7 +37,7 @@ class SchedulePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ScheduleCubit(getScheduleContent)..load(),
       child: SafeArea(
-        bottom: false,
+        top: false, bottom: false,
         child: BlocBuilder<ScheduleCubit, ScheduleState>(
           builder: (context, state) => switch (state.status) {
             ScheduleStatus.initial || ScheduleStatus.loading => const Center(
@@ -74,7 +74,7 @@ class _ScheduleView extends StatelessWidget {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.only(top: 16, bottom: _bottomInset),
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, bottom: _bottomInset),
             children: [
               Padding(
                 padding: _gutter,

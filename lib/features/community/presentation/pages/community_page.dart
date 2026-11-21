@@ -45,7 +45,7 @@ class _CommunityView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: false,
+      top: false, bottom: false,
       child: Column(
         children: [
           Expanded(
@@ -88,7 +88,7 @@ class _CommunityBody extends StatelessWidget {
     return Stack(
       children: [
         ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, _bottomInset),
+          padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, _bottomInset),
           children: [
             const CommunitySearchField(),
             const SizedBox(height: 12),
