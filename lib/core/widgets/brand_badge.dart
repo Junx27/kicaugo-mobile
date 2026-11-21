@@ -39,11 +39,12 @@ class BrandBadge extends StatelessWidget {
                     text: AppConstants.appNameAccent,
                     style: AppTextStyles.title.copyWith(
                       color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
               ),
-              style: AppTextStyles.title,
+              style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
         ],

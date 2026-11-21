@@ -29,7 +29,7 @@ class BrandTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brandStyle = AppTextStyles.title.copyWith(
-      fontWeight: FontWeight.w800,
+      fontWeight: FontWeight.w600,
     );
     return _TopBarFrame(
       actions: actions,
@@ -65,6 +65,7 @@ class BrandTopBar extends StatelessWidget {
                               text: AppConstants.appNameAccent,
                               style: brandStyle.copyWith(
                                 color: AppColors.primary,
+                                fontWeight: FontWeight.w800,
                               ),
                             ),
                           ],
