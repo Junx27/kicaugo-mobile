@@ -53,7 +53,8 @@ class _ProfileView extends StatelessWidget {
     return ColoredBox(
       color: AppColors.surfaceLavender,
       child: SafeArea(
-        top: false, bottom: false,
+        top: false,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
@@ -89,7 +90,12 @@ class _ProfileContentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, _bottomInset),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        MediaQuery.of(context).padding.top + 8,
+        16,
+        _bottomInset,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

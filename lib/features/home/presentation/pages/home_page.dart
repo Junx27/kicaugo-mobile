@@ -33,7 +33,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: false, bottom: false,
+      top: false,
+      bottom: false,
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) => switch (state.status) {
           HomeStatus.initial || HomeStatus.loading => const Center(
@@ -76,7 +77,10 @@ class _HomeContentView extends StatelessWidget {
       children: [
         Expanded(
           child: ListView(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, bottom: _bottomInset),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 8,
+              bottom: _bottomInset,
+            ),
             children: [
               Padding(
                 padding: _gutter,

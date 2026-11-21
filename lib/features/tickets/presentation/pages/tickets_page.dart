@@ -43,7 +43,8 @@ class _TicketsView extends StatelessWidget {
     return ColoredBox(
       color: AppColors.surfaceLavender,
       child: SafeArea(
-        top: false, bottom: false,
+        top: false,
+        bottom: false,
         child: Column(
           children: [
             Expanded(
@@ -78,7 +79,10 @@ class _TicketsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<TicketsCubit>();
     return ListView(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, bottom: _bottomInset),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 8,
+        bottom: _bottomInset,
+      ),
       children: [
         TicketsTabs(
           current: state.tab,
