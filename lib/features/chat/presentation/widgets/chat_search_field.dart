@@ -13,22 +13,28 @@ class ChatSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      key: const Key('chat_search_input'),
-      onChanged: onChanged,
-      style: AppTextStyles.body,
-      decoration: InputDecoration(
-        hintText: ChatStrings.searchHint,
-        prefixIcon: const Icon(Icons.search_rounded),
-        filled: true,
-        fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.inputRadius),
-          borderSide: BorderSide.none,
+    return Material(
+      color: AppColors.surface,
+      elevation: 2,
+      shadowColor: AppColors.shadow,
+      borderRadius: BorderRadius.circular(AppTheme.inputRadius),
+      child: TextField(
+        key: const Key('chat_search_input'),
+        onChanged: onChanged,
+        style: AppTextStyles.body,
+        decoration: InputDecoration(
+          hintText: ChatStrings.searchHint,
+          prefixIcon: const Icon(Icons.search_rounded),
+          filled: true,
+          fillColor: AppColors.surface,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppTheme.inputRadius),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );

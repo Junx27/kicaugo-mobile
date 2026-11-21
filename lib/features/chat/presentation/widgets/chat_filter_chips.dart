@@ -35,6 +35,8 @@ class ChatFilterChips extends StatelessWidget {
           final isSelected = filter == selected;
           return Material(
             color: isSelected ? AppColors.primary : AppColors.lavender,
+            elevation: isSelected ? 2 : 1,
+            shadowColor: AppColors.shadow,
             shape: const StadiumBorder(),
             child: InkWell(
               key: Key('chat_filter_${filter.name}'),

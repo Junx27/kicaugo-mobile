@@ -31,7 +31,7 @@ class ChatSessionCard extends StatelessWidget {
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppTheme.panelRadius),
-      elevation: 1,
+      elevation: 2,
       shadowColor: AppColors.shadow,
       child: InkWell(
         key: Key('chat_session_${session.id}'),

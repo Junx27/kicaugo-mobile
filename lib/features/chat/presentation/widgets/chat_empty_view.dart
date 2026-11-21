@@ -17,6 +17,7 @@ class ChatEmptyView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.lavenderTintStart,
         borderRadius: BorderRadius.circular(AppTheme.panelRadius),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(
         spacing: 8,
