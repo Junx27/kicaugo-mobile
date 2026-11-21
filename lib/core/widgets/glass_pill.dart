@@ -1,19 +1,17 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
-import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 
-/// Container pill/kartu dengan efek kaca (glassmorphism): blur, gradient
-/// putih transparan, border tipis, dan shadow.
+/// Container pill/kartu dengan efek kaca cair (liquid glass):
+/// LiquidGlassLayer + LiquidGlass (LiquidRoundedSuperellipse).
 class GlassPill extends StatelessWidget {
   const GlassPill({
     super.key,
     required this.child,
     this.padding,
     this.borderRadius,
-    this.blurSigma = 12,
+    this.blurSigma = 8,
   });
 
   final Widget child;
@@ -24,30 +22,16 @@ class GlassPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = borderRadius ?? BorderRadius.circular(AppTheme.pillRadius);
-    return ClipRRect(
-      borderRadius: radius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.55),
-                AppColors.surface.withValues(alpha: 0.35),
-              ],
-            ),
-            borderRadius: radius,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.5),
-              width: 1,
-            ),
-            boxShadow: AppTheme.softShadow,
-          ),
-          child: child,
-        ),
+    return LiquidGlassLayer(
+      settings: LiquidGlassSettings(
+        thickness: 20,
+        blur: blurSigma,
+        refractiveIndex: 1.5,
+        glassColor: const Color(0x1AFFFFFF),
+      ),
+      child: LiquidGlass(
+        shape: LiquidRoundedSuperellipse(borderRadius: radius.topLeft.x),
+        child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
       ),
     );
   }
