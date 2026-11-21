@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
@@ -36,26 +38,43 @@ class PillNavBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: Container(
-          height: height,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.95),
-            borderRadius: BorderRadius.circular(AppTheme.pillRadius),
-            boxShadow: AppTheme.raisedShadow,
-          ),
-          child: Row(
-            children: [
-              for (var index = 0; index < items.length; index++)
-                Expanded(
-                  child: _NavButton(
-                    item: items[index],
-                    isActive: index == currentIndex,
-                    onTap: () => onSelected(index),
-                  ),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppTheme.pillRadius),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+            child: Container(
+              height: height,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.55),
+                    AppColors.surface.withValues(alpha: 0.35),
+                  ],
                 ),
-            ],
+                borderRadius: BorderRadius.circular(AppTheme.pillRadius),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  width: 1,
+                ),
+                boxShadow: AppTheme.raisedShadow,
+              ),
+              child: Row(
+                children: [
+                  for (var index = 0; index < items.length; index++)
+                    Expanded(
+                      child: _NavButton(
+                        item: items[index],
+                        isActive: index == currentIndex,
+                        onTap: () => onSelected(index),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
