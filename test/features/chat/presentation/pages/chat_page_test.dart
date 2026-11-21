@@ -12,6 +12,7 @@ import 'package:rumahkicau_mobile/features/chat/presentation/chat_strings.dart';
 import 'package:rumahkicau_mobile/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:rumahkicau_mobile/features/chat/presentation/pages/chat_page.dart';
 
+import '../../../../support/layout.dart';
 import '../../support.dart';
 
 /// Repository yang menunggu [completer] untuk menguji state loading.
@@ -71,6 +72,38 @@ double _composeOpacity(WidgetTester tester) => tester
     .opacity;
 
 void main() {
+  testWidgets('latar mengikuti warna latar shell', (tester) async {
+    await _pumpChat(tester);
+
+    expectShellBackground(tester, find.byType(ChatPage));
+  });
+
+  testWidgets('kartu dan kontrol chat memakai bayangan standar', (
+    tester,
+  ) async {
+    await _pumpChat(tester);
+
+    Material materialOf(Finder child) => tester.widget<Material>(
+      find.ancestor(of: child, matching: find.byType(Material)).first,
+    );
+
+    expect(
+      materialOf(find.byKey(const Key('chat_session_piala-raja'))).elevation,
+      2,
+    );
+    expect(materialOf(find.byKey(const Key('chat_search_input'))).elevation, 2);
+    expect(
+      materialOf(find.byKey(const Key('chat_filter_all'))).elevation,
+      greaterThan(0),
+    );
+
+    await _search(tester, 'tidak-ada');
+    final empty = tester.widget<Container>(
+      find.byKey(const Key('chat_empty_state')),
+    );
+    expect((empty.decoration! as BoxDecoration).boxShadow, AppTheme.softShadow);
+  });
+
   testWidgets('menampilkan loading lalu daftar sesi', (tester) async {
     final completer = Completer<List<ChatSession>>();
     await _pumpChat(
