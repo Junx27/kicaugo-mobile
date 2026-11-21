@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
 
 /// Satu tujuan di [PillNavBar].
 @immutable
@@ -99,17 +98,7 @@ class _NavButton extends StatelessWidget {
               label: Text('$badge'),
               backgroundColor: AppColors.lime,
               textColor: AppColors.onLime,
-              child: Icon(item.icon, size: 22, color: color),
-            ),
-            Text(
-              item.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.eyebrow.copyWith(
-                color: color,
-                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                letterSpacing: 0,
-              ),
+              child: Icon(item.icon, size: 24, color: color),
             ),
           ],
         ),
