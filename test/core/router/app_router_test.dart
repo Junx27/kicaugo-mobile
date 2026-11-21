@@ -17,7 +17,9 @@ import 'package:rumahkicau_mobile/features/onboarding/presentation/pages/onboard
 import 'package:rumahkicau_mobile/features/reminders/presentation/pages/reminders_page.dart';
 import 'package:rumahkicau_mobile/features/reminders/presentation/reminders_strings.dart';
 import 'package:rumahkicau_mobile/features/schedule/presentation/pages/schedule_page.dart';
+import 'package:rumahkicau_mobile/features/tickets/presentation/pages/ticket_history_page.dart';
 import 'package:rumahkicau_mobile/features/tickets/presentation/pages/tickets_page.dart';
+import 'package:rumahkicau_mobile/features/tickets/presentation/ticket_history_strings.dart';
 
 import '../../support/pump_app.dart';
 
@@ -131,6 +133,22 @@ void main() {
 
     expect(find.byType(RemindersPage), findsOneWidget);
     expect(find.text(RemindersStrings.title), findsOneWidget);
+  });
+
+  testWidgets('menu riwayat tiket di Profil membuka halaman Riwayat Tiket', (
+    tester,
+  ) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    await tester.tap(find.text(HomeStrings.navProfile).last);
+    await pumpNavigation(tester);
+    await tapVisible(tester, find.byKey(const Key('profile_history')));
+
+    expect(find.byType(TicketHistoryPage), findsOneWidget);
+    expect(find.text(TicketHistoryStrings.title), findsWidgets);
   });
 
   test('notifier meneruskan perubahan state AuthBloc', () async {
