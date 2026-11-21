@@ -127,4 +127,7 @@ class InMemorySessionStorage implements SessionStorage {
   Future<void> clearSession() async {
     _user = null;
   }
+
+  @override
+  Future<String?> readToken() async => _user?.token;
 }

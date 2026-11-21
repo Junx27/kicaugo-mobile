@@ -20,6 +20,7 @@ import '../../features/schedule/presentation/pages/schedule_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/tickets/presentation/pages/ticket_history_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
+import 'app_navigator_observer.dart';
 import 'app_routes.dart';
 
 /// Jembatan stream [AuthBloc] ke [Listenable] milik `GoRouter`.
@@ -50,6 +51,7 @@ GoRouter createRouter({
   return GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: refreshListenable,
+    observers: <NavigatorObserver>[AppNavigatorObserver()],
     redirect: (context, state) =>
         authRedirect(authBloc.state.isAuthenticated, state.matchedLocation),
     routes: [
