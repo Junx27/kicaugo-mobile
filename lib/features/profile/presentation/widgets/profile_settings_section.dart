@@ -14,10 +14,12 @@ class ProfileSettingsSection extends StatelessWidget {
     super.key,
     required this.onLogout,
     this.onHelp,
+    this.onReminders,
   });
 
   final VoidCallback onLogout;
   final VoidCallback? onHelp;
+  final VoidCallback? onReminders;
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +42,11 @@ class ProfileSettingsSection extends StatelessWidget {
                 icon: Icons.receipt_long_rounded,
                 label: ProfileStrings.history,
               ),
-              const _SettingsRow(
-                actionKey: Key('profile_reminders'),
+              _SettingsRow(
+                actionKey: const Key('profile_reminders'),
                 icon: Icons.notifications_active_rounded,
                 label: ProfileStrings.reminders,
+                onTap: onReminders,
               ),
               _SettingsRow(
                 actionKey: const Key('profile_help'),

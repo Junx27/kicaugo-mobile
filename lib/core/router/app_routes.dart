@@ -30,6 +30,9 @@ abstract final class AppRoutes {
   /// Pusat bantuan dan kontak panitia.
   static const String helpCenter = '/help-center';
 
+  /// Pengingat rawatan dan alarm lomba.
+  static const String reminders = '/reminders';
+
   /// Rute yang boleh dibuka tanpa sesi.
   static const Set<String> publicRoutes = <String>{
     splash,

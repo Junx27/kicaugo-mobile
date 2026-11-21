@@ -14,6 +14,7 @@ import '../../features/home/presentation/main_shell.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/reminders/presentation/pages/reminders_page.dart';
 import '../../features/schedule/presentation/pages/schedule_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
@@ -69,6 +70,10 @@ GoRouter createRouter({
       GoRoute(
         path: AppRoutes.helpCenter,
         builder: (context, state) => const HelpCenterPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.reminders,
+        builder: (context, state) => const RemindersPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => MainShell(
