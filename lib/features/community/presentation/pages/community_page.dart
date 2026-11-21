@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/load_error_view.dart';
-import '../../../../core/widgets/top_bars.dart';
 import '../../data/datasources/fake_community_data_source.dart';
 import '../../data/repositories/community_repository_impl.dart';
 import '../../domain/entities/community_content.dart';
 import '../../domain/usecases/get_community_content.dart';
-import '../community_strings.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
 import '../widgets/club_section.dart';
@@ -52,25 +48,6 @@ class _CommunityView extends StatelessWidget {
       bottom: false,
       child: Column(
         children: [
-          BrandTopBar(
-            subtitle: Text(
-              CommunityStrings.subtitle,
-              style: AppTextStyles.caption,
-            ),
-            actions: [
-              TopBarIconButton(
-                icon: Icons.search_rounded,
-                tooltip: CommunityStrings.searchTooltip,
-                onPressed: () => showComingSoon(context),
-              ),
-              TopBarIconButton(
-                icon: Icons.notifications_none_rounded,
-                tooltip: CommunityStrings.notificationsTooltip,
-                showDot: true,
-                onPressed: () => showComingSoon(context),
-              ),
-            ],
-          ),
           Expanded(
             child: BlocBuilder<CommunityCubit, CommunityState>(
               builder: (context, state) => switch (state.status) {

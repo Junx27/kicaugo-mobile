@@ -58,7 +58,6 @@ void main() {
 
     await _pumpPage(tester);
 
-    expect(find.text(CommunityStrings.subtitle), findsOneWidget);
     expect(find.text(CommunityStrings.clubTitle), findsOneWidget);
     expect(
       find.text('4.200 ${CommunityStrings.membersSuffix}'),
@@ -140,8 +139,6 @@ void main() {
   });
 
   final comingSoon = <String, Finder Function()>{
-    'cari (bar atas)': () => find.byTooltip(CommunityStrings.searchTooltip),
-    'notifikasi': () => find.byTooltip(CommunityStrings.notificationsTooltip),
     'kolom cari': () => find.text(CommunityStrings.searchHint),
     'lihat semua klub': () => find.text(CommunityStrings.seeAllClubs),
     'ikuti diskusi': () => find.text(CommunityStrings.followDiscussion),

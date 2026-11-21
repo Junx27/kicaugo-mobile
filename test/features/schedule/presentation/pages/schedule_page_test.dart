@@ -154,7 +154,6 @@ void main() {
   });
 
   final comingSoonTargets = <String, Finder Function()>{
-    'notifikasi': () => find.byTooltip(ScheduleStrings.notificationsTooltip),
     'kalender': () => find.byTooltip(ScheduleStrings.calendarTooltip),
     'cari': () => find.text(ScheduleStrings.searchHint),
     'kalender lengkap': () => find.text(ScheduleStrings.fullCalendar),

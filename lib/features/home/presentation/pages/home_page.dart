@@ -18,7 +18,6 @@ import '../widgets/featured_contest_card.dart';
 import '../widgets/home_greeting.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_stats_card.dart';
-import '../widgets/home_top_bar.dart';
 import '../widgets/popular_schedule_list.dart';
 import '../widgets/upcoming_contest_card.dart';
 
@@ -75,10 +74,9 @@ class _HomeContentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        HomeTopBar(location: content.summary.location),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.only(top: 8, bottom: _bottomInset),
+            padding: const EdgeInsets.only(top: 16, bottom: _bottomInset),
             children: [
               Padding(
                 padding: _gutter,

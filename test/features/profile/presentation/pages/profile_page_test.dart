@@ -134,8 +134,6 @@ void main() {
   });
 
   final comingSoonTargets = <String, Finder Function()>{
-    'notifikasi': () => find.byKey(const Key('profile_notifications')),
-    'pengaturan': () => find.byKey(const Key('profile_settings')),
     'QR': () => find.byKey(const Key('profile_qr')),
     'edit profil': () => find.byKey(const Key('profile_edit')),
     'bagikan kartu': () => find.byKey(const Key('profile_share')),

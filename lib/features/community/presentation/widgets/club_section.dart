@@ -161,7 +161,7 @@ class _ClubCard extends StatelessWidget {
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
-        spacing: 8,
+        spacing: 4,
         children: [
           InitialsAvatar(
             initials: club.initials,

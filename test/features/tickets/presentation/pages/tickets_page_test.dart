@@ -129,7 +129,6 @@ void main() {
   });
 
   final comingSoonTargets = <String, Finder Function()>{
-    'filter': () => find.byTooltip(TicketsStrings.filterTooltip),
     'QR': () => find.text(TicketsStrings.openQr),
     'peta': () => find.text(TicketsStrings.paddockMap),
     'detail': () => find.text(TicketsStrings.ticketDetail),

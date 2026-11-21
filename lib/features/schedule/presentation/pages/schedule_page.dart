@@ -20,7 +20,6 @@ import '../widgets/featured_event_card.dart';
 import '../widgets/schedule_chip_row.dart';
 import '../widgets/schedule_header.dart';
 import '../widgets/schedule_quick_actions.dart';
-import '../widgets/schedule_top_bar.dart';
 
 /// Tab Jadwal: kalender pekan, filter wilayah/hari/kelas, dan daftar agenda.
 class SchedulePage extends StatelessWidget {
@@ -73,10 +72,9 @@ class _ScheduleView extends StatelessWidget {
     final agendas = state.visibleAgendas;
     return Column(
       children: [
-        ScheduleTopBar(summary: content.summary),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.only(top: 8, bottom: _bottomInset),
+            padding: const EdgeInsets.only(top: 16, bottom: _bottomInset),
             children: [
               Padding(
                 padding: _gutter,
