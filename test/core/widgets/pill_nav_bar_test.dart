@@ -28,7 +28,7 @@ void main() {
 
     expect(
       tester.widget<Icon>(find.byIcon(Icons.home)).color,
-      AppColors.primary,
+      AppColors.limeStrong,
     );
     expect(
       tester.widget<Icon>(find.byIcon(Icons.star)).color,

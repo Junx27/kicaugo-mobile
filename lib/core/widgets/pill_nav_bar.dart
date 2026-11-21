@@ -36,7 +36,7 @@ class PillNavBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         child: LiquidGlassLayer(
           settings: const LiquidGlassSettings(
             thickness: 20,
@@ -82,7 +82,7 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primary : AppColors.textSecondary;
+    final color = isActive ? AppColors.limeStrong : AppColors.textSecondary;
     final badge = item.badge ?? 0;
     return Semantics(
       selected: isActive,
