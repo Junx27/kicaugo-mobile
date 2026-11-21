@@ -5,6 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/load_error_view.dart';
+import '../../../../core/widgets/scroll_aware_fab.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 import '../widgets/chat_compose_button.dart';
@@ -51,90 +52,49 @@ class _ChatView extends StatelessWidget {
   }
 }
 
-class _ChatContent extends StatefulWidget {
+class _ChatContent extends StatelessWidget {
   const _ChatContent({required this.state});
 
   final ChatState state;
 
-  @override
-  State<_ChatContent> createState() => _ChatContentState();
-}
-
-class _ChatContentState extends State<_ChatContent> {
   static const double _gap = 16;
   static const double _fieldGap = 12;
-  static const double _fabBottomGap = 12;
-  static const Duration _fadeDuration = Duration(milliseconds: 200);
-
-  /// Awalnya terlihat; scroll menuju atas menyembunyikan dan ke bawah
-  /// menampilkan kembali tombol tulis pesan.
-  bool _showCompose = true;
-
-  bool _onScroll(ScrollUpdateNotification notification) {
-    final delta = notification.scrollDelta;
-    if (delta == null || delta == 0) return false;
-    final shouldShow = delta > 0;
-    if (shouldShow != _showCompose) {
-      setState(() => _showCompose = shouldShow);
-    }
-    return false;
-  }
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ChatCubit>();
-    final sessions = widget.state.visibleSessions;
-    final padding = MediaQuery.of(context).padding;
+    final sessions = state.visibleSessions;
+    final padding = MediaQuery.paddingOf(context);
     final topPadding = padding.top + _fieldGap;
-
-    // Dengan extendBody: true, padding.bottom sudah mencakup tinggi PillNavBar,
-    // sehingga tinggi navbar tidak boleh dijumlahkan dua kali.
-    final fabBottom = padding.bottom + _fabBottomGap;
     final bottomInset = padding.bottom + 48;
 
-    return Stack(
-      children: [
-        NotificationListener<ScrollUpdateNotification>(
-          onNotification: _onScroll,
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(_gap, topPadding, _gap, bottomInset),
-            children: [
-              ChatSearchField(onChanged: cubit.search),
-              const SizedBox(height: _fieldGap),
-              ChatFilterChips(
-                selected: widget.state.filter,
-                onSelected: cubit.selectFilter,
-              ),
-              const SizedBox(height: _gap),
-              if (sessions.isEmpty)
-                const ChatEmptyView()
-              else
-                Column(
-                  spacing: _fieldGap,
-                  children: [
-                    for (final session in sessions)
-                      ChatSessionCard(
-                        session: session,
-                        onTap: () => showComingSoon(context),
-                      ),
-                  ],
-                ),
-            ],
+    return ScrollAwareFab(
+      fab: const ChatComposeButton(),
+      scrollable: ListView(
+        padding: EdgeInsets.fromLTRB(_gap, topPadding, _gap, bottomInset),
+        children: [
+          ChatSearchField(onChanged: cubit.search),
+          const SizedBox(height: _fieldGap),
+          ChatFilterChips(
+            selected: state.filter,
+            onSelected: cubit.selectFilter,
           ),
-        ),
-        Positioned(
-          right: _gap,
-          bottom: fabBottom,
-          child: AnimatedOpacity(
-            opacity: _showCompose ? 1 : 0,
-            duration: _fadeDuration,
-            child: IgnorePointer(
-              ignoring: !_showCompose,
-              child: const ChatComposeButton(),
+          const SizedBox(height: _gap),
+          if (sessions.isEmpty)
+            const ChatEmptyView()
+          else
+            Column(
+              spacing: _fieldGap,
+              children: [
+                for (final session in sessions)
+                  ChatSessionCard(
+                    session: session,
+                    onTap: () => showComingSoon(context),
+                  ),
+              ],
             ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

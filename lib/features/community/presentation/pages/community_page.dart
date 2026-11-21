@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/load_error_view.dart';
+import '../../../../core/widgets/scroll_aware_fab.dart';
 import '../../data/datasources/fake_community_data_source.dart';
 import '../../data/repositories/community_repository_impl.dart';
 import '../../domain/entities/community_content.dart';
@@ -77,62 +78,52 @@ class _CommunityBody extends StatelessWidget {
   final CommunityContent content;
   final CommunityState state;
 
-  /// Ruang bawah agar FAB dan navigasi mengambang tidak menutupi konten.
-  static const double _bottomInset = 180;
-
-  /// Jarak FAB dari bawah: di atas navigasi pill (64 + margin).
-  static const double _fabBottom = 92;
-
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<CommunityCubit>();
-    return Stack(
-      children: [
-        ListView(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            MediaQuery.of(context).padding.top + 8,
-            16,
-            _bottomInset,
+    final padding = MediaQuery.paddingOf(context);
+
+    return ScrollAwareFab(
+      fab: const CreatePostFab(),
+      scrollable: ListView(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          padding.top + 8,
+          16,
+          padding.bottom + 48,
+        ),
+        children: [
+          const CommunitySearchField(),
+          const SizedBox(height: 12),
+          TopicChips(selected: state.topic, onSelected: cubit.selectTopic),
+          const SizedBox(height: 20),
+          ClubSection(
+            clubs: content.clubs,
+            isJoined: state.isJoined,
+            memberCount: state.memberCount,
+            onToggleJoin: (club) => cubit.toggleJoin(club.id),
           ),
-          children: [
-            const CommunitySearchField(),
-            const SizedBox(height: 12),
-            TopicChips(selected: state.topic, onSelected: cubit.selectTopic),
-            const SizedBox(height: 20),
-            ClubSection(
-              clubs: content.clubs,
-              isJoined: state.isJoined,
-              memberCount: state.memberCount,
-              onToggleJoin: (club) => cubit.toggleJoin(club.id),
+          const SizedBox(height: 20),
+          TrendingCard(discussion: content.trending),
+          const SizedBox(height: 20),
+          PollCard(
+            poll: content.poll,
+            tally: (
+              choice: state.interactions.pollChoice,
+              total: state.pollTotal,
+              percentOf: state.pollPercent,
             ),
-            const SizedBox(height: 20),
-            TrendingCard(discussion: content.trending),
-            const SizedBox(height: 20),
-            PollCard(
-              poll: content.poll,
-              tally: (
-                choice: state.interactions.pollChoice,
-                total: state.pollTotal,
-                percentOf: state.pollPercent,
-              ),
-              onVote: cubit.vote,
-            ),
-            const SizedBox(height: 24),
-            PostFeed(
-              posts: state.visiblePosts,
-              likeOf: (post) =>
-                  (liked: state.isLiked(post), count: state.likeCount(post)),
-              onToggleLike: (post) => cubit.toggleLike(post.id),
-            ),
-          ],
-        ),
-        Positioned(
-          right: 16,
-          bottom: _fabBottom + MediaQuery.paddingOf(context).bottom,
-          child: const CreatePostFab(),
-        ),
-      ],
+            onVote: cubit.vote,
+          ),
+          const SizedBox(height: 24),
+          PostFeed(
+            posts: state.visiblePosts,
+            likeOf: (post) =>
+                (liked: state.isLiked(post), count: state.likeCount(post)),
+            onToggleLike: (post) => cubit.toggleLike(post.id),
+          ),
+        ],
+      ),
     );
   }
 }

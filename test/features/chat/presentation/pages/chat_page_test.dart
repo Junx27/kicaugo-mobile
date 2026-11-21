@@ -155,7 +155,7 @@ void main() {
   });
 
   testWidgets(
-    'FAB hilang saat scroll ke atas dan muncul saat scroll ke bawah',
+    'FAB hilang saat scroll ke bawah dan muncul saat scroll ke atas',
     (tester) async {
       await _pumpChat(tester, size: const Size(420, 800));
       final list = find.ancestor(
@@ -168,15 +168,15 @@ void main() {
 
       await tester.drag(list, const Offset(0, -400));
       await tester.pump(settle);
-      expect(_composeOpacity(tester), 1);
+      expect(_composeOpacity(tester), 0);
 
       await tester.drag(list, const Offset(0, 300));
       await tester.pump(settle);
-      expect(_composeOpacity(tester), 0);
+      expect(_composeOpacity(tester), 1);
 
       await tester.drag(list, const Offset(0, -300));
       await tester.pump(settle);
-      expect(_composeOpacity(tester), 1);
+      expect(_composeOpacity(tester), 0);
     },
   );
 
