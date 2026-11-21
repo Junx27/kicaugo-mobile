@@ -36,7 +36,7 @@ class PillNavBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         child: Container(
           height: height,
           padding: const EdgeInsets.symmetric(horizontal: 4),
