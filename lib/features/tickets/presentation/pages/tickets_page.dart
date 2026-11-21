@@ -3,15 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/load_error_view.dart';
-import '../../../../core/widgets/top_bars.dart';
 import '../../data/datasources/fake_tickets_data_source.dart';
 import '../../data/repositories/tickets_repository_impl.dart';
 import '../../domain/usecases/get_tickets_content.dart';
 import '../cubit/tickets_cubit.dart';
 import '../cubit/tickets_state.dart';
-import '../tickets_strings.dart';
 import '../widgets/tickets_filters.dart';
 import '../widgets/tickets_tab_content.dart';
 
@@ -46,19 +43,9 @@ class _TicketsView extends StatelessWidget {
     return ColoredBox(
       color: AppColors.surfaceLavender,
       child: SafeArea(
-        bottom: false,
+        top: false, bottom: false,
         child: Column(
           children: [
-            TitleTopBar(
-              title: TicketsStrings.title,
-              actions: [
-                TopBarIconButton(
-                  icon: Icons.tune_rounded,
-                  tooltip: TicketsStrings.filterTooltip,
-                  onPressed: () => showComingSoon(context),
-                ),
-              ],
-            ),
             Expanded(
               child: BlocBuilder<TicketsCubit, TicketsState>(
                 builder: (context, state) => switch (state.status) {
@@ -91,7 +78,7 @@ class _TicketsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<TicketsCubit>();
     return ListView(
-      padding: const EdgeInsets.only(top: 8, bottom: _bottomInset),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, bottom: _bottomInset),
       children: [
         TicketsTabs(
           current: state.tab,

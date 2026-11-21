@@ -18,7 +18,6 @@ import '../widgets/featured_contest_card.dart';
 import '../widgets/home_greeting.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_stats_card.dart';
-import '../widgets/home_top_bar.dart';
 import '../widgets/popular_schedule_list.dart';
 import '../widgets/upcoming_contest_card.dart';
 
@@ -34,7 +33,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: false,
+      top: false, bottom: false,
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) => switch (state.status) {
           HomeStatus.initial || HomeStatus.loading => const Center(
@@ -75,10 +74,9 @@ class _HomeContentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        HomeTopBar(location: content.summary.location),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.only(top: 8, bottom: _bottomInset),
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, bottom: _bottomInset),
             children: [
               Padding(
                 padding: _gutter,

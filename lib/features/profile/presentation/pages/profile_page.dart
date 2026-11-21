@@ -5,9 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/load_error_view.dart';
-import '../../../../core/widgets/top_bars.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -55,26 +53,9 @@ class _ProfileView extends StatelessWidget {
     return ColoredBox(
       color: AppColors.surfaceLavender,
       child: SafeArea(
-        bottom: false,
+        top: false, bottom: false,
         child: Column(
           children: [
-            TitleTopBar(
-              title: ProfileStrings.title,
-              actions: [
-                TopBarIconButton(
-                  key: const Key('profile_notifications'),
-                  icon: Icons.notifications_none_rounded,
-                  tooltip: ProfileStrings.notificationsTooltip,
-                  onPressed: () => showComingSoon(context),
-                ),
-                TopBarIconButton(
-                  key: const Key('profile_settings'),
-                  icon: Icons.settings_outlined,
-                  tooltip: ProfileStrings.settingsTooltip,
-                  onPressed: () => showComingSoon(context),
-                ),
-              ],
-            ),
             Expanded(
               child: BlocBuilder<ProfileCubit, ProfileState>(
                 builder: (context, state) => switch (state.status) {
@@ -108,7 +89,7 @@ class _ProfileContentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, _bottomInset),
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, _bottomInset),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

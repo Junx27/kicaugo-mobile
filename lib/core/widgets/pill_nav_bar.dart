@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
-import '../theme/app_theme.dart';
 
 /// Satu tujuan di [PillNavBar].
 @immutable
@@ -36,26 +35,32 @@ class PillNavBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: Container(
-          height: height,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.95),
-            borderRadius: BorderRadius.circular(AppTheme.pillRadius),
-            boxShadow: AppTheme.raisedShadow,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: LiquidGlassLayer(
+          settings: const LiquidGlassSettings(
+            thickness: 20,
+            blur: 8,
+            refractiveIndex: 1.5,
+            glassColor: Color(0x1AFFFFFF),
           ),
-          child: Row(
-            children: [
-              for (var index = 0; index < items.length; index++)
-                Expanded(
-                  child: _NavButton(
-                    item: items[index],
-                    isActive: index == currentIndex,
-                    onTap: () => onSelected(index),
-                  ),
-                ),
-            ],
+          child: LiquidGlass(
+            shape: const LiquidRoundedSuperellipse(borderRadius: 40),
+            child: Container(
+              height: height,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  for (var index = 0; index < items.length; index++)
+                    Expanded(
+                      child: _NavButton(
+                        item: items[index],
+                        isActive: index == currentIndex,
+                        onTap: () => onSelected(index),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -76,7 +81,7 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primary : AppColors.textSecondary;
+    final color = isActive ? AppColors.onLime : AppColors.textSecondary;
     final badge = item.badge ?? 0;
     return Semantics(
       selected: isActive,
@@ -93,17 +98,7 @@ class _NavButton extends StatelessWidget {
               label: Text('$badge'),
               backgroundColor: AppColors.lime,
               textColor: AppColors.onLime,
-              child: Icon(item.icon, size: 22, color: color),
-            ),
-            Text(
-              item.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.eyebrow.copyWith(
-                color: color,
-                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                letterSpacing: 0,
-              ),
+              child: Icon(item.icon, size: 24, color: color),
             ),
           ],
         ),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
+import '../../../../core/widgets/glass_pill.dart';
 import '../help_center_strings.dart';
 
 /// Kolom pencarian FAQ dengan aksi filter.
@@ -38,13 +38,8 @@ class _HelpSearchFieldState extends State<HelpSearchField> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassPill(
       padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.pillRadius),
-        boxShadow: AppTheme.softShadow,
-      ),
       child: Row(
         spacing: 8,
         children: [

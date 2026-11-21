@@ -124,7 +124,6 @@ void main() {
     expect(find.text('SELAMAT PAGI'), findsOneWidget);
     expect(find.text('Halo, ${HomeStrings.fallbackName} 👋'), findsOneWidget);
     expect(find.text('14 ${HomeStrings.liveSuffix}'), findsOneWidget);
-    expect(find.text(_content.summary.location), findsOneWidget);
     expect(find.text(_content.featured.title), findsOneWidget);
     expect(find.text('+48'), findsOneWidget);
     expect(find.text('SISA 3 TIKET'), findsOneWidget);
@@ -156,17 +155,7 @@ void main() {
     expect(find.text(HomeStrings.emptySchedules), findsOneWidget);
   });
 
-  testWidgets('avatar membuka tab Profil', (tester) async {
-    await _pumpHome(tester);
-
-    await tester.tap(find.byTooltip(profileTooltip));
-    await pumpNavigation(tester);
-
-    expect(find.text(_profileMarker), findsOneWidget);
-  });
-
   final comingSoonTargets = <String, Finder Function()>{
-    'notifikasi': () => find.byTooltip(HomeStrings.notificationsTooltip),
     'cari': () => find.text(HomeStrings.searchHint),
     'filter': () => find.byTooltip(HomeStrings.filterTooltip),
     'detail': () => find.text(HomeStrings.seeDetail),

@@ -28,7 +28,7 @@ void main() {
 
     expect(
       tester.widget<Icon>(find.byIcon(Icons.home)).color,
-      AppColors.primary,
+      AppColors.onLime,
     );
     expect(
       tester.widget<Icon>(find.byIcon(Icons.star)).color,
@@ -37,7 +37,7 @@ void main() {
     expect(find.text('2'), findsOneWidget);
     expect(find.text('0'), findsNothing);
 
-    await tester.tap(find.text('Dua'));
+    await tester.tap(find.byIcon(Icons.star));
     expect(taps, [1]);
   });
 }
