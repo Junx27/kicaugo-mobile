@@ -439,10 +439,10 @@ class _SupportCtaCard extends StatelessWidget {
             icon: const Icon(Icons.confirmation_number_rounded, size: 20),
             label: const Text(HelpCenterStrings.createTicket),
           ),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 12,
-            children: const [
+            children: [
               _TrustItem(label: HelpCenterStrings.archived),
               _Dot(),
               _TrustItem(label: HelpCenterStrings.escalation),
