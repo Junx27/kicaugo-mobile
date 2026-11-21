@@ -60,11 +60,11 @@ class MainShell extends StatelessWidget {
                   ),
                   items: [
                     const PillNavItem(
-                      icon: Icons.home_rounded,
+                      icon: Icons.local_fire_department_rounded,
                       label: HomeStrings.navHome,
                     ),
                     const PillNavItem(
-                      icon: Icons.calendar_month_rounded,
+                      icon: Icons.event_note_rounded,
                       label: HomeStrings.navSchedule,
                     ),
                     PillNavItem(
@@ -73,7 +73,7 @@ class MainShell extends StatelessWidget {
                       badge: ticketCount,
                     ),
                     const PillNavItem(
-                      icon: Icons.groups_rounded,
+                      icon: Icons.diversity_2_rounded,
                       label: HomeStrings.navCommunity,
                     ),
                     PillNavItem(
@@ -82,7 +82,7 @@ class MainShell extends StatelessWidget {
                       badge: unreadCount,
                     ),
                     const PillNavItem(
-                      icon: Icons.person_rounded,
+                      icon: Icons.settings,
                       label: HomeStrings.navProfile,
                     ),
                   ],
