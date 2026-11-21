@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/load_error_view.dart';
 import '../../../../core/widgets/scroll_aware_fab.dart';
@@ -30,23 +29,20 @@ class _ChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.surfaceLavender,
-      child: SafeArea(
-        top: false,
-        bottom: false,
-        child: BlocBuilder<ChatCubit, ChatState>(
-          builder: (context, state) => switch (state.status) {
-            ChatStatus.initial || ChatStatus.loading => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            ChatStatus.failure => LoadErrorView(
-              message: state.message ?? AppConstants.homeLoadError,
-              onRetry: () => context.read<ChatCubit>().load(),
-            ),
-            ChatStatus.success => _ChatContent(state: state),
-          },
-        ),
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: BlocBuilder<ChatCubit, ChatState>(
+        builder: (context, state) => switch (state.status) {
+          ChatStatus.initial || ChatStatus.loading => const Center(
+            child: CircularProgressIndicator(),
+          ),
+          ChatStatus.failure => LoadErrorView(
+            message: state.message ?? AppConstants.homeLoadError,
+            onRetry: () => context.read<ChatCubit>().load(),
+          ),
+          ChatStatus.success => _ChatContent(state: state),
+        },
       ),
     );
   }
