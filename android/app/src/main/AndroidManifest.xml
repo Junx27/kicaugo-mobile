@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dibutuhkan release build untuk memanggil API (debug/profile sudah punya). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="KicauKu"
+        android:label="${appLabel}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
