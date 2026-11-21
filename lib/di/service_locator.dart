@@ -1,7 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../features/auth/data/datasources/fake_auth_remote_data_source.dart';
+import '../features/auth/data/datasources/session_storage.dart';
+import '../features/auth/data/datasources/shared_preferences_session_storage.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/login_usecase.dart';
@@ -18,8 +21,14 @@ import '../features/home/domain/usecases/get_home_content.dart';
 final GetIt getIt = GetIt.instance;
 
 /// Merakit dependency dari layer terluar ke terdalam.
-void configureDependencies() {
+Future<void> configureDependencies() async {
+  final prefs = await SharedPreferences.getInstance();
+  final sessionStorage = SharedPreferencesSessionStorage(prefs);
+  final initialUser = await sessionStorage.readSession();
+
   getIt
+    ..registerLazySingleton<SharedPreferences>(() => prefs)
+    ..registerLazySingleton<SessionStorage>(() => sessionStorage)
     ..registerLazySingleton<AuthRemoteDataSource>(
       () => FakeAuthRemoteDataSource(),
     )
@@ -28,7 +37,13 @@ void configureDependencies() {
     ..registerLazySingleton(() => RegisterUseCase(getIt()))
     ..registerLazySingleton(() => LogoutUseCase(getIt()))
     ..registerLazySingleton(
-      () => AuthBloc(login: getIt(), register: getIt(), logout: getIt()),
+      () => AuthBloc(
+        login: getIt(),
+        register: getIt(),
+        logout: getIt(),
+        sessionStorage: getIt<SessionStorage>(),
+        initialUser: initialUser,
+      ),
       dispose: (bloc) => bloc.close(),
     )
     ..registerLazySingleton<HomeDataSource>(() => const FakeHomeDataSource())

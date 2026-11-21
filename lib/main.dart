@@ -9,11 +9,11 @@ import 'di/service_locator.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
   _registerFontLicenses();
-  configureDependencies();
+  await configureDependencies();
   runApp(
     KicauKuApp(
       authBloc: getIt<AuthBloc>(),

@@ -11,14 +11,17 @@ import 'package:rumahkicau_mobile/features/home/data/datasources/fake_home_data_
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
 import 'package:rumahkicau_mobile/features/home/domain/usecases/get_home_content.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   tearDown(() async {
     await getIt.reset();
   });
 
-  test('merakit seluruh dependency aplikasi', () {
-    configureDependencies();
+  test('merakit seluruh dependency aplikasi', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await configureDependencies();
 
     expect(getIt<AuthRemoteDataSource>(), isA<FakeAuthRemoteDataSource>());
     expect(getIt<AuthRepository>(), isNotNull);
@@ -32,7 +35,8 @@ void main() {
   });
 
   test('reset menutup AuthBloc yang sudah dibuat', () async {
-    configureDependencies();
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await configureDependencies();
     final bloc = getIt<AuthBloc>();
 
     await getIt.reset();

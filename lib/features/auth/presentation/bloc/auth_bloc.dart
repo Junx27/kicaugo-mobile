@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/error/failure.dart';
+import '../../data/datasources/session_storage.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
@@ -14,10 +15,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required LoginUseCase login,
     required RegisterUseCase register,
     required LogoutUseCase logout,
+    SessionStorage? sessionStorage,
+    User? initialUser,
   }) : _login = login,
        _register = register,
        _logout = logout,
-       super(const AuthState()) {
+       _sessionStorage = sessionStorage,
+       super(
+         initialUser == null
+             ? const AuthState()
+             : AuthState(status: AuthStatus.authenticated, user: initialUser),
+       ) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<RegisterSubmitted>(_onRegisterSubmitted);
     on<LogoutRequested>(_onLogoutRequested);
@@ -26,6 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _login;
   final RegisterUseCase _register;
   final LogoutUseCase _logout;
+  final SessionStorage? _sessionStorage;
 
   Future<void> _onLoginSubmitted(
     LoginSubmitted event,
@@ -59,6 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthState(status: AuthStatus.authenticating));
     try {
       final user = await request();
+      await _sessionStorage?.saveSession(user);
       emit(AuthState(status: AuthStatus.authenticated, user: user));
     } on Failure catch (failure) {
       emit(AuthState(message: failure.message));
@@ -71,6 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       await _logout();
+      await _sessionStorage?.clearSession();
       emit(const AuthState());
     } on Failure catch (failure) {
       emit(AuthState(message: failure.message));
