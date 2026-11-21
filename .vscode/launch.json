@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter: DEV (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--flavor",
+        "dev",
+        "--dart-define-from-file=env/dev.json",
+        "--dart-define=LOG_COLOR=true"
+      ]
+    },
+    {
+      "name": "Flutter: STG (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--flavor",
+        "stg",
+        "--dart-define-from-file=env/stg.json",
+        "--dart-define=LOG_COLOR=false"
+      ]
+    },
+    {
+      "name": "Flutter: PRODUCTION (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--flavor",
+        "production",
+        "--dart-define-from-file=env/production.json",
+        "--dart-define=LOG_COLOR=false"
+      ]
+    }
+  ]
+}
