@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
-import 'package:rumahkicau_mobile/core/widgets/top_bars.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_event.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
