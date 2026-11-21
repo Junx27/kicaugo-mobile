@@ -128,6 +128,7 @@ class _ProfileContentView extends StatelessWidget {
           ProfileSettingsSection(
             onHelp: () => context.push(AppRoutes.helpCenter),
             onReminders: () => context.push(AppRoutes.reminders),
+            onTicketInvoices: () => context.push(AppRoutes.ticketHistory),
             onLogout: () =>
                 context.read<AuthBloc>().add(const LogoutRequested()),
           ),

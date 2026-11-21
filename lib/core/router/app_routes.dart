@@ -33,6 +33,9 @@ abstract final class AppRoutes {
   /// Pengingat rawatan dan alarm lomba.
   static const String reminders = '/reminders';
 
+  /// Riwayat tiket gantangan dan invoice.
+  static const String ticketHistory = '/ticket-history';
+
   /// Rute yang boleh dibuka tanpa sesi.
   static const Set<String> publicRoutes = <String>{
     splash,
