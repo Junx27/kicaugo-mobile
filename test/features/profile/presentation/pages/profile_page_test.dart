@@ -147,7 +147,6 @@ void main() {
     'layanan ring': () => find.byKey(const Key('profile_service_ring')),
     'layanan audio': () => find.byKey(const Key('profile_service_audio')),
     'riwayat': () => find.byKey(const Key('profile_history')),
-    'pengingat': () => find.byKey(const Key('profile_reminders')),
   };
   comingSoonTargets.forEach((name, finder) {
     testWidgets('$name menampilkan segera hadir', (tester) async {

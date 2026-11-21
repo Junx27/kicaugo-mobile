@@ -14,6 +14,8 @@ import 'package:rumahkicau_mobile/features/home/presentation/home_strings.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/pages/home_page.dart';
 import 'package:rumahkicau_mobile/features/onboarding/presentation/onboarding_strings.dart';
 import 'package:rumahkicau_mobile/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:rumahkicau_mobile/features/reminders/presentation/pages/reminders_page.dart';
+import 'package:rumahkicau_mobile/features/reminders/presentation/reminders_strings.dart';
 import 'package:rumahkicau_mobile/features/schedule/presentation/pages/schedule_page.dart';
 import 'package:rumahkicau_mobile/features/tickets/presentation/pages/tickets_page.dart';
 
@@ -113,6 +115,22 @@ void main() {
 
     expect(find.byType(HelpCenterPage), findsOneWidget);
     expect(find.text(HelpCenterStrings.heading), findsOneWidget);
+  });
+
+  testWidgets('menu pengingat di Profil membuka halaman Pengingat', (
+    tester,
+  ) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    await tester.tap(find.text(HomeStrings.navProfile).last);
+    await pumpNavigation(tester);
+    await tapVisible(tester, find.byKey(const Key('profile_reminders')));
+
+    expect(find.byType(RemindersPage), findsOneWidget);
+    expect(find.text(RemindersStrings.title), findsOneWidget);
   });
 
   test('notifier meneruskan perubahan state AuthBloc', () async {
