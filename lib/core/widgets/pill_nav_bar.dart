@@ -1,10 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
-import '../theme/app_theme.dart';
 
 /// Satu tujuan di [PillNavBar].
 @immutable
@@ -39,29 +37,18 @@ class PillNavBar extends StatelessWidget {
       top: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.pillRadius),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: LiquidGlassLayer(
+          settings: const LiquidGlassSettings(
+            thickness: 20,
+            blur: 8,
+            refractiveIndex: 1.5,
+            glassColor: Color(0x1AFFFFFF),
+          ),
+          child: LiquidGlass(
+            shape: const LiquidRoundedSuperellipse(borderRadius: 40),
             child: Container(
               height: height,
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.55),
-                    AppColors.surface.withValues(alpha: 0.35),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(AppTheme.pillRadius),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  width: 1,
-                ),
-                boxShadow: AppTheme.raisedShadow,
-              ),
               child: Row(
                 children: [
                   for (var index = 0; index < items.length; index++)
