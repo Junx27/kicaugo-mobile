@@ -53,6 +53,7 @@ class PillNavBar extends StatelessWidget {
                   for (var index = 0; index < items.length; index++)
                     Expanded(
                       child: _NavButton(
+                        key: ValueKey('nav_item_${items[index].label}'),
                         item: items[index],
                         isActive: index == currentIndex,
                         onTap: () => onSelected(index),
@@ -70,6 +71,7 @@ class PillNavBar extends StatelessWidget {
 
 class _NavButton extends StatelessWidget {
   const _NavButton({
+    super.key,
     required this.item,
     required this.isActive,
     required this.onTap,
@@ -84,6 +86,7 @@ class _NavButton extends StatelessWidget {
     final color = isActive ? AppColors.onLime : AppColors.textSecondary;
     final badge = item.badge ?? 0;
     return Semantics(
+      label: item.label,
       selected: isActive,
       button: true,
       child: InkWell(

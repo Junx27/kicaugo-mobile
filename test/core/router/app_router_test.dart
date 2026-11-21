@@ -29,6 +29,9 @@ Future<void> _toLogin(WidgetTester tester) async {
   await pumpNavigation(tester);
 }
 
+/// Finder stabil untuk tab navigasi bawah yang sekarang hanya berisi ikon.
+Finder navTab(String label) => find.byKey(ValueKey('nav_item_$label'));
+
 void main() {
   group('authRedirect', () {
     test('tanpa sesi, rute privat dialihkan ke login', () {
@@ -97,7 +100,7 @@ void main() {
     await submitLogin(tester);
     await pumpNavigation(tester);
 
-    await tester.tap(find.text(HomeStrings.navProfile).last);
+    await tester.tap(navTab(HomeStrings.navProfile));
     await pumpNavigation(tester);
     await tapVisible(tester, find.byKey(const Key('profile_logout')));
     await pumpNavigation(tester);
@@ -111,7 +114,7 @@ void main() {
     await submitLogin(tester);
     await pumpNavigation(tester);
 
-    await tester.tap(find.text(HomeStrings.navProfile).last);
+    await tester.tap(navTab(HomeStrings.navProfile));
     await pumpNavigation(tester);
     await tapVisible(tester, find.byKey(const Key('profile_help')));
 
@@ -127,7 +130,7 @@ void main() {
     await submitLogin(tester);
     await pumpNavigation(tester);
 
-    await tester.tap(find.text(HomeStrings.navProfile).last);
+    await tester.tap(navTab(HomeStrings.navProfile));
     await pumpNavigation(tester);
     await tapVisible(tester, find.byKey(const Key('profile_reminders')));
 
@@ -143,7 +146,7 @@ void main() {
     await submitLogin(tester);
     await pumpNavigation(tester);
 
-    await tester.tap(find.text(HomeStrings.navProfile).last);
+    await tester.tap(navTab(HomeStrings.navProfile));
     await pumpNavigation(tester);
     await tapVisible(tester, find.byKey(const Key('profile_history')));
 
@@ -183,12 +186,12 @@ void main() {
       HomeStrings.navCommunity: CommunityPage,
     };
     for (final MapEntry(key: label, value: page) in tabs.entries) {
-      await tester.tap(find.text(label).last);
+      await tester.tap(navTab(label));
       await pumpNavigation(tester);
       expect(find.byType(page), findsOneWidget);
     }
 
-    await tester.tap(find.text(HomeStrings.navHome));
+    await tester.tap(navTab(HomeStrings.navHome));
     await pumpNavigation(tester);
     expect(find.byType(HomePage), findsOneWidget);
   });
