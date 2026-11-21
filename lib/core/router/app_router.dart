@@ -8,6 +8,7 @@ import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/community/presentation/pages/community_page.dart';
+import '../../features/help_center/presentation/pages/help_center_page.dart';
 import '../../features/home/domain/usecases/get_home_content.dart';
 import '../../features/home/presentation/main_shell.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -16,7 +17,6 @@ import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/schedule/presentation/pages/schedule_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
-import '../../features/help_center/presentation/pages/help_center_page.dart';
 import 'app_routes.dart';
 
 /// Jembatan stream [AuthBloc] ke [Listenable] milik `GoRouter`.
