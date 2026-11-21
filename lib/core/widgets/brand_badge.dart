@@ -5,6 +5,7 @@ import '../constants/app_constants.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/app_theme.dart';
+import 'glass_pill.dart';
 
 /// Pill putih berisi logo maskot dan nama "Kicau" + "Go" (indigo).
 class BrandBadge extends StatelessWidget {
@@ -12,13 +13,8 @@ class BrandBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassPill(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.pillRadius),
-        boxShadow: AppTheme.softShadow,
-      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 8,
