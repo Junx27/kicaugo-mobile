@@ -10,6 +10,7 @@ import 'package:rumahkicau_mobile/features/tickets/domain/usecases/get_tickets_c
 import 'package:rumahkicau_mobile/features/tickets/presentation/pages/tickets_page.dart';
 import 'package:rumahkicau_mobile/features/tickets/presentation/tickets_strings.dart';
 
+import '../../../../support/layout.dart';
 import '../../support.dart';
 
 /// Repository yang menunggu [completer] untuk menguji state loading.
@@ -59,6 +60,12 @@ void main() {
     await tester.pump();
 
     expect(find.text('#G-18'), findsOneWidget);
+  });
+
+  testWidgets('latar mengikuti warna latar shell', (tester) async {
+    await _pumpTickets(tester);
+
+    expectShellBackground(tester, find.byType(TicketsPage));
   });
 
   testWidgets('gagal memuat lalu coba lagi berhasil', (tester) async {

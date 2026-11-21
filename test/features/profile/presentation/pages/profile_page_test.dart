@@ -14,6 +14,7 @@ import 'package:rumahkicau_mobile/features/profile/presentation/pages/profile_pa
 import 'package:rumahkicau_mobile/features/profile/presentation/profile_strings.dart';
 
 import '../../../../support/fakes.dart';
+import '../../../../support/layout.dart';
 import '../../../../support/pump_app.dart';
 import '../../profile_fakes.dart';
 
@@ -59,6 +60,12 @@ Future<AuthBloc> _pumpProfile(
 }
 
 void main() {
+  testWidgets('latar mengikuti warna latar shell', (tester) async {
+    await _pumpProfile(tester);
+
+    expectShellBackground(tester, find.byType(ProfilePage));
+  });
+
   testWidgets('menampilkan loading lalu konten profil', (tester) async {
     final completer = Completer<ProfileContent>();
     await _pumpProfile(

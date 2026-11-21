@@ -47,6 +47,16 @@ Future<void> _tapTopic(WidgetTester tester, String label) async {
   await tester.pump();
 }
 
+/// Nilai opasitas FAB, dipakai untuk menguji visibilitas saat scroll.
+double _createOpacity(WidgetTester tester) => tester
+    .widget<AnimatedOpacity>(
+      find.ancestor(
+        of: find.byKey(const Key('community_create_post')),
+        matching: find.byType(AnimatedOpacity),
+      ),
+    )
+    .opacity;
+
 void main() {
   testWidgets('loading lalu menampilkan seluruh bagian', (tester) async {
     await tester.pumpWidget(
@@ -71,7 +81,8 @@ void main() {
       expect(find.text(post.author.name), findsOneWidget);
     }
     expect(find.text(CommunityStrings.champion), findsOneWidget);
-    expect(find.text(CommunityStrings.createPost), findsOneWidget);
+    expect(find.byKey(const Key('community_create_post')), findsOneWidget);
+    expect(find.byTooltip(CommunityStrings.createPost), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -138,6 +149,32 @@ void main() {
     expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
   });
 
+  testWidgets(
+    'FAB hilang saat scroll ke bawah dan muncul saat scroll ke atas',
+    (tester) async {
+      await _pumpPage(tester, size: const Size(420, 800));
+      final list = find.byWidgetPredicate(
+        (widget) =>
+            widget is ListView && widget.scrollDirection == Axis.vertical,
+      );
+      const settle = Duration(milliseconds: 300);
+
+      expect(_createOpacity(tester), 1);
+
+      await tester.drag(list, const Offset(0, -400));
+      await tester.pump(settle);
+      expect(_createOpacity(tester), 0);
+
+      await tester.drag(list, const Offset(0, 300));
+      await tester.pump(settle);
+      expect(_createOpacity(tester), 1);
+
+      await tester.drag(list, const Offset(0, -300));
+      await tester.pump(settle);
+      expect(_createOpacity(tester), 0);
+    },
+  );
+
   final comingSoon = <String, Finder Function()>{
     'kolom cari': () => find.text(CommunityStrings.searchHint),
     'lihat semua klub': () => find.text(CommunityStrings.seeAllClubs),
@@ -146,7 +183,7 @@ void main() {
     'balasan': () => find.text('38 ${CommunityStrings.repliesSuffix}'),
     'bagikan': () => find.text(CommunityStrings.share).first,
     'menu lainnya': () => find.byTooltip(CommunityStrings.moreTooltip).first,
-    'buat postingan': () => find.text(CommunityStrings.createPost),
+    'buat postingan': () => find.byKey(const Key('community_create_post')),
   };
   comingSoon.forEach((name, finder) {
     testWidgets('$name menampilkan segera hadir', (tester) async {

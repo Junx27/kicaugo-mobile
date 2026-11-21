@@ -39,6 +39,7 @@ abstract final class HomeStrings {
   static const String navSchedule = 'Jadwal';
   static const String navTickets = 'Tiket Saya';
   static const String navCommunity = 'Komunitas';
+  static const String navChat = 'Chat';
   static const String navProfile = 'Profil';
   static const String logout = 'Keluar';
 }

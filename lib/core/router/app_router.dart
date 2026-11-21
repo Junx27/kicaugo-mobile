@@ -7,6 +7,7 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/chat/presentation/pages/chat_page.dart';
 import '../../features/community/presentation/pages/community_page.dart';
 import '../../features/help_center/presentation/pages/help_center_page.dart';
 import '../../features/home/domain/usecases/get_home_content.dart';
@@ -19,6 +20,7 @@ import '../../features/schedule/presentation/pages/schedule_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/tickets/presentation/pages/ticket_history_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
+import 'app_navigator_observer.dart';
 import 'app_routes.dart';
 
 /// Jembatan stream [AuthBloc] ke [Listenable] milik `GoRouter`.
@@ -49,6 +51,7 @@ GoRouter createRouter({
   return GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: refreshListenable,
+    observers: <NavigatorObserver>[AppNavigatorObserver()],
     redirect: (context, state) =>
         authRedirect(authBloc.state.isAuthenticated, state.matchedLocation),
     routes: [
@@ -93,6 +96,7 @@ GoRouter createRouter({
             AppRoutes.community,
             (context, state) => const CommunityPage(),
           ),
+          _branch(AppRoutes.chat, (context, state) => const ChatPage()),
           _branch(AppRoutes.profile, (context, state) => const ProfilePage()),
         ],
       ),

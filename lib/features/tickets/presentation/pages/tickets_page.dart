@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/load_error_view.dart';
 import '../../data/datasources/fake_tickets_data_source.dart';
 import '../../data/repositories/tickets_repository_impl.dart';
@@ -40,28 +39,26 @@ class _TicketsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.surfaceLavender,
-      child: SafeArea(
-        top: false,
-        bottom: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: BlocBuilder<TicketsCubit, TicketsState>(
-                builder: (context, state) => switch (state.status) {
-                  TicketsStatus.initial || TicketsStatus.loading =>
-                    const Center(child: CircularProgressIndicator()),
-                  TicketsStatus.failure => LoadErrorView(
-                    message: state.message ?? AppConstants.homeLoadError,
-                    onRetry: context.read<TicketsCubit>().load,
-                  ),
-                  TicketsStatus.success => _TicketsList(state: state),
-                },
-              ),
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Column(
+        children: [
+          Expanded(
+            child: BlocBuilder<TicketsCubit, TicketsState>(
+              builder: (context, state) => switch (state.status) {
+                TicketsStatus.initial || TicketsStatus.loading => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                TicketsStatus.failure => LoadErrorView(
+                  message: state.message ?? AppConstants.homeLoadError,
+                  onRetry: context.read<TicketsCubit>().load,
+                ),
+                TicketsStatus.success => _TicketsList(state: state),
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

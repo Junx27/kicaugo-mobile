@@ -28,6 +28,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["appLabel"] = "KicauGo"
     }
 
     buildTypes {
@@ -35,6 +36,25 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    // Tiap flavor punya applicationId berbeda agar bisa terpasang berdampingan.
+    flavorDimensions += "default"
+    productFlavors {
+        create("dev") {
+            dimension = "default"
+            applicationIdSuffix = ".dev"
+            manifestPlaceholders["appLabel"] = "[DEV] KicauGo"
+        }
+        create("stg") {
+            dimension = "default"
+            applicationIdSuffix = ".stg"
+            manifestPlaceholders["appLabel"] = "[STG] KicauGo"
+        }
+        create("production") {
+            dimension = "default"
+            manifestPlaceholders["appLabel"] = "KicauGo"
         }
     }
 }

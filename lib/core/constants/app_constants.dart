@@ -1,3 +1,5 @@
+import 'app_flavor.dart';
+
 /// Konstanta aplikasi yang mudah diganti.
 abstract final class AppConstants {
   /// Bagian awal nama aplikasi.
@@ -57,6 +59,51 @@ abstract final class AppConstants {
 
   /// Label tombol muat ulang.
   static const String retryLabel = 'Coba lagi';
+
+  /// Flavor aktif hasil flag `--flavor` (default: [AppFlavor.dev]).
+  static final AppFlavor flavor = currentFlavor;
+
+  /// Alamat backend. Diubah lewat `--dart-define=API_BASE_URL=...` atau
+  /// `env/<flavor>.json`; bawaan mengikuti flavor aktif.
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: flavorName == productionFlavorName
+        ? productionApiBaseUrl
+        : flavorName == stgFlavorName
+        ? stgApiBaseUrl
+        : devApiBaseUrl,
+  );
+
+  /// Pakai data source API lewat `--dart-define=USE_API=true`.
+  ///
+  /// Bawaan: `false` untuk dev, `true` untuk stg/production.
+  static const bool useApi = bool.fromEnvironment(
+    'USE_API',
+    defaultValue:
+        flavorName == stgFlavorName || flavorName == productionFlavorName,
+  );
+
+  /// Batas waktu koneksi dan penerimaan respons API.
+  static const Duration apiTimeout = Duration(seconds: 15);
+
+  /// Pesan saat token tidak ada atau sudah kedaluwarsa.
+  static const String apiUnauthorized = 'Sesi berakhir. Silakan masuk lagi.';
+
+  /// Pesan saat koneksi melewati batas waktu.
+  static const String apiTimeoutMessage = 'Koneksi timeout. Coba lagi.';
+
+  /// Pesan saat perangkat tidak dapat menjangkau backend.
+  static const String apiConnection =
+      'Tidak dapat terhubung ke server. Periksa koneksi Anda.';
+
+  /// Pesan saat bentuk respons tidak sesuai kontrak.
+  static const String apiInvalidResponse = 'Respons server tidak dikenal.';
+
+  /// Pesan saat backend gagal dengan status 4xx/5xx tanpa pesan detail.
+  static const String apiDataFailure = 'Gagal memuat data. Coba lagi.';
+
+  /// Pesan untuk kesalahan jaringan yang tidak dikenal.
+  static const String apiUnexpected = 'Terjadi kesalahan. Coba lagi.';
 
   /// Asset lisensi font yang didaftarkan ke [LicenseRegistry].
   static const List<String> fontLicenseAssets = <String>[

@@ -28,12 +28,18 @@ void main() {
 
     expect(
       tester.widget<Icon>(find.byIcon(Icons.home)).color,
-      AppColors.onLime,
+      AppColors.primary,
     );
     expect(
       tester.widget<Icon>(find.byIcon(Icons.star)).color,
       AppColors.textSecondary,
     );
+
+    final badge = tester.widget<Badge>(
+      find.ancestor(of: find.text('2'), matching: find.byType(Badge)),
+    );
+    expect(badge.backgroundColor, AppColors.onPink);
+    expect(badge.textColor, AppColors.surface);
     expect(find.text('2'), findsOneWidget);
     expect(find.text('0'), findsNothing);
 

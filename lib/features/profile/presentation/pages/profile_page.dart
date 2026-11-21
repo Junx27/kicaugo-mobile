@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/load_error_view.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
@@ -50,30 +49,28 @@ class _ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.surfaceLavender,
-      child: SafeArea(
-        top: false,
-        bottom: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: BlocBuilder<ProfileCubit, ProfileState>(
-                builder: (context, state) => switch (state.status) {
-                  ProfileStatus.initial || ProfileStatus.loading =>
-                    const Center(child: CircularProgressIndicator()),
-                  ProfileStatus.failure => LoadErrorView(
-                    message: state.message ?? AppConstants.homeLoadError,
-                    onRetry: () => context.read<ProfileCubit>().load(),
-                  ),
-                  ProfileStatus.success => _ProfileContentView(
-                    content: state.content!,
-                  ),
-                },
-              ),
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Column(
+        children: [
+          Expanded(
+            child: BlocBuilder<ProfileCubit, ProfileState>(
+              builder: (context, state) => switch (state.status) {
+                ProfileStatus.initial || ProfileStatus.loading => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                ProfileStatus.failure => LoadErrorView(
+                  message: state.message ?? AppConstants.homeLoadError,
+                  onRetry: () => context.read<ProfileCubit>().load(),
+                ),
+                ProfileStatus.success => _ProfileContentView(
+                  content: state.content!,
+                ),
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

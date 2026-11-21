@@ -870,3 +870,92 @@ Domain dan presentation **tidak berubah**. Yang dikerjakan:
 Dengan urutan ini, halaman tidak pernah "menunggu backend": UI, state, dan
 test sudah selesai lebih dulu, lalu sumber data ditukar tanpa menyentuh
 tampilan.
+
+---
+
+## 20. Flavor dan environment
+
+Tiga flavor dipakai: `dev`, `stg`, `production`. Rincian command ada di
+`README.md` → "Flavor". Yang penting saat menambah fitur:
+
+1. **Jangan baca flavor dari `dart:io` atau hardcode URL.** Pakai
+   `AppConstants.apiBaseUrl` / `AppConstants.useApi` (atau `AppConstants.flavor`
+   bila perlu cabang UI). Keduanya sudah flavor-aware lewat
+   `lib/core/constants/app_flavor.dart`.
+2. **Nilai environment berada di `env/<flavor>.json`.** File ini hanya berisi
+   konfigurasi non-secret (`API_BASE_URL`, `USE_API`) karena ikut ter-embed di
+   binary. Token, API key, dan kredensial tidak boleh ditaruh di sini.
+3. **`FLUTTER_APP_FLAVOR` bukan dart-define biasa.** Flutter CLI yang
+   mengisinya dari `--flavor` / `default-flavor`; menuliskannya di env file
+   akan membuat build gagal.
+4. **Menambah flavor baru** berarti menyentuh: `productFlavors` di
+   `android/app/build.gradle.kts`, scheme + konfigurasi + xcconfig iOS,
+   pemetaan di `ios/Podfile`, file `env/<flavor>.json`, target `Makefile`, dan
+   `AppFlavor` di `app_flavor.dart`. Jalankan `pod install` setelahnya.
+5. **Test scoped.** `flutter test test/core/constants` menguji parser flavor
+   dan tetap lulus untuk `--flavor dev`, `--flavor stg`, maupun
+   `--flavor production` karena ekspektasinya dihitung dari environment aktif.
+6. **`dev` memakai backend lokal.** `env/dev.json` berisi
+   `API_BASE_URL=http://localhost:8080` dan `USE_API=true` (simulator iOS).
+   Backend harus menyala sebelum menjalankan aplikasi; `http://10.0.2.2:8080`
+   hanya untuk emulator Android.
+7. **Envelope response ditangani pusat.** Backend membalas
+   `{status, message, data}`; `decodeEnvelope` di `ApiClient` membuka `data`
+   untuk `getJson`/`postJson`, dengan fallback ke map datar. Pesan error juga
+   dibaca dari `message` di root oleh `serverMessage`. Datasource baru cukup
+   memetakan isi `data`, tanpa membuka envelope sendiri.
+
+## 21. Log debugging
+
+Logging sudah terpasang pusat, jadi fitur baru tidak perlu menambah
+`debugPrint` manual:
+
+1. **Startup** — `main.dart` mencatat `[BOOT] flavor=... baseUrl=... useApi=...`
+   sekali setelah `configureDependencies`. Ini cara cepat memastikan flavor dan
+   alamat backend yang dipakai tanpa membuka `env/<flavor>.json`.
+2. **Warna ANSI** — `LOG_COLOR` aktif secara default
+   (`bool.fromEnvironment('LOG_COLOR', defaultValue: true)`) dan hanya dipakai
+   saat `kDebugMode`. Matikan lewat `--dart-define=LOG_COLOR=false`. Kode warna:
+   `BOOT` hijau `\x1B[32m`, `API` biru `\x1B[34m`, respons API 2xx hijau,
+   respons 4xx/5xx dan `ERR` merah `\x1B[31m`, `NAV` magenta `\x1B[35m`,
+   dengan reset `\x1B[0m`. Fungsi murni `colorizeLog(text, enabled:, color:)`
+   di `app_logger.dart` mewarnai **setiap baris** secara terpisah supaya JSON
+   multi-baris tidak kehilangan warna; warna hanya masuk ke jalur `debugPrint`.
+   Sink test selalu teks polos. Tag baru tanpa warna tidak akan error.
+3. **Navigasi** — `AppNavigatorObserver` di `createRouter` mencatat
+   `[NAV] PUSH/POP <rute>` setiap halaman dibuka/ditutup. Nama yang tampil
+   adalah `path` rute (mis. `/login`), jadi beri `name:` pada `GoRoute` bila
+   ingin label yang lebih ramah.
+4. **HTTP** — `ApiLoggingInterceptor` dipasang pada `Dio` di
+   `configureDependencies` hanya saat `useApi = true`. Ia mencatat method,
+   URL, header, payload, status, dan body response. Payload dan body response
+   dicetak multi-baris dengan indentasi dua spasi lewat `prettyMaskedJson` di
+   `core/logging/pretty_json.dart`: string JSON diurai dulu, string non-JSON
+   ditampilkan apa adanya.
+5. **Data sensitif** — jangan pernah menonaktifkan mask. `isSensitiveLogKey`
+   dan `maskSensitiveValues` di `pretty_json.dart` mengganti kunci seperti
+   `password`, `token`, dan `Authorization` dengan `***` **pada Map/list hasil
+   decode sebelum pretty-print** — bukan dengan mengganti string akhir.
+   Header juga memakai `isSensitiveLogKey`. Jika menambah field rahasia baru,
+   daftarkan kuncinya di `_sensitiveKeys`.
+6. **Batas body** — `truncateLogBody` memotong body lebih dari 4000 karakter
+   dan menambahkan `... (truncated)`.
+7. **Mode** — `AppLogger` memakai `kDebugMode`, sehingga log hilang di release.
+   Sink bisa diganti lewat `AppLogger.setSink(...)` di test untuk menguji
+   isi log tanpa bergantung pada console. `AppLogger.colorEnabled` dan
+   `colorizeLog` bisa dipakai di test untuk menguji cabang ANSI tanpa bergantung
+   pada `dart-define`.
+8. **Alur VS Code** — `Flutter: * (debug)` memakai `LOG_COLOR=false` karena
+   Debug Console meng-escape ESC. Untuk melihat warna, jalankan
+   `Terminal: * (warna)` atau `flutter run --flavor dev
+   --dart-define-from-file=env/dev.json` di terminal. Bila butuh breakpoint
+   sambil log berwarna, jalankan perintah itu di terminal lalu F5 →
+   `Attach: debugger ke app berjalan` dan masukkan VM Service URI dari terminal.
+   `LOG_COLOR` bersifat compile-time, jadi butuh full restart; konsol Xcode juga
+   tidak merender ANSI (pakai `LOG_COLOR=false`), dan attach harus diulang
+   setelah full restart karena URI berubah.
+9. **Test** — gunakan `flutter test test/core/logging`,
+   `test/core/network/api_logging_interceptor_test.dart`, dan
+   `test/core/router/app_navigator_observer_test.dart` setelah mengubah
+   logging. Helper `pump_app.dart` mematikan log agar keluaran test tetap
+   bersih.

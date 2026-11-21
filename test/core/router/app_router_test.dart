@@ -7,6 +7,7 @@ import 'package:rumahkicau_mobile/features/auth/presentation/auth_strings.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_event.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/register_page.dart';
+import 'package:rumahkicau_mobile/features/chat/presentation/pages/chat_page.dart';
 import 'package:rumahkicau_mobile/features/community/presentation/pages/community_page.dart';
 import 'package:rumahkicau_mobile/features/help_center/presentation/help_center_strings.dart';
 import 'package:rumahkicau_mobile/features/help_center/presentation/pages/help_center_page.dart';
@@ -171,28 +172,37 @@ void main() {
     expect(notified, greaterThan(0));
   });
 
-  testWidgets('tab Jadwal, Tiket Saya, dan Komunitas membuka halamannya', (
-    tester,
-  ) async {
-    await pumpKicauKuApp(tester);
-    await _toLogin(tester);
-    await submitLogin(tester);
-    await pumpNavigation(tester);
-    expect(find.text('2'), findsOneWidget);
-
-    final tabs = <String, Type>{
-      HomeStrings.navSchedule: SchedulePage,
-      HomeStrings.navTickets: TicketsPage,
-      HomeStrings.navCommunity: CommunityPage,
-    };
-    for (final MapEntry(key: label, value: page) in tabs.entries) {
-      await tester.tap(navTab(label));
+  testWidgets(
+    'tab Jadwal, Tiket Saya, Komunitas, dan Chat membuka halamannya',
+    (tester) async {
+      await pumpKicauKuApp(tester);
+      await _toLogin(tester);
+      await submitLogin(tester);
       await pumpNavigation(tester);
-      expect(find.byType(page), findsOneWidget);
-    }
+      expect(find.text('2'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: navTab(HomeStrings.navChat),
+          matching: find.text('5'),
+        ),
+        findsOneWidget,
+      );
 
-    await tester.tap(navTab(HomeStrings.navHome));
-    await pumpNavigation(tester);
-    expect(find.byType(HomePage), findsOneWidget);
-  });
+      final tabs = <String, Type>{
+        HomeStrings.navSchedule: SchedulePage,
+        HomeStrings.navTickets: TicketsPage,
+        HomeStrings.navCommunity: CommunityPage,
+        HomeStrings.navChat: ChatPage,
+      };
+      for (final MapEntry(key: label, value: page) in tabs.entries) {
+        await tester.tap(navTab(label));
+        await pumpNavigation(tester);
+        expect(find.byType(page), findsOneWidget);
+      }
+
+      await tester.tap(navTab(HomeStrings.navHome));
+      await pumpNavigation(tester);
+      expect(find.byType(HomePage), findsOneWidget);
+    },
+  );
 }

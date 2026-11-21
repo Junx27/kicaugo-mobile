@@ -83,7 +83,7 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.onLime : AppColors.textSecondary;
+    final color = isActive ? AppColors.primary : AppColors.textSecondary;
     final badge = item.badge ?? 0;
     return Semantics(
       label: item.label,
@@ -99,8 +99,8 @@ class _NavButton extends StatelessWidget {
             Badge(
               isLabelVisible: badge > 0,
               label: Text('$badge'),
-              backgroundColor: AppColors.lime,
-              textColor: AppColors.onLime,
+              backgroundColor: AppColors.onPink,
+              textColor: AppColors.surface,
               child: Icon(item.icon, size: 24, color: color),
             ),
           ],

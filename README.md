@@ -1,4 +1,4 @@
-# KicauKu
+# KicauGo
 
 Aplikasi mobile Flutter untuk komunitas burung kicau: melihat lomba terdekat,
 mencari tempat penitipan, dan mengelola akun. Seluruh data masih **dummy**
@@ -26,6 +26,65 @@ Contoh:
 flutter run -d "iPhone 16 Pro"   # simulator iOS
 flutter run -d emulator-5554     # emulator Android
 ```
+
+### Flavor
+
+Ada tiga flavor: `dev`, `stg`, dan `production`. `dev` adalah default
+(`default-flavor` di `pubspec.yaml`). Tiap flavor punya applicationId/bundle ID
+dan nama aplikasi sendiri sehingga bisa terpasang berdampingan. Nilai
+`env/<flavor>.json` dipakai lewat Makefile / VS Code; `flutter run` polos memakai
+bawaan `AppConstants`.
+
+```bash
+make run-dev                       # atau: flutter run --flavor dev
+make run-stg device=emulator-5554
+make run-production
+
+make build-apk-dev
+make build-apk-stg
+make build-apk-production
+
+make pod-install                   # wajib setelah mengubah ios/Podfile
+make build-ios-dev
+make build-ios-stg
+make build-ios-production
+```
+
+Nilai API per flavor ada di `env/dev.json`, `env/stg.json`, dan
+`env/production.json`. Isinya diteruskan lewat `--dart-define-from-file`.
+`FLUTTER_APP_FLAVOR` tidak ditaruh di file itu karena dikelola Flutter lewat
+`--flavor`. `env/production.json` sengaja masuk `.gitignore` agar URL atau
+secret produksi tidak ter-commit; salin `env/production.example.json` sebagai
+pintasan awal. Jangan menaruh `LOG_COLOR` di file env — nilainya sudah menjadi
+default kompilasi dan diatur lewat `--dart-define` bila perlu diubah.
+
+Di **VS Code**, buka panel *Run and Debug*. Konfigurasi di `.vscode/launch.json`
+terbagi tiga kelompok:
+
+- `Flutter: DEV|STG|PRODUCTION (debug)` — debugger biasa, warna dimatikan
+  (`LOG_COLOR=false`) karena Debug Console tidak merender ANSI.
+- `Terminal: DEV|STG|PRODUCTION (warna)` — menjalankan `flutter run` di
+  integrated terminal supaya warna ANSI tampil.
+- `Attach: debugger ke app berjalan` — menyambungkan breakpoint ke aplikasi
+  yang sudah berjalan di terminal.
+
+Saat dijalankan, Flutter akan menanyakan device bila lebih dari satu tersedia.
+
+| Flavor | applicationId / bundle ID suffix | Nama di device | API | Data source |
+| --- | --- | --- | --- | --- |
+| `dev` | `.dev` | `[DEV] KicauGo` | `http://localhost:8080` | API (`USE_API=true`) |
+| `stg` | `.stg` | `[STG] KicauGo` | `https://stg-api.kicaugo.app` | API |
+| `production` | tanpa suffix | KicauGo | `https://api.kicaugo.app` | API |
+
+Flavor `dev` saat ini tersambung ke backend lokal. Pastikan backend berjalan
+sebelum F5; kalau tidak, log `[ERR] ERROR` akan muncul dan form menampilkan
+pesan koneksi. Untuk emulator Android, ganti `API_BASE_URL` di `env/dev.json`
+menjadi `http://10.0.2.2:8080` (simulator iOS memakai `localhost`). Untuk
+kembali ke data dummy, set `USE_API` menjadi `"false"`.
+
+Akun backend untuk uji login: `user@example.com` / `stringst`. Endpoint
+mengirim dan menerima envelope standar `{status, message, data}`; `ApiClient`
+membuka `data` otomatis, jadi datasource tidak perlu tahu soal envelope.
 
 ### Akun demo
 
@@ -161,6 +220,112 @@ di `main.dart` dan tersedia lewat halaman **About** Flutter.
 
 > Setelah mengganti file font, lakukan stop lalu `flutter run` ulang —
 > hot reload tidak memuat ulang font.
+
+## Log debugging
+
+Logging terpusat di `ApiLoggingInterceptor` (Dio) dan `AppNavigatorObserver`
+(GoRouter). Berikut contoh keluaran **polos** (`LOG_COLOR=false`):
+
+```
+[BOOT] flavor=dev baseUrl=http://localhost:8080 useApi=true
+[NAV] PUSH /login from /onboarding
+[API] REQUEST POST http://localhost:8080/api/v1/auth/login
+[API] HEADERS {"Authorization":"***","content-type":"application/json"}
+[API] PAYLOAD
+{
+  "identifier": "user@example.com",
+  "password": "***"
+}
+[API] RESPONSE 200 POST http://localhost:8080/api/v1/auth/login
+{
+  "status": 200,
+  "message": "Login successful",
+  "data": {
+    "user": { ... },
+    "token": "***"
+  }
+}
+```
+
+Versi **warna** (kode ANSI ditulis eksplisit di sini; di terminal kode itu
+langsung dirender). Setiap baris JSON dibungkus sendiri supaya warnanya tidak
+hilang di tengah output:
+
+```
+\x1B[32m[BOOT] flavor=dev baseUrl=http://localhost:8080 useApi=true\x1B[0m
+\x1B[35m[NAV] PUSH /login from /onboarding\x1B[0m
+\x1B[34m[API] REQUEST POST http://localhost:8080/api/v1/auth/login\x1B[0m
+\x1B[34m[API] PAYLOAD\x1B[0m
+\x1B[34m{\x1B[0m
+\x1B[34m  "identifier": "user@example.com"\x1B[0m
+\x1B[34m  "password": "***"\x1B[0m
+\x1B[34m}\x1B[0m
+\x1B[32m[API] RESPONSE 200 POST http://localhost:8080/api/v1/auth/login\x1B[0m
+\x1B[32m{\x1B[0m
+\x1B[32m  "status": 200\x1B[0m
+\x1B[32m  "data": { ... }\x1B[0m
+\x1B[32m}\x1B[0m
+```
+
+| Tag | Warna | Kode | Arti |
+|---|---|---|---|
+| `BOOT` | hijau | `\x1B[32m` | Konfigurasi awal: flavor, base URL, dan mode API/data dummy |
+| `API` | biru | `\x1B[34m` | Request, header, dan payload |
+| `API` 2xx | hijau | `\x1B[32m` | Respons sukses |
+| `API` 4xx/5xx | merah | `\x1B[31m` | Respons gagal yang tetap diterima (`validateStatus`) |
+| `ERR` | merah | `\x1B[31m` | `DioException`: status, pesan, dan body error |
+| `NAV` | magenta | `\x1B[35m` | Navigasi/rute aplikasi |
+
+Warna **aktif secara default** (`const bool.fromEnvironment('LOG_COLOR',
+defaultValue: true)`). Matikan dengan `--dart-define=LOG_COLOR=false`.
+
+### Alur kerja yang disarankan
+
+1. **Lihat log berwarna** — jalankan konfigurasi `Terminal: DEV (warna)` (F5)
+   atau dari terminal:
+
+   ```bash
+   flutter run --flavor dev --dart-define-from-file=env/dev.json
+   ```
+
+   `LOG_COLOR` tidak perlu ditulis karena default-nya `true`.
+2. **Breakpoint sambil log berwarna** — jalankan `flutter run` seperti di atas
+   di terminal, lalu di VS Code tekan F5 dan pilih
+   `Attach: debugger ke app berjalan`. Masukkan VM Service URI yang muncul di
+   terminal (biasanya `http://127.0.0.1:xxxxx/...`). Debugger VS Code lalu
+   terhubung ke aplikasi yang masih berjalan di terminal.
+3. **Debugger biasa tanpa warna** — pakai `Flutter: DEV (debug)` (serta varian
+   STG/PRODUCTION). Konfigurasi ini sudah memakai `LOG_COLOR=false` karena
+   Debug Console VS Code meng-escape ESC menjadi `\^[[32m`.
+
+Catatan:
+
+- `LOG_COLOR` bernilai tetap saat kompilasi; mengubahnya butuh **full restart**
+  (hot reload tidak cukup).
+- Konsol Xcode juga tidak merender ANSI. Bila menjalankan dari Xcode, pakai
+  `LOG_COLOR=false`.
+- Attach harus diulang setelah full restart karena VM Service URI berubah.
+- Sink test selalu menerima teks polos, dan tidak ada log sama sekali di build
+  release (`kDebugMode=false`).
+
+Tag dan isi log:
+
+- `[NAV] PUSH / POP` — halaman yang dibuka/ditutup beserta halaman
+  sebelumnya/tujuannya.
+- `[API] REQUEST` — method dan URL lengkap.
+- `[API] HEADERS` — header request; nilai `Authorization` tetap `***`.
+- `[API] PAYLOAD` — body request; kunci `password`, `token`, `accessToken`,
+  `refreshToken`, `secret`, dan `apiKey` di-mask `***`, termasuk di dalam
+  string JSON maupun map/list bertingkat.
+- `[API] RESPONSE` — status code, method, URL, lalu body JSON rapi.
+- `[ERR] ERROR` — status code, pesan error, lalu body JSON rapi.
+
+Body dicetak dengan indentasi dua spasi oleh `prettyJson`; string JSON diurai
+lebih dulu, string biasa ditampilkan apa adanya. Masking terjadi pada objek
+hasil decode **sebelum** pretty-print, bukan pada string akhir. Body lebih dari
+4000 karakter dipotong lalu diberi `... (truncated)`. Untuk mematikan sementara,
+set `AppLogger.enabled = false`. `useApi=false` berarti tidak ada request HTTP;
+form memakai data dummy, jadi yang tampil hanya baris `[BOOT]` dan `[NAV]`.
 
 ## Pengujian
 

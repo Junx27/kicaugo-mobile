@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rumahkicau_mobile/app.dart';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
+import 'package:rumahkicau_mobile/core/logging/app_logger.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
@@ -66,6 +67,7 @@ Future<AuthBloc> pumpKicauKuApp(
   HomeRepository? homeRepository,
   SessionStorage? sessionStorage,
 }) async {
+  AppLogger.enabled = false;
   final authBloc = createAuthBloc(
     repository: authRepository,
     sessionStorage: sessionStorage,
@@ -89,6 +91,7 @@ Future<AuthBloc> pumpAuthPage(
   required String initialLocation,
   AuthRepository? repository,
 }) async {
+  AppLogger.enabled = false;
   final authBloc = createAuthBloc(repository: repository);
   addTearDown(authBloc.close);
   final router = GoRouter(
