@@ -6,6 +6,8 @@ import 'package:rumahkicau_mobile/app.dart';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
+import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
+import 'package:rumahkicau_mobile/features/auth/domain/entities/user.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/usecases/login_usecase.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/usecases/logout_usecase.dart';
@@ -39,12 +41,18 @@ GetHomeContent defaultGetHomeContent() {
 }
 
 /// Membuat [AuthBloc] dari satu repository palsu.
-AuthBloc createAuthBloc({AuthRepository? repository}) {
+AuthBloc createAuthBloc({
+  AuthRepository? repository,
+  SessionStorage? sessionStorage,
+  User? initialUser,
+}) {
   final authRepository = repository ?? FakeAuthRepository();
   return AuthBloc(
     login: LoginUseCase(authRepository),
     register: RegisterUseCase(authRepository),
     logout: LogoutUseCase(authRepository),
+    sessionStorage: sessionStorage,
+    initialUser: initialUser,
   );
 }
 
@@ -56,8 +64,12 @@ Future<AuthBloc> pumpKicauKuApp(
   WidgetTester tester, {
   AuthRepository? authRepository,
   HomeRepository? homeRepository,
+  SessionStorage? sessionStorage,
 }) async {
-  final authBloc = createAuthBloc(repository: authRepository);
+  final authBloc = createAuthBloc(
+    repository: authRepository,
+    sessionStorage: sessionStorage,
+  );
   addTearDown(authBloc.close);
   final homeUseCase = GetHomeContent(
     homeRepository ?? const HomeRepositoryImpl(instantHomeData),

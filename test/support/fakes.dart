@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/error/failure.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/fake_auth_remote_data_source.dart';
+import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/entities/user.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/fake_home_data_source.dart';
@@ -108,4 +109,22 @@ class CompleterHomeRepository implements HomeRepository {
 
   @override
   Future<HomeContent> fetchHomeContent() => completer.future;
+}
+
+/// Penyimpanan sesi di memori untuk keperluan test.
+class InMemorySessionStorage implements SessionStorage {
+  User? _user;
+
+  @override
+  Future<User?> readSession() async => _user;
+
+  @override
+  Future<void> saveSession(User user) async {
+    _user = user;
+  }
+
+  @override
+  Future<void> clearSession() async {
+    _user = null;
+  }
 }

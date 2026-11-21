@@ -93,4 +93,34 @@ void main() {
       expect: () => const <AuthState>[AuthState(message: 'Gagal keluar')],
     );
   });
+
+  group('sesi tersimpan', () {
+    test('state awal authenticated bila initialUser diberikan', () {
+      final bloc = createAuthBloc(initialUser: user);
+      addTearDown(bloc.close);
+
+      expect(
+        bloc.state,
+        const AuthState(status: AuthStatus.authenticated, user: user),
+      );
+    });
+
+    test('login menyimpan sesi dan logout menghapusnya', () async {
+      final storage = InMemorySessionStorage();
+      final bloc = createAuthBloc(sessionStorage: storage);
+      addTearDown(bloc.close);
+
+      bloc.add(login());
+      await bloc.stream.firstWhere(
+        (state) => state.status == AuthStatus.authenticated,
+      );
+      expect(await storage.readSession(), user);
+
+      bloc.add(logout());
+      await bloc.stream.firstWhere(
+        (state) => state.status == AuthStatus.unauthenticated,
+      );
+      expect(await storage.readSession(), isNull);
+    });
+  });
 }
