@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
+import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_event.dart';
@@ -17,6 +18,7 @@ import 'package:rumahkicau_mobile/features/home/presentation/bloc/home_event.dar
 import 'package:rumahkicau_mobile/features/home/presentation/home_strings.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/pages/home_page.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/widgets/category_chips.dart';
+import 'package:rumahkicau_mobile/features/profile/domain/usecases/update_current_location.dart';
 
 import '../../../../support/fakes.dart';
 import '../../../../support/pump_app.dart';
@@ -57,8 +59,13 @@ Future<void> _pumpHome(
     );
     await authBloc.stream.firstWhere((state) => state.isAuthenticated);
   }
-  final homeBloc = HomeBloc(GetHomeContent(repository ?? FakeHomeRepository()))
-    ..add(const HomeStarted());
+  final homeBloc = HomeBloc(
+    GetHomeContent(repository ?? FakeHomeRepository()),
+    locationService: const NoLocationService(),
+    updateCurrentLocation: UpdateCurrentLocation(
+      FakeCurrentLocationRepository(),
+    ),
+  )..add(const HomeStarted());
   addTearDown(homeBloc.close);
 
   final router = GoRouter(

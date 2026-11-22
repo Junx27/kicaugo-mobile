@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rumahkicau_mobile/core/location/geolocator_location_service.dart';
+import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/core/network/api_client.dart';
 import 'package:rumahkicau_mobile/di/service_locator.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/api_auth_remote_data_source.dart';
@@ -13,6 +15,10 @@ import 'package:rumahkicau_mobile/features/home/data/datasources/api_home_data_s
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
 import 'package:rumahkicau_mobile/features/home/domain/usecases/get_home_content.dart';
+import 'package:rumahkicau_mobile/features/profile/data/datasources/api_current_location_data_source.dart';
+import 'package:rumahkicau_mobile/features/profile/data/datasources/current_location_data_source.dart';
+import 'package:rumahkicau_mobile/features/profile/domain/repositories/current_location_repository.dart';
+import 'package:rumahkicau_mobile/features/profile/domain/usecases/update_current_location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -34,6 +40,13 @@ void main() {
     expect(getIt<HomeDataSource>(), isA<HomeDemoDataSource>());
     expect(getIt<HomeRepository>(), isNotNull);
     expect(getIt<GetHomeContent>(), isNotNull);
+    expect(getIt<LocationService>(), isA<NoLocationService>());
+    expect(
+      getIt<CurrentLocationDataSource>(),
+      isA<NoOpCurrentLocationDataSource>(),
+    );
+    expect(getIt<CurrentLocationRepository>(), isNotNull);
+    expect(getIt<UpdateCurrentLocation>(), isNotNull);
   });
 
   test('flag useApi merakit data source API', () async {
@@ -43,6 +56,11 @@ void main() {
     expect(getIt<AuthRemoteDataSource>(), isA<ApiAuthRemoteDataSource>());
     expect(getIt<HomeDataSource>(), isA<ApiHomeDataSource>());
     expect(getIt<ApiClient>(), isNotNull);
+    expect(getIt<LocationService>(), isA<GeolocatorLocationService>());
+    expect(
+      getIt<CurrentLocationDataSource>(),
+      isA<ApiCurrentLocationDataSource>(),
+    );
   });
 
   test('reset menutup AuthBloc yang sudah dibuat', () async {

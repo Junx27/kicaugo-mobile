@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/error/failure.dart';
+import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/fake_auth_remote_data_source.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/entities/user.dart';
@@ -9,6 +10,7 @@ import 'package:rumahkicau_mobile/features/auth/domain/repositories/auth_reposit
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
+import 'package:rumahkicau_mobile/features/profile/domain/repositories/current_location_repository.dart';
 
 /// Akun demo yang sama dengan sumber data palsu aplikasi.
 const String demoIdentifier = FakeAuthRemoteDataSource.demoIdentifier;
@@ -138,4 +140,34 @@ class InMemorySessionStorage implements SessionStorage {
 
   @override
   Future<String?> readToken() async => _user?.token;
+}
+
+/// Pembaca lokasi palsu: hasil, error, dan jumlah pemanggilan bisa diatur.
+class FakeLocationService implements LocationService {
+  FakeLocationService({this.location, this.error});
+
+  final DeviceLocation? location;
+  final Object? error;
+  int readCalls = 0;
+
+  @override
+  Future<DeviceLocation?> readCurrentLocation() async {
+    readCalls++;
+    if (error != null) throw error!;
+    return location;
+  }
+}
+
+/// Repository lokasi palsu yang mencatat koordinat yang dikirim.
+class FakeCurrentLocationRepository implements CurrentLocationRepository {
+  FakeCurrentLocationRepository({this.error});
+
+  final Object? error;
+  final List<DeviceLocation> updates = <DeviceLocation>[];
+
+  @override
+  Future<void> updateCurrentLocation(DeviceLocation location) async {
+    updates.add(location);
+    if (error != null) throw error!;
+  }
 }

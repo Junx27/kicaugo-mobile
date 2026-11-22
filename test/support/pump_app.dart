@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rumahkicau_mobile/app.dart';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
+import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/core/logging/app_logger.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
@@ -20,6 +21,7 @@ import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_sourc
 import 'package:rumahkicau_mobile/features/home/data/repositories/home_repository_impl.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
 import 'package:rumahkicau_mobile/features/home/domain/usecases/get_home_content.dart';
+import 'package:rumahkicau_mobile/features/profile/domain/usecases/update_current_location.dart';
 
 import 'fakes.dart';
 
@@ -40,6 +42,10 @@ const HomeDemoDataSource instantHomeData = HomeDemoDataSource(
 GetHomeContent defaultGetHomeContent() {
   return const GetHomeContent(HomeRepositoryImpl(instantHomeData));
 }
+
+/// Usecase lokasi palsu tanpa koordinat untuk test aplikasi.
+UpdateCurrentLocation defaultUpdateCurrentLocation() =>
+    UpdateCurrentLocation(FakeCurrentLocationRepository());
 
 /// Membuat [AuthBloc] dari satu repository palsu.
 AuthBloc createAuthBloc({
@@ -77,7 +83,12 @@ Future<AuthBloc> pumpKicauKuApp(
     homeRepository ?? const HomeRepositoryImpl(instantHomeData),
   );
   await tester.pumpWidget(
-    KicauKuApp(authBloc: authBloc, getHomeContent: homeUseCase),
+    KicauKuApp(
+      authBloc: authBloc,
+      getHomeContent: homeUseCase,
+      locationService: const NoLocationService(),
+      updateCurrentLocation: defaultUpdateCurrentLocation(),
+    ),
   );
   await tester.pump(AppConstants.splashDuration);
   await tester.pump(pageTransition);
