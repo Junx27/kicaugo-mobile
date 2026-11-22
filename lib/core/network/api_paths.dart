@@ -11,10 +11,9 @@ abstract final class ApiPaths {
   // Home
   static const String home = '$_prefix/home';
   static const String homeProfile = '$_prefix/home/profile';
+  static const String homeFeatured = '$_prefix/home/featured';
 
   // Home (per bagian, cadangan)
-  static const String homeSummary = '$_prefix/home/summary';
-  static const String homeFeatured = '$_prefix/home/featured';
   static const String homeUpcoming = '$_prefix/home/upcoming';
   static const String homeStats = '$_prefix/home/stats';
   static const String homeActiveTicket = '$_prefix/home/active-ticket';

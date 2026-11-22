@@ -3,39 +3,52 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rumahkicau_mobile/core/error/failure.dart';
 import 'package:rumahkicau_mobile/core/network/api_client.dart';
+import 'package:rumahkicau_mobile/core/network/api_paths.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/api_home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 
 import '../../../support/fake_http.dart';
 import 'home_api_fixture.dart';
 
+/// [FakeHttpAdapter] mencocokkan path lengkap termasuk query string.
+const String profilePath =
+    '${ApiPaths.homeProfile}?radius_km=1&category_id=1&limit=5';
+const String featuredTitle = 'Lomba Unggulan dari API';
+
 void main() {
   late FakeHttpAdapter adapter;
   late ApiHomeDataSource dataSource;
 
   setUp(() {
-    adapter = FakeHttpAdapter();
+    adapter = FakeHttpAdapter(
+      bodyByPath: <String, String>{
+        profilePath: jsonEncode(homeProfilePayload()),
+        ApiPaths.homeFeatured: jsonEncode(
+          homeFeaturedPayload(title: featuredTitle),
+        ),
+      },
+    );
     dataSource = ApiHomeDataSource(
       ApiClient(testDio(adapter), FakeTokenProvider('jwt-token')),
     );
   });
 
   test(
-    'fetchHomeContent memetakan profil backend ke summary, bagian lain tetap demo',
+    'fetchHomeContent memetakan profil dan featured backend, bagian lain tetap demo',
     () async {
-      adapter.body = jsonEncode(homeProfilePayload());
-
       final content = await dataSource.fetchHomeContent();
 
-      expect(content.summary.greeting, 'Selamat pagi');
-      expect(content.summary.fullName, 'Budi Santoso');
-      expect(content.summary.avatarUrl, 'https://example.com/avatar.png');
-      expect(content.summary.location, 'Bandung');
-      expect(content.summary.liveCount, 7);
-      expect(content.summary.searchRadiusKM, 10);
-      expect(content.summary.isComplete, isTrue);
-      expect(content.summary.favoriteCategories, hasLength(1));
-      expect(content.featured, HomeDemoDataSource.content.featured);
+      expect(content.profile.greeting, 'Selamat siang');
+      expect(content.profile.name, 'Kicau Mania');
+      expect(content.profile.avatarUrl, 'https://example.com/avatar.png');
+      expect(content.profile.liveCount, 7);
+      expect(content.featured.title, featuredTitle);
+      expect(
+        content.featured.schedule,
+        'Minggu, 6 Des • Batavia Arena, Jaksel',
+      );
+      expect(content.featured.attendees.initials, <String>['MK', 'BN']);
+      expect(content.featured.attendees.others, 48);
       expect(content.upcoming, HomeDemoDataSource.content.upcoming);
       expect(content.stats, HomeDemoDataSource.content.stats);
       expect(content.activeTicket, HomeDemoDataSource.content.activeTicket);
@@ -44,20 +57,38 @@ void main() {
   );
 
   test('fetchHomeContent membuka envelope data dari backend', () async {
-    adapter.body = jsonEncode(<String, dynamic>{
-      'status': 200,
-      'message': 'Home profile loaded',
-      'data': homeProfilePayload(),
-    });
+    adapter.bodyByPath = <String, String>{
+      profilePath: jsonEncode(<String, dynamic>{
+        'status': 200,
+        'message': 'Home profile loaded',
+        'data': homeProfilePayload(),
+      }),
+      ApiPaths.homeFeatured: jsonEncode(<String, dynamic>{
+        'status': 200,
+        'message': 'Home featured loaded',
+        'data': homeFeaturedPayload(title: featuredTitle),
+      }),
+    };
 
     final content = await dataSource.fetchHomeContent();
 
-    expect(content.summary.fullName, 'Budi Santoso');
-    expect(content.summary.location, 'Bandung');
+    expect(content.profile.name, 'Kicau Mania');
+    expect(content.featured.title, featuredTitle);
+  });
+
+  test('meminta profile dan featured dengan header Bearer', () async {
+    await dataSource.fetchHomeContent();
+
+    expect(adapter.recordedOptions?.path, ApiPaths.homeFeatured);
+    expect(
+      adapter.recordedOptions?.headers['Authorization'],
+      'Bearer jwt-token',
+    );
   });
 
   test('kesalahan 500 diteruskan sebagai DataFailure', () async {
     adapter
+      ..bodyByPath = null
       ..statusCode = 500
       ..body = jsonEncode(<String, dynamic>{
         'error': <String, dynamic>{'message': 'Gagal memuat'},
@@ -76,8 +107,10 @@ void main() {
   });
 
   test('endpoint tidak tersedia kembali ke data dummy', () async {
-    adapter.statusCode = 404;
-    adapter.body = '404 page not found';
+    adapter
+      ..bodyByPath = null
+      ..statusCode = 404
+      ..body = '404 page not found';
 
     final content = await dataSource.fetchHomeContent();
 
@@ -85,7 +118,9 @@ void main() {
   });
 
   test('payload tidak valid ditolak', () async {
-    adapter.body = jsonEncode(<String, dynamic>{'foo': 'bar'});
+    adapter
+      ..bodyByPath = null
+      ..body = jsonEncode(<String, dynamic>{'foo': 'bar'});
 
     await expectLater(
       dataSource.fetchHomeContent(),

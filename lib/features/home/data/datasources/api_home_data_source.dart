@@ -8,10 +8,11 @@ import 'home_data_source.dart';
 
 /// Sumber data Beranda yang memakai backend KicauGo.
 ///
-/// Endpoint `/api/v1/home` belum tersedia di backend saat ini, sehingga bila
-/// permintaan gagal karena endpoint tidak ada atau masalah jaringan, sumber
-/// data ini kembali ke data dummy agar Beranda tetap bisa dimuat. Kegagalan
-/// lain (mis. 5xx dengan pesan server) tetap diteruskan.
+/// Profil diambil dari `/api/v1/home/profile` dan lomba unggulan dari
+/// `/api/v1/home/featured`. Bila salah satu permintaan gagal karena endpoint
+/// tidak ada atau masalah jaringan, sumber data ini kembali ke data dummy agar
+/// Beranda tetap bisa dimuat. Kegagalan lain (mis. 5xx dengan pesan server)
+/// tetap diteruskan.
 class ApiHomeDataSource implements HomeDataSource {
   const ApiHomeDataSource(
     this._client, {
@@ -27,12 +28,24 @@ class ApiHomeDataSource implements HomeDataSource {
     int categoryId = 1,
     int limit = 5,
   }) async {
-    HomeSummary summary;
     try {
       final json = await _client.getJson(
         '${ApiPaths.homeProfile}?radius_km=$radiusKm&category_id=$categoryId&limit=$limit',
       );
-      summary = HomeContentDto.summaryFromProfileJson(json);
+      final profile = HomeContentDto.profileFromJson(json);
+
+      final featuredJson = await _client.getJson(ApiPaths.homeFeatured);
+      final featured = HomeContentDto.featuredFromJson(featuredJson);
+
+      const demo = HomeDemoDataSource.content;
+      return HomeContent(
+        profile: profile,
+        featured: featured,
+        upcoming: demo.upcoming,
+        stats: demo.stats,
+        activeTicket: demo.activeTicket,
+        schedules: demo.schedules,
+      );
     } on Failure catch (failure) {
       if (_shouldFallback(failure)) {
         return fallback.fetchHomeContent(
@@ -43,16 +56,6 @@ class ApiHomeDataSource implements HomeDataSource {
       }
       rethrow;
     }
-
-    const demo = HomeDemoDataSource.content;
-    return HomeContent(
-      summary: summary,
-      featured: demo.featured,
-      upcoming: demo.upcoming,
-      stats: demo.stats,
-      activeTicket: demo.activeTicket,
-      schedules: demo.schedules,
-    );
   }
 
   bool _shouldFallback(Failure failure) =>

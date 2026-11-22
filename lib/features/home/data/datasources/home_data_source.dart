@@ -3,6 +3,7 @@ import '../../../../core/entities/ticket_status.dart';
 import '../../domain/entities/active_ticket.dart';
 import '../../domain/entities/featured_contest.dart';
 import '../../domain/entities/home_content.dart';
+import '../../domain/entities/home_profile.dart';
 import '../../domain/entities/home_stats.dart';
 import '../../domain/entities/schedule_item.dart';
 import '../../domain/entities/upcoming_contest.dart';
@@ -25,17 +26,11 @@ class HomeDemoDataSource implements HomeDataSource {
   final Duration delay;
 
   static const HomeContent content = HomeContent(
-    summary: HomeSummary(
-      location: 'Jakarta Selatan',
-      liveCount: 14,
-      activeTicketCount: 2,
-      greeting: '',
-      fullName: '',
+    profile: HomeProfile(
+      name: '',
       avatarUrl: null,
-      searchRadiusKM: 0,
-      favoriteCategories: <({int id, String name})>[],
-      isComplete: false,
-      missingFields: <String>[],
+      greeting: '',
+      liveCount: 14,
     ),
     featured: FeaturedContest(
       title: 'Piala Raja Nusantara 2026',

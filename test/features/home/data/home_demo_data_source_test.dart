@@ -10,7 +10,7 @@ void main() {
     ).fetchHomeContent();
 
     expect(content, HomeDemoDataSource.content);
-    expect(content.summary.activeTicketCount, 2);
+    expect(content.profile.liveCount, 14);
     expect(content.featured.attendees.others, 48);
     expect(content.upcoming.remainingTickets, 3);
   });

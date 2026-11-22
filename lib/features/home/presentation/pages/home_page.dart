@@ -91,14 +91,14 @@ class _HomeContentView extends StatelessWidget {
                       selector: (auth) =>
                           auth.user?.name ?? HomeStrings.fallbackName,
                       builder: (context, name) => HomeGreeting(
-                        greeting: content.summary.greeting.isNotEmpty
-                            ? content.summary.greeting
+                        greeting: content.profile.greeting.isNotEmpty
+                            ? content.profile.greeting
                             : greeting,
-                        name: content.summary.fullName.isNotEmpty
-                            ? content.summary.fullName
+                        name: content.profile.name.isNotEmpty
+                            ? content.profile.name
                             : name,
-                        liveCount: content.summary.liveCount,
-                        avatarUrl: content.summary.avatarUrl,
+                        liveCount: content.profile.liveCount,
+                        avatarUrl: content.profile.avatarUrl,
                       ),
                     ),
                     const HomeSearchBar(),

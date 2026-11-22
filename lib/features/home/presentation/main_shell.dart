@@ -12,13 +12,12 @@ import '../../chat/presentation/cubit/chat_state.dart';
 import '../domain/usecases/get_home_content.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/home_event.dart';
-import 'bloc/home_state.dart';
 import 'home_strings.dart';
 
 /// Kerangka tab utama: konten branch aktif dan navigasi pill mengambang.
 ///
-/// [HomeBloc] dan [ChatCubit] dibuat di sini agar badge "Tiket Saya" dan
-/// "Chat" dibaca dari state yang sama dan tetap hidup saat berpindah tab.
+/// [HomeBloc] dan [ChatCubit] dibuat di sini agar konten Beranda dan badge
+/// "Chat" tetap hidup saat berpindah tab.
 class MainShell extends StatelessWidget {
   const MainShell({
     super.key,
@@ -47,47 +46,43 @@ class MainShell extends StatelessWidget {
         backgroundColor: AppColors.background,
         extendBody: true,
         body: navigationShell,
-        bottomNavigationBar: BlocSelector<HomeBloc, HomeState, int?>(
-          selector: (state) => state.content?.summary.activeTicketCount,
-          builder: (context, ticketCount) =>
-              BlocSelector<ChatCubit, ChatState, int>(
-                selector: (state) => state.unreadCount,
-                builder: (context, unreadCount) => PillNavBar(
-                  currentIndex: navigationShell.currentIndex,
-                  onSelected: (index) => navigationShell.goBranch(
-                    index,
-                    initialLocation: index == navigationShell.currentIndex,
-                  ),
-                  items: [
-                    const PillNavItem(
-                      icon: Icons.local_fire_department_rounded,
-                      label: HomeStrings.navHome,
-                    ),
-                    const PillNavItem(
-                      icon: Icons.event_note_rounded,
-                      label: HomeStrings.navSchedule,
-                    ),
-                    PillNavItem(
-                      icon: Icons.confirmation_number_rounded,
-                      label: HomeStrings.navTickets,
-                      badge: ticketCount,
-                    ),
-                    const PillNavItem(
-                      icon: Icons.diversity_2_rounded,
-                      label: HomeStrings.navCommunity,
-                    ),
-                    PillNavItem(
-                      icon: Icons.chat_rounded,
-                      label: HomeStrings.navChat,
-                      badge: unreadCount,
-                    ),
-                    const PillNavItem(
-                      icon: Icons.settings,
-                      label: HomeStrings.navProfile,
-                    ),
-                  ],
-                ),
+        bottomNavigationBar: BlocSelector<ChatCubit, ChatState, int>(
+          selector: (state) => state.unreadCount,
+          builder: (context, unreadCount) => PillNavBar(
+            currentIndex: navigationShell.currentIndex,
+            onSelected: (index) => navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            ),
+            items: [
+              const PillNavItem(
+                icon: Icons.local_fire_department_rounded,
+                label: HomeStrings.navHome,
               ),
+              const PillNavItem(
+                icon: Icons.event_note_rounded,
+                label: HomeStrings.navSchedule,
+              ),
+              const PillNavItem(
+                icon: Icons.confirmation_number_rounded,
+                label: HomeStrings.navTickets,
+                badge: 0,
+              ),
+              const PillNavItem(
+                icon: Icons.diversity_2_rounded,
+                label: HomeStrings.navCommunity,
+              ),
+              PillNavItem(
+                icon: Icons.chat_rounded,
+                label: HomeStrings.navChat,
+                badge: unreadCount,
+              ),
+              const PillNavItem(
+                icon: Icons.settings,
+                label: HomeStrings.navProfile,
+              ),
+            ],
+          ),
         ),
       ),
     );
