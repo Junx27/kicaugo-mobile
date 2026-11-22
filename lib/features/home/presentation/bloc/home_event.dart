@@ -1,3 +1,5 @@
+import 'dart:async';
+
 /// Event yang diterima [HomeBloc].
 sealed class HomeEvent {
   const HomeEvent();
@@ -23,6 +25,14 @@ final class HomeRetryRequested extends HomeEvent {
   final int radiusKm;
   final int categoryId;
   final int limit;
+}
+
+/// Pengguna menarik daftar Beranda untuk menyegarkan data.
+final class HomeRefreshRequested extends HomeEvent {
+  const HomeRefreshRequested({required this.completer});
+
+  /// Diselesaikan setelah percobaan refresh selesai, berhasil maupun gagal.
+  final Completer<void> completer;
 }
 
 /// Pengguna memilih kategori burung untuk menyaring jadwal populer.

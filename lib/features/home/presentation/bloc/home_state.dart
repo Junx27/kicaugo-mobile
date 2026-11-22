@@ -15,12 +15,31 @@ class HomeState extends Equatable {
     this.content,
     this.message,
     this.categoryName = HomeStrings.allCategories,
+    this.isFetching = false,
   });
 
   final HomeStatus status;
   final HomeContent? content;
   final String? message;
   final String categoryName;
+
+  /// Sedang mengambil data dari backend, dipakai untuk menampilkan shimmer.
+  final bool isFetching;
+
+  /// Salinan state dengan sebagian nilai diganti.
+  HomeState copyWith({
+    HomeStatus? status,
+    HomeContent? content,
+    String? message,
+    String? categoryName,
+    bool? isFetching,
+  }) => HomeState(
+    status: status ?? this.status,
+    content: content ?? this.content,
+    message: message ?? this.message,
+    categoryName: categoryName ?? this.categoryName,
+    isFetching: isFetching ?? this.isFetching,
+  );
 
   /// Jadwal populer sesuai nama kategori terpilih.
   List<ScheduleItem> get visibleSchedules {
@@ -34,13 +53,15 @@ class HomeState extends Equatable {
   }
 
   /// Salinan state dengan nama kategori jadwal [categoryName].
-  HomeState withCategoryName(String categoryName) => HomeState(
-    status: status,
-    content: content,
-    message: message,
-    categoryName: categoryName,
-  );
+  HomeState withCategoryName(String categoryName) =>
+      copyWith(categoryName: categoryName);
 
   @override
-  List<Object?> get props => [status, content, message, categoryName];
+  List<Object?> get props => [
+    status,
+    content,
+    message,
+    categoryName,
+    isFetching,
+  ];
 }
