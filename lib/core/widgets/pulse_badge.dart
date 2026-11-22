@@ -12,6 +12,7 @@ class PulseBadge extends StatefulWidget {
     required this.label,
     this.backgroundColor = AppColors.lavender,
     this.accentColor = AppColors.primary,
+    this.icon,
   });
 
   final String label;
@@ -19,6 +20,9 @@ class PulseBadge extends StatefulWidget {
 
   /// Warna titik berdenyut dan teks.
   final Color accentColor;
+
+  /// Ikon opsional yang menggantikan titik berdenyut.
+  final IconData? icon;
 
   @override
   State<PulseBadge> createState() => _PulseBadgeState();
@@ -56,10 +60,21 @@ class _PulseBadgeState extends State<PulseBadge>
           mainAxisSize: MainAxisSize.min,
           spacing: 6,
           children: [
-            FadeTransition(
-              opacity: _opacity,
-              child: ColorPill.dot(size: 8, color: widget.accentColor),
-            ),
+            if (widget.icon != null)
+              FadeTransition(
+                opacity: _opacity,
+                child: Icon(
+                  widget.icon,
+                  size: 14,
+                  weight: 700,
+                  color: widget.accentColor,
+                ),
+              )
+            else
+              FadeTransition(
+                opacity: _opacity,
+                child: ColorPill.dot(size: 8, color: widget.accentColor),
+              ),
             Flexible(
               child: Text(
                 widget.label,

@@ -120,7 +120,7 @@ void main() {
   testWidgets('menampilkan seluruh bagian Beranda', (tester) async {
     await _pumpHome(tester);
 
-    expect(find.text('SELAMAT PAGI'), findsOneWidget);
+    expect(find.text('Selamat Pagi'), findsOneWidget);
     expect(find.text('Halo, ${HomeStrings.fallbackName} 👋'), findsOneWidget);
     expect(find.text('14 ${HomeStrings.liveSuffix}'), findsOneWidget);
     expect(find.text(_content.featured.title), findsOneWidget);

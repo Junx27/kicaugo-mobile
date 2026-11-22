@@ -2,7 +2,7 @@
 abstract final class HomeStrings {
   static const String fallbackName = 'Kicau Mania';
   static const String waveEmoji = '👋';
-  static const String liveSuffix = 'Live Gantangan';
+  static const String liveSuffix = 'Live Events';
   static const String searchHint = 'Cari lomba, EO, arena gantangan...';
   static const String notificationsTooltip = 'Notifikasi';
   static const String filterTooltip = 'Filter Pencarian';

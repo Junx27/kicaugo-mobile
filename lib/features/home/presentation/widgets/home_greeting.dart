@@ -24,37 +24,40 @@ class HomeGreeting extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       spacing: 8,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (avatarUrl != null && avatarUrl!.isNotEmpty)
-          CircleAvatar(
-            radius: 18,
-            backgroundImage: NetworkImage(avatarUrl!),
-            backgroundColor: AppColors.lavenderGlow,
-          )
-        else
-          const CircleAvatar(
-            radius: 18,
-            backgroundColor: AppColors.lavenderGlow,
-            child: Icon(Icons.person_rounded, size: 20),
-          ),
+        CircleAvatar(
+          radius: 18,
+          backgroundImage: (avatarUrl != null && avatarUrl!.isNotEmpty)
+              ? NetworkImage(avatarUrl!)
+              : const AssetImage('assets/avatar/avatar1.jpg'),
+          backgroundColor: AppColors.lavenderGlow,
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(greeting.toUpperCase(), style: AppTextStyles.eyebrow),
+              Row(
+                spacing: 8,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(child: Text(greeting, style: AppTextStyles.eyebrow)),
+                ],
+              ),
               Text(
                 'Halo, $name ${HomeStrings.waveEmoji}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.headlineSmall,
+                style: AppTextStyles.title,
               ),
             ],
           ),
         ),
         PulseBadge(
           label: '$liveCount ${HomeStrings.liveSuffix}',
-          backgroundColor: AppColors.lavenderGlow,
-          accentColor: AppColors.onLime,
+          backgroundColor: AppColors.error.withValues(alpha: 0.12),
+          accentColor: AppColors.error,
+          icon: Icons.sensors_rounded,
         ),
       ],
     );
