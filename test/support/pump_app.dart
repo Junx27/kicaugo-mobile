@@ -16,7 +16,7 @@ import 'package:rumahkicau_mobile/features/auth/domain/usecases/register_usecase
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/register_page.dart';
-import 'package:rumahkicau_mobile/features/home/data/datasources/fake_home_data_source.dart';
+import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/data/repositories/home_repository_impl.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
 import 'package:rumahkicau_mobile/features/home/domain/usecases/get_home_content.dart';
@@ -32,7 +32,7 @@ const Duration pageTransition = Duration(milliseconds: 600);
 const String homeMarker = 'beranda-test';
 
 /// Sumber data Beranda demo tanpa jeda.
-const FakeHomeDataSource instantHomeData = FakeHomeDataSource(
+const HomeDemoDataSource instantHomeData = HomeDemoDataSource(
   delay: Duration.zero,
 );
 

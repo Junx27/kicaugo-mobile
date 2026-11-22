@@ -6,7 +6,7 @@ import 'package:rumahkicau_mobile/features/auth/data/datasources/fake_auth_remot
 import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/entities/user.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/repositories/auth_repository.dart';
-import 'package:rumahkicau_mobile/features/home/data/datasources/fake_home_data_source.dart';
+import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
 
@@ -16,7 +16,7 @@ const String demoPassword = FakeAuthRemoteDataSource.demoPassword;
 const String demoName = FakeAuthRemoteDataSource.demoName;
 
 /// Data Beranda yang dipakai test widget dan bloc (sama dengan data demo).
-const HomeContent sampleHomeContent = FakeHomeDataSource.content;
+const HomeContent sampleHomeContent = HomeDemoDataSource.content;
 
 /// Repository auth palsu yang dapat dikonfigurasi per test.
 class FakeAuthRepository implements AuthRepository {
@@ -88,7 +88,11 @@ class FakeHomeRepository implements HomeRepository {
   int fetchCalls = 0;
 
   @override
-  Future<HomeContent> fetchHomeContent() async {
+  Future<HomeContent> fetchHomeContent({
+    int radiusKm = 1,
+    int categoryId = 1,
+    int limit = 5,
+  }) async {
     fetchCalls++;
     if (delay > Duration.zero) {
       await Future<void>.delayed(delay);
@@ -108,7 +112,11 @@ class CompleterHomeRepository implements HomeRepository {
   final Completer<HomeContent> completer;
 
   @override
-  Future<HomeContent> fetchHomeContent() => completer.future;
+  Future<HomeContent> fetchHomeContent({
+    int radiusKm = 1,
+    int categoryId = 1,
+    int limit = 5,
+  }) => completer.future;
 }
 
 /// Penyimpanan sesi di memori untuk keperluan test.

@@ -15,23 +15,41 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   final GetHomeContent _getHomeContent;
 
-  Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) =>
-      _load(emit);
+  Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) => _load(
+    emit,
+    radiusKm: event.radiusKm,
+    categoryId: event.categoryId,
+    limit: event.limit,
+  );
 
   Future<void> _onRetryRequested(
     HomeRetryRequested event,
     Emitter<HomeState> emit,
-  ) => _load(emit);
+  ) => _load(
+    emit,
+    radiusKm: event.radiusKm,
+    categoryId: event.categoryId,
+    limit: event.limit,
+  );
 
   void _onCategorySelected(
     HomeCategorySelected event,
     Emitter<HomeState> emit,
   ) => emit(state.withCategory(event.category));
 
-  Future<void> _load(Emitter<HomeState> emit) async {
+  Future<void> _load(
+    Emitter<HomeState> emit, {
+    int radiusKm = 1,
+    int categoryId = 1,
+    int limit = 5,
+  }) async {
     emit(HomeState(status: HomeStatus.loading, category: state.category));
     try {
-      final content = await _getHomeContent();
+      final content = await _getHomeContent(
+        radiusKm: radiusKm,
+        categoryId: categoryId,
+        limit: limit,
+      );
       emit(
         HomeState(
           status: HomeStatus.success,

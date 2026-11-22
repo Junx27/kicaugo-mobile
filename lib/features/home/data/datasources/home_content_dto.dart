@@ -11,21 +11,76 @@ import '../../domain/entities/upcoming_contest.dart';
 /// Mapping payload `/api/v1/home` ke entity domain Beranda.
 abstract final class HomeContentDto {
   static HomeContent fromJson(Map<String, dynamic> json) => HomeContent(
-    summary: _summary(JsonMapper.object(json['summary'])),
-    featured: _featured(JsonMapper.object(json['featured'])),
-    upcoming: _upcoming(JsonMapper.object(json['upcoming'])),
-    stats: _stats(JsonMapper.object(json['stats'])),
-    activeTicket: _activeTicket(JsonMapper.object(json['activeTicket'])),
-    schedules: _schedules(JsonMapper.list(json, 'schedules')),
+    summary: summaryFromJson(JsonMapper.object(json['summary'])),
+    featured: featuredFromJson(JsonMapper.object(json['featured'])),
+    upcoming: upcomingFromJson(JsonMapper.object(json['upcoming'])),
+    stats: statsFromJson(JsonMapper.object(json['stats'])),
+    activeTicket: activeTicketFromJson(JsonMapper.object(json['activeTicket'])),
+    schedules: schedulesFromJson(json),
   );
 
-  static HomeSummary _summary(Map<String, dynamic> json) => HomeSummary(
+  /// Parsing bagian `summary` dari payload utuh maupun endpoint terpisah.
+  static HomeSummary summaryFromJson(Map<String, dynamic> json) => HomeSummary(
     location: JsonMapper.string(json, 'location'),
     liveCount: JsonMapper.integer(json, 'liveCount'),
     activeTicketCount: JsonMapper.integer(json, 'activeTicketCount'),
   );
 
-  static FeaturedContest _featured(Map<String, dynamic> json) {
+  /// Parsing ringkasan Beranda dari endpoint `/api/v1/home/profile`.
+  static HomeSummary summaryFromProfileJson(Map<String, dynamic> json) {
+    final profile = JsonMapper.object(json['profile']);
+    final nearby = JsonMapper.object(json['nearby']);
+
+    final city = profile['city'];
+    var location = 'Jakarta Selatan';
+    if (city is Map) {
+      final name = city['name'];
+      if (name is String && name.isNotEmpty) location = name;
+    }
+
+    final avatar = profile['avatar_url'];
+    final favoriteCategories = <({int id, String name})>[];
+    final rawFavorites = profile['favorite_categories'];
+    if (rawFavorites is List) {
+      for (final item in rawFavorites) {
+        if (item is Map) {
+          final id = item['id'];
+          final name = item['name'];
+          if (id is int && name is String) {
+            favoriteCategories.add((id: id, name: name));
+          }
+        }
+      }
+    }
+
+    final missingFields = <String>[];
+    final rawMissing = profile['missing_fields'];
+    if (rawMissing is List) {
+      for (final item in rawMissing) {
+        if (item is String) missingFields.add(item);
+      }
+    }
+
+    return HomeSummary(
+      location: location,
+      liveCount: _intOrZero(nearby['ongoing_events_count']),
+      activeTicketCount: 0,
+      greeting: _stringOrEmpty(profile['greeting']),
+      fullName: _stringOrEmpty(profile['full_name']),
+      avatarUrl: avatar is String && avatar.isNotEmpty ? avatar : null,
+      searchRadiusKM: _intOrZero(profile['search_radius_km']),
+      favoriteCategories: favoriteCategories,
+      isComplete: profile['is_complete'] == true,
+      missingFields: missingFields,
+    );
+  }
+
+  static int _intOrZero(Object? value) => value is int ? value : 0;
+
+  static String _stringOrEmpty(Object? value) => value is String ? value : '';
+
+  /// Parsing bagian `featured` dari payload utuh maupun endpoint terpisah.
+  static FeaturedContest featuredFromJson(Map<String, dynamic> json) {
     final attendees = JsonMapper.object(json['attendees']);
     return FeaturedContest(
       title: JsonMapper.string(json, 'title'),
@@ -40,7 +95,8 @@ abstract final class HomeContentDto {
     );
   }
 
-  static UpcomingContest _upcoming(Map<String, dynamic> json) =>
+  /// Parsing bagian `upcoming` dari payload utuh maupun endpoint terpisah.
+  static UpcomingContest upcomingFromJson(Map<String, dynamic> json) =>
       UpcomingContest(
         type: JsonMapper.string(json, 'type'),
         title: JsonMapper.string(json, 'title'),
@@ -49,19 +105,27 @@ abstract final class HomeContentDto {
         remainingTickets: JsonMapper.integer(json, 'remainingTickets'),
       );
 
-  static HomeStats _stats(Map<String, dynamic> json) => HomeStats(
+  /// Parsing bagian `stats` dari payload utuh maupun endpoint terpisah.
+  static HomeStats statsFromJson(Map<String, dynamic> json) => HomeStats(
     badge: JsonMapper.string(json, 'badge'),
     headline: JsonMapper.string(json, 'headline'),
     note: JsonMapper.string(json, 'note'),
     securityNote: JsonMapper.string(json, 'securityNote'),
   );
 
-  static ActiveTicket _activeTicket(Map<String, dynamic> json) => ActiveTicket(
-    event: JsonMapper.string(json, 'event'),
-    schedule: JsonMapper.string(json, 'schedule'),
-    number: JsonMapper.string(json, 'number'),
-    session: JsonMapper.string(json, 'session'),
-  );
+  /// Parsing bagian `activeTicket` dari payload utuh maupun endpoint terpisah.
+  static ActiveTicket activeTicketFromJson(Map<String, dynamic> json) =>
+      ActiveTicket(
+        event: JsonMapper.string(json, 'event'),
+        schedule: JsonMapper.string(json, 'schedule'),
+        number: JsonMapper.string(json, 'number'),
+        session: JsonMapper.string(json, 'session'),
+      );
+
+  /// Parsing daftar jadwal dari payload utuh (`schedules`) maupun endpoint
+  /// terpisah (`{ "schedules": [...] }`).
+  static List<ScheduleItem> schedulesFromJson(Map<String, dynamic> json) =>
+      _schedules(JsonMapper.list(json, 'schedules'));
 
   static List<ScheduleItem> _schedules(List<Object?> values) => [
     for (final value in values) _schedule(JsonMapper.object(value)),

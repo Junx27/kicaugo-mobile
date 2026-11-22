@@ -17,7 +17,6 @@ import '../features/auth/domain/usecases/logout_usecase.dart';
 import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/home/data/datasources/api_home_data_source.dart';
-import '../features/home/data/datasources/fake_home_data_source.dart';
 import '../features/home/data/datasources/home_data_source.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
 import '../features/home/domain/repositories/home_repository.dart';
@@ -61,7 +60,7 @@ Future<void> configureDependencies({bool? useApi}) async {
       ..registerLazySingleton<AuthRemoteDataSource>(
         () => FakeAuthRemoteDataSource(),
       )
-      ..registerLazySingleton<HomeDataSource>(() => const FakeHomeDataSource());
+      ..registerLazySingleton<HomeDataSource>(() => const HomeDemoDataSource());
   }
 
   getIt

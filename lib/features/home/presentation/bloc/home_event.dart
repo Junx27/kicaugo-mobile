@@ -7,12 +7,24 @@ sealed class HomeEvent {
 
 /// Beranda pertama kali dibuka.
 final class HomeStarted extends HomeEvent {
-  const HomeStarted();
+  const HomeStarted({this.radiusKm = 1, this.categoryId = 1, this.limit = 5});
+
+  final int radiusKm;
+  final int categoryId;
+  final int limit;
 }
 
 /// Pengguna meminta memuat ulang konten.
 final class HomeRetryRequested extends HomeEvent {
-  const HomeRetryRequested();
+  const HomeRetryRequested({
+    this.radiusKm = 1,
+    this.categoryId = 1,
+    this.limit = 5,
+  });
+
+  final int radiusKm;
+  final int categoryId;
+  final int limit;
 }
 
 /// Pengguna memilih kategori burung untuk menyaring jadwal populer.

@@ -22,11 +22,19 @@ class ThrowingTokenProvider implements TokenProvider {
 
 /// Adapter Dio yang mengembalikan respons tertentu tanpa membuka jaringan.
 class FakeHttpAdapter implements HttpClientAdapter {
-  FakeHttpAdapter({this.statusCode = 200, this.body = '{}', this.exception});
+  FakeHttpAdapter({
+    this.statusCode = 200,
+    this.body = '{}',
+    this.exception,
+    this.bodyByPath,
+  });
 
   int statusCode;
   String body;
   Object? exception;
+
+  /// Respons berbeda per path. Jika path tidak ada, pakai [body].
+  Map<String, String>? bodyByPath;
 
   RequestOptions? recordedOptions;
 
@@ -38,11 +46,16 @@ class FakeHttpAdapter implements HttpClientAdapter {
   ) async {
     recordedOptions = options;
     if (exception != null) throw exception!;
+    var resolvedBody = body;
+    if (bodyByPath != null) {
+      final mapped = bodyByPath![options.path];
+      if (mapped != null) resolvedBody = mapped;
+    }
     final headers = <String, List<String>>{};
-    if (body.isNotEmpty) {
+    if (resolvedBody.isNotEmpty) {
       headers[Headers.contentTypeHeader] = <String>[Headers.jsonContentType];
     }
-    return ResponseBody.fromString(body, statusCode, headers: headers);
+    return ResponseBody.fromString(resolvedBody, statusCode, headers: headers);
   }
 
   @override

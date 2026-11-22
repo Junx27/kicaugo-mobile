@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rumahkicau_mobile/features/home/data/datasources/fake_home_data_source.dart';
+import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
 
 /// Payload `/api/v1/home` sesuai seed backend dan kontrak OpenAPI.
@@ -75,8 +75,31 @@ Map<String, dynamic> homeApiPayload() => <String, dynamic>{
   ],
 };
 
+/// Payload `/api/v1/home/profile` sesuai backend.
+Map<String, dynamic> homeProfilePayload() => <String, dynamic>{
+  'profile': <String, dynamic>{
+    'greeting': 'Selamat pagi',
+    'full_name': 'Budi Santoso',
+    'avatar_url': 'https://example.com/avatar.png',
+    'city': <String, dynamic>{'id': 1, 'name': 'Bandung'},
+    'search_radius_km': 10,
+    'favorite_categories': <Map<String, dynamic>>[
+      <String, dynamic>{'id': 1, 'name': 'Murai Batu'},
+    ],
+    'is_complete': true,
+    'missing_fields': <String>[],
+  },
+  'nearby': <String, dynamic>{
+    'origin_source': 'profile_city',
+    'radius_km': 1,
+    'events': <Map<String, dynamic>>[],
+    'hint': null,
+    'ongoing_events_count': 7,
+  },
+};
+
 /// Hasil mapping yang diharapkan: sama persis dengan data dummy Beranda.
-HomeContent get expectedHomeContent => FakeHomeDataSource.content;
+HomeContent get expectedHomeContent => HomeDemoDataSource.content;
 
 /// Membandingkan tiap field karena record [Attendees] memakai List (identity ==).
 void expectHomeContentEquals(HomeContent actual, HomeContent expected) {

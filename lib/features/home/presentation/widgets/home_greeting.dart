@@ -12,17 +12,31 @@ class HomeGreeting extends StatelessWidget {
     required this.greeting,
     required this.name,
     required this.liveCount,
+    this.avatarUrl,
   });
 
   final String greeting;
   final String name;
   final int liveCount;
+  final String? avatarUrl;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       spacing: 8,
       children: [
+        if (avatarUrl != null && avatarUrl!.isNotEmpty)
+          CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage(avatarUrl!),
+            backgroundColor: AppColors.lavenderGlow,
+          )
+        else
+          const CircleAvatar(
+            radius: 18,
+            backgroundColor: AppColors.lavenderGlow,
+            child: Icon(Icons.person_rounded, size: 20),
+          ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

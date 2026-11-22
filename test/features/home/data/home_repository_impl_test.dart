@@ -9,7 +9,11 @@ class _RecordingHomeDataSource implements HomeDataSource {
   int fetchCalls = 0;
 
   @override
-  Future<HomeContent> fetchHomeContent() async {
+  Future<HomeContent> fetchHomeContent({
+    int radiusKm = 1,
+    int categoryId = 1,
+    int limit = 5,
+  }) async {
     fetchCalls++;
     return sampleHomeContent;
   }
