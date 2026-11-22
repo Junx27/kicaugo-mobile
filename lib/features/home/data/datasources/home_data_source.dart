@@ -1,6 +1,7 @@
 import '../../../../core/entities/bird_category.dart';
 import '../../../../core/entities/ticket_status.dart';
 import '../../domain/entities/active_ticket.dart';
+import '../../domain/entities/bird_category_item.dart';
 import '../../domain/entities/featured_contest.dart';
 import '../../domain/entities/home_content.dart';
 import '../../domain/entities/home_profile.dart';
@@ -24,6 +25,46 @@ class HomeDemoDataSource implements HomeDataSource {
   const HomeDemoDataSource({this.delay = const Duration(milliseconds: 500)});
 
   final Duration delay;
+
+  /// Fallback saat endpoint kategori belum tersedia.
+  static const List<BirdCategoryItem> categories = <BirdCategoryItem>[
+    BirdCategoryItem(
+      id: 1,
+      name: 'Murai Batu',
+      slug: 'murai_batu',
+      icon: '${BirdCategoryItem.iconDirectory}murai_batu.svg',
+    ),
+    BirdCategoryItem(
+      id: 2,
+      name: 'Cucak Hijau',
+      slug: 'cucak_hijau',
+      icon: '${BirdCategoryItem.iconDirectory}cucak_hijau.svg',
+    ),
+    BirdCategoryItem(
+      id: 3,
+      name: 'Kacer',
+      slug: 'kacer',
+      icon: '${BirdCategoryItem.iconDirectory}kacer.svg',
+    ),
+    BirdCategoryItem(
+      id: 4,
+      name: 'Anis Merah',
+      slug: 'anis_merah',
+      icon: '${BirdCategoryItem.iconDirectory}anis_merah.svg',
+    ),
+    BirdCategoryItem(
+      id: 5,
+      name: 'Kenari',
+      slug: 'kenari',
+      icon: '${BirdCategoryItem.iconDirectory}kenari.svg',
+    ),
+    BirdCategoryItem(
+      id: 6,
+      name: 'Lovebird',
+      slug: 'lovebird',
+      icon: '${BirdCategoryItem.iconDirectory}lovebird.svg',
+    ),
+  ];
 
   static const HomeContent content = HomeContent(
     profile: HomeProfile(
@@ -93,6 +134,7 @@ class HomeDemoDataSource implements HomeDataSource {
         category: BirdCategory.kenari,
       ),
     ],
+    categories: categories,
   );
 
   @override

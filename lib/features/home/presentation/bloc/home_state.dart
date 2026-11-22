@@ -1,8 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/entities/bird_category.dart';
+import '../../../../core/widgets/bird_category_style.dart';
 import '../../domain/entities/home_content.dart';
 import '../../domain/entities/schedule_item.dart';
+import '../home_strings.dart';
 
 /// Status pemuatan Beranda.
 enum HomeStatus { initial, loading, success, failure }
@@ -13,31 +14,33 @@ class HomeState extends Equatable {
     this.status = HomeStatus.initial,
     this.content,
     this.message,
-    this.category = BirdCategory.all,
+    this.categoryName = HomeStrings.allCategories,
   });
 
   final HomeStatus status;
   final HomeContent? content;
   final String? message;
-  final BirdCategory category;
+  final String categoryName;
 
-  /// Jadwal populer sesuai kategori terpilih.
+  /// Jadwal populer sesuai nama kategori terpilih.
   List<ScheduleItem> get visibleSchedules {
     final schedules = content?.schedules ?? const <ScheduleItem>[];
-    if (category == BirdCategory.all) {
+    if (categoryName == HomeStrings.allCategories) {
       return schedules;
     }
-    return schedules.where((item) => item.category == category).toList();
+    return schedules
+        .where((item) => item.category.label == categoryName)
+        .toList();
   }
 
-  /// Salinan state dengan kategori jadwal [category].
-  HomeState withCategory(BirdCategory category) => HomeState(
+  /// Salinan state dengan nama kategori jadwal [categoryName].
+  HomeState withCategoryName(String categoryName) => HomeState(
     status: status,
     content: content,
     message: message,
-    category: category,
+    categoryName: categoryName,
   );
 
   @override
-  List<Object?> get props => [status, content, message, category];
+  List<Object?> get props => [status, content, message, categoryName];
 }

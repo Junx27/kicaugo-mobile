@@ -9,6 +9,7 @@ import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_event.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
+import 'package:rumahkicau_mobile/features/home/domain/entities/home_profile.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
 import 'package:rumahkicau_mobile/features/home/domain/usecases/get_home_content.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/bloc/home_bloc.dart';
@@ -23,6 +24,16 @@ import '../../../../support/pump_app.dart';
 const _profileMarker = 'profil-test';
 final _morning = DateTime(2026, 11, 20, 8);
 const _content = sampleHomeContent;
+
+HomeContent _contentWithProfile(HomeProfile profile) => HomeContent(
+  profile: profile,
+  featured: _content.featured,
+  upcoming: _content.upcoming,
+  stats: _content.stats,
+  activeTicket: _content.activeTicket,
+  schedules: _content.schedules,
+  categories: _content.categories,
+);
 
 /// Memasang Beranda di layar tinggi agar seluruh isi daftar ter-render.
 Future<void> _pumpHome(
@@ -87,7 +98,8 @@ Future<void> _tapChip(WidgetTester tester, String label) async {
   // Tunggu sisa animasi geser agar ketukan tidak hanya menghentikan scroll.
   await pumpNavigation(tester);
   await tester.tap(find.text(label));
-  await tester.pump();
+  // Tunggu animasi reorder chip dan scroll ke pangkal selesai.
+  await tester.pump(const Duration(milliseconds: 300));
 }
 
 void main() {
@@ -139,6 +151,26 @@ void main() {
     await _pumpHome(tester, signedIn: true);
 
     expect(find.text('Halo, Sari 👋'), findsOneWidget);
+  });
+
+  testWidgets('sapaan dan nama memakai profil dari API bila tersedia', (
+    tester,
+  ) async {
+    await _pumpHome(
+      tester,
+      repository: FakeHomeRepository(
+        content: _contentWithProfile(
+          const HomeProfile(
+            name: 'Nama API',
+            greeting: 'Sapaan API',
+            liveCount: 3,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Sapaan API'), findsOneWidget);
+    expect(find.text('Halo, Nama API 👋'), findsOneWidget);
   });
 
   testWidgets('chip kategori menyaring jadwal, Lovebird kosong', (

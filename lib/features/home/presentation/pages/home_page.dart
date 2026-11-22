@@ -107,10 +107,10 @@ class _HomeContentView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               CategoryChips(
-                selected: state.category,
-                onSelected: (category) => context.read<HomeBloc>().add(
-                  HomeCategorySelected(category),
-                ),
+                categories: content.categories,
+                selectedName: state.categoryName,
+                onSelected: (name) =>
+                    context.read<HomeBloc>().add(HomeCategorySelected(name)),
               ),
               const SizedBox(height: 16),
               Padding(

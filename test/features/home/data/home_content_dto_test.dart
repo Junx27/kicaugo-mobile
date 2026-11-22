@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rumahkicau_mobile/core/error/failure.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_content_dto.dart';
+import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
+import 'package:rumahkicau_mobile/features/home/domain/entities/bird_category_item.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_profile.dart';
 
 import 'home_api_fixture.dart';
@@ -33,5 +36,47 @@ void main() {
     expect(featured.slots, '12 Gantangan');
     expect(featured.attendees.initials, <String>['MK', 'BN']);
     expect(featured.attendees.others, 48);
+  });
+
+  test('birdCategoriesFromJson memetakan seluruh kategori dari envelope', () {
+    final categories = HomeContentDto.birdCategoriesFromJson(
+      homeBirdCategoriesPayload(),
+    );
+
+    expect(categories, HomeDemoDataSource.categories);
+    expect(
+      categories.first.icon,
+      '${BirdCategoryItem.iconDirectory}murai_batu.svg',
+    );
+  });
+
+  test(
+    'birdCategoriesFromJson mempertahankan path ikon yang sudah lengkap',
+    () {
+      const fullPath = '${BirdCategoryItem.iconDirectory}murai_batu.svg';
+      final categories = HomeContentDto.birdCategoriesFromJson(
+        <String, dynamic>{
+          'data': const <Map<String, dynamic>>[
+            <String, dynamic>{
+              'id': 1,
+              'name': 'Murai Batu',
+              'slug': 'murai_batu',
+              'icon': fullPath,
+            },
+          ],
+        },
+      );
+
+      expect(categories.single.icon, fullPath);
+    },
+  );
+
+  test('birdCategoriesFromJson menolak data yang bukan list', () {
+    expect(
+      () => HomeContentDto.birdCategoriesFromJson(<String, dynamic>{
+        'data': 'bukan list',
+      }),
+      throwsA(isA<DataFailure>()),
+    );
   });
 }

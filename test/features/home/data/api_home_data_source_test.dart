@@ -26,6 +26,7 @@ void main() {
         ApiPaths.homeFeatured: jsonEncode(
           homeFeaturedPayload(title: featuredTitle),
         ),
+        ApiPaths.homeBirdCategories: jsonEncode(homeBirdCategoriesPayload()),
       },
     );
     dataSource = ApiHomeDataSource(
@@ -34,7 +35,7 @@ void main() {
   });
 
   test(
-    'fetchHomeContent memetakan profil dan featured backend, bagian lain tetap demo',
+    'fetchHomeContent memetakan profil, featured, dan kategori backend',
     () async {
       final content = await dataSource.fetchHomeContent();
 
@@ -49,6 +50,7 @@ void main() {
       );
       expect(content.featured.attendees.initials, <String>['MK', 'BN']);
       expect(content.featured.attendees.others, 48);
+      expect(content.categories, HomeDemoDataSource.categories);
       expect(content.upcoming, HomeDemoDataSource.content.upcoming);
       expect(content.stats, HomeDemoDataSource.content.stats);
       expect(content.activeTicket, HomeDemoDataSource.content.activeTicket);
@@ -68,18 +70,20 @@ void main() {
         'message': 'Home featured loaded',
         'data': homeFeaturedPayload(title: featuredTitle),
       }),
+      ApiPaths.homeBirdCategories: jsonEncode(homeBirdCategoriesPayload()),
     };
 
     final content = await dataSource.fetchHomeContent();
 
     expect(content.profile.name, 'Kicau Mania');
     expect(content.featured.title, featuredTitle);
+    expect(content.categories, HomeDemoDataSource.categories);
   });
 
-  test('meminta profile dan featured dengan header Bearer', () async {
+  test('meminta kategori terakhir dengan header Bearer', () async {
     await dataSource.fetchHomeContent();
 
-    expect(adapter.recordedOptions?.path, ApiPaths.homeFeatured);
+    expect(adapter.recordedOptions?.path, ApiPaths.homeBirdCategories);
     expect(
       adapter.recordedOptions?.headers['Authorization'],
       'Bearer jwt-token',

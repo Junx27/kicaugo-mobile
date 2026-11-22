@@ -8,6 +8,9 @@ import 'package:rumahkicau_mobile/features/home/presentation/bloc/home_state.dar
 
 import '../../../../support/fakes.dart';
 
+const String kacerName = 'Kacer';
+const String kenariName = 'Kenari';
+
 void main() {
   HomeBloc buildBloc([FakeHomeRepository? repository]) =>
       HomeBloc(GetHomeContent(repository ?? FakeHomeRepository()));
@@ -43,15 +46,15 @@ void main() {
     seed: () => const HomeState(
       status: HomeStatus.failure,
       message: 'Gagal',
-      category: BirdCategory.kacer,
+      categoryName: kacerName,
     ),
     act: (bloc) => bloc.add(const HomeRetryRequested()),
     expect: () => const <HomeState>[
-      HomeState(status: HomeStatus.loading, category: BirdCategory.kacer),
+      HomeState(status: HomeStatus.loading, categoryName: kacerName),
       HomeState(
         status: HomeStatus.success,
         content: sampleHomeContent,
-        category: BirdCategory.kacer,
+        categoryName: kacerName,
       ),
     ],
   );
@@ -60,8 +63,8 @@ void main() {
     'memilih kategori menyaring jadwal populer',
     build: buildBloc,
     seed: () => loaded,
-    act: (bloc) => bloc.add(const HomeCategorySelected(BirdCategory.kenari)),
-    expect: () => [loaded.withCategory(BirdCategory.kenari)],
+    act: (bloc) => bloc.add(const HomeCategorySelected(kenariName)),
+    expect: () => [loaded.withCategoryName(kenariName)],
     verify: (bloc) {
       expect(bloc.state.visibleSchedules, hasLength(1));
       expect(bloc.state.visibleSchedules.single.category, BirdCategory.kenari);

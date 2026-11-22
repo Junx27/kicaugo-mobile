@@ -8,8 +8,9 @@ import 'home_data_source.dart';
 
 /// Sumber data Beranda yang memakai backend KicauGo.
 ///
-/// Profil diambil dari `/api/v1/home/profile` dan lomba unggulan dari
-/// `/api/v1/home/featured`. Bila salah satu permintaan gagal karena endpoint
+/// Profil diambil dari `/api/v1/home/profile`, lomba unggulan dari
+/// `/api/v1/home/featured`, dan kategori burung dari
+/// `/api/v1/home/bird-categories`. Bila salah satu permintaan gagal karena endpoint
 /// tidak ada atau masalah jaringan, sumber data ini kembali ke data dummy agar
 /// Beranda tetap bisa dimuat. Kegagalan lain (mis. 5xx dengan pesan server)
 /// tetap diteruskan.
@@ -37,6 +38,9 @@ class ApiHomeDataSource implements HomeDataSource {
       final featuredJson = await _client.getJson(ApiPaths.homeFeatured);
       final featured = HomeContentDto.featuredFromJson(featuredJson);
 
+      final categoriesJson = await _client.getJson(ApiPaths.homeBirdCategories);
+      final categories = HomeContentDto.birdCategoriesFromJson(categoriesJson);
+
       const demo = HomeDemoDataSource.content;
       return HomeContent(
         profile: profile,
@@ -45,6 +49,7 @@ class ApiHomeDataSource implements HomeDataSource {
         stats: demo.stats,
         activeTicket: demo.activeTicket,
         schedules: demo.schedules,
+        categories: categories,
       );
     } on Failure catch (failure) {
       if (_shouldFallback(failure)) {

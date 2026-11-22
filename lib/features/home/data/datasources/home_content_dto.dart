@@ -1,4 +1,5 @@
 import '../../../../core/network/json_mapper.dart';
+import '../../domain/entities/bird_category_item.dart';
 import '../../domain/entities/featured_contest.dart';
 import '../../domain/entities/home_profile.dart';
 
@@ -27,6 +28,33 @@ abstract final class HomeContentDto {
       ),
     );
   }
+
+  /// Parsing daftar kategori dari endpoint `/api/v1/home/bird-categories`.
+  ///
+  /// Envelope backend tidak terurai otomatis karena `data` berupa List,
+  /// sehingga kategori tetap dibaca dari kunci `data`.
+  static List<BirdCategoryItem> birdCategoriesFromJson(
+    Map<String, dynamic> json,
+  ) {
+    final result = <BirdCategoryItem>[];
+    for (final value in JsonMapper.list(json, 'data')) {
+      final item = JsonMapper.object(value);
+      result.add(
+        BirdCategoryItem(
+          id: JsonMapper.integer(item, 'id'),
+          name: JsonMapper.string(item, 'name'),
+          slug: JsonMapper.string(item, 'slug'),
+          icon: _categoryIcon(JsonMapper.string(item, 'icon')),
+        ),
+      );
+    }
+    return result;
+  }
+
+  /// Backend mengirim nama file, sementara widget butuh path aset lengkap.
+  /// Path yang sudah mengandung direktori dibiarkan apa adanya.
+  static String _categoryIcon(String value) =>
+      value.contains('/') ? value : '${BirdCategoryItem.iconDirectory}$value';
 
   static String? _stringOrNull(Object? value) =>
       value is String && value.isNotEmpty ? value : null;

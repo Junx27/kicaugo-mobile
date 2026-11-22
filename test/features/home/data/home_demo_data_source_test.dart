@@ -11,6 +11,8 @@ void main() {
 
     expect(content, HomeDemoDataSource.content);
     expect(content.profile.liveCount, 14);
+    expect(content.categories, HomeDemoDataSource.categories);
+    expect(content.categories, hasLength(6));
     expect(content.featured.attendees.others, 48);
     expect(content.upcoming.remainingTickets, 3);
   });

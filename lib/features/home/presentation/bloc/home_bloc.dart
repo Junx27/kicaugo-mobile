@@ -35,7 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _onCategorySelected(
     HomeCategorySelected event,
     Emitter<HomeState> emit,
-  ) => emit(state.withCategory(event.category));
+  ) => emit(state.withCategoryName(event.name));
 
   Future<void> _load(
     Emitter<HomeState> emit, {
@@ -43,7 +43,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     int categoryId = 1,
     int limit = 5,
   }) async {
-    emit(HomeState(status: HomeStatus.loading, category: state.category));
+    emit(
+      HomeState(status: HomeStatus.loading, categoryName: state.categoryName),
+    );
     try {
       final content = await _getHomeContent(
         radiusKm: radiusKm,
@@ -54,7 +56,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         HomeState(
           status: HomeStatus.success,
           content: content,
-          category: state.category,
+          categoryName: state.categoryName,
         ),
       );
     } on Failure catch (failure) {
@@ -62,7 +64,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         HomeState(
           status: HomeStatus.failure,
           message: failure.message,
-          category: state.category,
+          categoryName: state.categoryName,
         ),
       );
     }

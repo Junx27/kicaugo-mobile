@@ -1,5 +1,3 @@
-import '../../../../core/entities/bird_category.dart';
-
 /// Event yang diterima [HomeBloc].
 sealed class HomeEvent {
   const HomeEvent();
@@ -29,7 +27,8 @@ final class HomeRetryRequested extends HomeEvent {
 
 /// Pengguna memilih kategori burung untuk menyaring jadwal populer.
 final class HomeCategorySelected extends HomeEvent {
-  const HomeCategorySelected(this.category);
+  const HomeCategorySelected(this.name);
 
-  final BirdCategory category;
+  /// Nama kategori dari endpoint bird-categories, atau "Semua Lomba".
+  final String name;
 }

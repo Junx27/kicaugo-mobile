@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'active_ticket.dart';
+import 'bird_category_item.dart';
 import 'featured_contest.dart';
 import 'home_profile.dart';
 import 'home_stats.dart';
@@ -16,6 +17,7 @@ class HomeContent extends Equatable {
     required this.stats,
     required this.activeTicket,
     required this.schedules,
+    required this.categories,
   });
 
   final HomeProfile profile;
@@ -24,6 +26,7 @@ class HomeContent extends Equatable {
   final HomeStats stats;
   final ActiveTicket activeTicket;
   final List<ScheduleItem> schedules;
+  final List<BirdCategoryItem> categories;
 
   @override
   List<Object?> get props => [
@@ -33,5 +36,6 @@ class HomeContent extends Equatable {
     stats,
     activeTicket,
     schedules,
+    categories,
   ];
 }

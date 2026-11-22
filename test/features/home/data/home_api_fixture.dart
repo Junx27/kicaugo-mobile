@@ -31,6 +31,52 @@ Map<String, dynamic> homeProfilePayloadWithoutAvatar() => <String, dynamic>{
   'avatar': null,
 };
 
+/// Payload `/api/v1/home/bird-categories` sesuai kontrak backend terbaru:
+/// field `icon` hanya berisi nama file.
+
+Map<String, dynamic> homeBirdCategoriesPayload() => <String, dynamic>{
+  'status': 200,
+  'message': 'Home bird categories loaded',
+  'data': const <Map<String, dynamic>>[
+    <String, dynamic>{
+      'id': 1,
+      'name': 'Murai Batu',
+      'slug': 'murai_batu',
+      'icon': 'murai_batu.svg',
+    },
+    <String, dynamic>{
+      'id': 2,
+      'name': 'Cucak Hijau',
+      'slug': 'cucak_hijau',
+      'icon': 'cucak_hijau.svg',
+    },
+    <String, dynamic>{
+      'id': 3,
+      'name': 'Kacer',
+      'slug': 'kacer',
+      'icon': 'kacer.svg',
+    },
+    <String, dynamic>{
+      'id': 4,
+      'name': 'Anis Merah',
+      'slug': 'anis_merah',
+      'icon': 'anis_merah.svg',
+    },
+    <String, dynamic>{
+      'id': 5,
+      'name': 'Kenari',
+      'slug': 'kenari',
+      'icon': 'kenari.svg',
+    },
+    <String, dynamic>{
+      'id': 6,
+      'name': 'Lovebird',
+      'slug': 'lovebird',
+      'icon': 'lovebird.svg',
+    },
+  ],
+};
+
 /// Hasil mapping yang diharapkan: sama persis dengan data dummy Beranda.
 HomeContent get expectedHomeContent => HomeDemoDataSource.content;
 
@@ -44,6 +90,7 @@ void expectHomeContentEquals(HomeContent actual, HomeContent expected) {
   expect(actual.stats, expected.stats);
   expect(actual.activeTicket, expected.activeTicket);
   expect(actual.schedules, equals(expected.schedules));
+  expect(actual.categories, equals(expected.categories));
   expect(featured.title, expectedFeatured.title);
   expect(featured.schedule, expectedFeatured.schedule);
   expect(featured.distance, expectedFeatured.distance);

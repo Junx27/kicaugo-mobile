@@ -6,6 +6,7 @@ abstract final class HomeStrings {
   static const String searchHint = 'Cari lomba, EO, arena gantangan...';
   static const String notificationsTooltip = 'Notifikasi';
   static const String filterTooltip = 'Filter Pencarian';
+  static const String allCategories = 'Semua Lomba';
 
   static const String nearestPrefix = 'TERDEKAT •';
   static const String mainCategory = 'Kategori Utama';
