@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/error/failure.dart';
 import 'package:rumahkicau_mobile/core/network/api_client.dart';
 import 'package:rumahkicau_mobile/core/network/api_paths.dart';
@@ -110,15 +112,51 @@ void main() {
     );
   });
 
-  test('endpoint tidak tersedia kembali ke data dummy', () async {
+  test('endpoint tidak tersedia diteruskan tanpa fallback demo', () async {
     adapter
       ..bodyByPath = null
       ..statusCode = 404
       ..body = '404 page not found';
 
-    final content = await dataSource.fetchHomeContent();
+    await expectLater(
+      dataSource.fetchHomeContent(),
+      throwsA(isA<DataFailure>()),
+    );
+  });
 
-    expect(content, HomeDemoDataSource.content);
+  test('kesalahan tak dikenal diteruskan tanpa fallback demo', () async {
+    final source = ApiHomeDataSource(
+      ApiClient(testDio(adapter), ThrowingTokenProvider()),
+    );
+
+    await expectLater(
+      source.fetchHomeContent(),
+      throwsA(
+        isA<DataFailure>().having(
+          (failure) => failure.message,
+          'message',
+          AppConstants.apiUnexpected,
+        ),
+      ),
+    );
+  });
+
+  test('kegagalan koneksi diteruskan ke pemanggil', () async {
+    adapter.exception = DioException(
+      requestOptions: RequestOptions(path: profilePath),
+      type: DioExceptionType.connectionError,
+    );
+
+    await expectLater(
+      dataSource.fetchHomeContent(),
+      throwsA(
+        isA<DataFailure>().having(
+          (failure) => failure.message,
+          'message',
+          AppConstants.apiConnection,
+        ),
+      ),
+    );
   });
 
   test('payload tidak valid ditolak', () async {

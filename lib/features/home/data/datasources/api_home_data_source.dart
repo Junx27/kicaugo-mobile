@@ -1,5 +1,3 @@
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/error/failure.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_paths.dart';
 import '../../domain/entities/home_content.dart';
@@ -10,18 +8,12 @@ import 'home_data_source.dart';
 ///
 /// Profil diambil dari `/api/v1/home/profile`, lomba unggulan dari
 /// `/api/v1/home/featured`, dan kategori burung dari
-/// `/api/v1/home/bird-categories`. Bila salah satu permintaan gagal karena endpoint
-/// tidak ada atau masalah jaringan, sumber data ini kembali ke data dummy agar
-/// Beranda tetap bisa dimuat. Kegagalan lain (mis. 5xx dengan pesan server)
-/// tetap diteruskan.
+/// `/api/v1/home/bird-categories`. Kegagalan backend apa pun diteruskan ke
+/// pemanggil agar shimmer bisa retry dan akhirnya menampilkan tombol coba lagi.
 class ApiHomeDataSource implements HomeDataSource {
-  const ApiHomeDataSource(
-    this._client, {
-    this.fallback = const HomeDemoDataSource(),
-  });
+  const ApiHomeDataSource(this._client);
 
   final ApiClient _client;
-  final HomeDataSource fallback;
 
   @override
   Future<HomeContent> fetchHomeContent({
@@ -29,44 +21,27 @@ class ApiHomeDataSource implements HomeDataSource {
     int categoryId = 1,
     int limit = 5,
   }) async {
-    try {
-      final json = await _client.getJson(
-        '${ApiPaths.homeProfile}?radius_km=$radiusKm&category_id=$categoryId&limit=$limit',
-      );
-      final profile = HomeContentDto.profileFromJson(json);
+    final json = await _client.getJson(
+      '${ApiPaths.homeProfile}?radius_km=$radiusKm&category_id=$categoryId&limit=$limit',
+    );
+    final profile = HomeContentDto.profileFromJson(json);
 
-      final featuredJson = await _client.getJson(ApiPaths.homeFeatured);
-      final featured = HomeContentDto.featuredFromJson(featuredJson);
+    final featuredJson = await _client.getJson(ApiPaths.homeFeatured);
+    final featured = HomeContentDto.featuredFromJson(featuredJson);
 
-      final categoriesJson = await _client.getJson(ApiPaths.homeBirdCategories);
-      final categories = HomeContentDto.birdCategoriesFromJson(categoriesJson);
+    final categoriesJson = await _client.getJson(ApiPaths.homeBirdCategories);
+    final categories = HomeContentDto.birdCategoriesFromJson(categoriesJson);
 
-      const demo = HomeDemoDataSource.content;
-      return HomeContent(
-        profile: profile,
-        featured: featured,
-        upcoming: demo.upcoming,
-        stats: demo.stats,
-        activeTicket: demo.activeTicket,
-        schedules: demo.schedules,
-        categories: categories,
-      );
-    } on Failure catch (failure) {
-      if (_shouldFallback(failure)) {
-        return fallback.fetchHomeContent(
-          radiusKm: radiusKm,
-          categoryId: categoryId,
-          limit: limit,
-        );
-      }
-      rethrow;
-    }
+    // Bagian yang belum disediakan backend masih memakai data contoh.
+    const demo = HomeDemoDataSource.content;
+    return HomeContent(
+      profile: profile,
+      featured: featured,
+      upcoming: demo.upcoming,
+      stats: demo.stats,
+      activeTicket: demo.activeTicket,
+      schedules: demo.schedules,
+      categories: categories,
+    );
   }
-
-  bool _shouldFallback(Failure failure) =>
-      failure is DataFailure &&
-      (failure.message == AppConstants.apiDataFailure ||
-          failure.message == AppConstants.apiTimeoutMessage ||
-          failure.message == AppConstants.apiConnection ||
-          failure.message == AppConstants.apiUnexpected);
 }
