@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Dibutuhkan release build untuk memanggil API (debug/profile sudah punya). -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Dipakai untuk mencari event terdekat dari lokasi terkini pengguna. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:label="${appLabel}"
         android:name="${applicationName}"
