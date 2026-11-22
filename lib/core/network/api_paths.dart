@@ -19,4 +19,8 @@ abstract final class ApiPaths {
   static const String homeStats = '$_prefix/home/stats';
   static const String homeActiveTicket = '$_prefix/home/active-ticket';
   static const String homeSchedules = '$_prefix/home/schedules';
+
+  // Profile
+  static const String meProfileCurrentLocation =
+      '$_prefix/me/profile/current-location';
 }

@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/constants/app_constants.dart';
+import 'core/location/location_service.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
+import 'features/profile/domain/usecases/update_current_location.dart';
 
 /// Root widget KicauKu.
 class KicauKuApp extends StatefulWidget {
@@ -14,10 +16,14 @@ class KicauKuApp extends StatefulWidget {
     super.key,
     required this.authBloc,
     required this.getHomeContent,
+    required this.locationService,
+    required this.updateCurrentLocation,
   });
 
   final AuthBloc authBloc;
   final GetHomeContent getHomeContent;
+  final LocationService locationService;
+  final UpdateCurrentLocation updateCurrentLocation;
 
   @override
   State<KicauKuApp> createState() => _KicauKuAppState();
@@ -34,6 +40,8 @@ class _KicauKuAppState extends State<KicauKuApp> {
     _router = createRouter(
       authBloc: widget.authBloc,
       getHomeContent: widget.getHomeContent,
+      locationService: widget.locationService,
+      updateCurrentLocation: widget.updateCurrentLocation,
       refreshListenable: _refreshNotifier,
     );
   }

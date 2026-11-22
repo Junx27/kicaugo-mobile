@@ -5,10 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app.dart';
 import 'core/constants/app_constants.dart';
+import 'core/location/location_service.dart';
 import 'core/logging/app_logger.dart';
 import 'di/service_locator.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
+import 'features/profile/domain/usecases/update_current_location.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,8 @@ Future<void> main() async {
     KicauKuApp(
       authBloc: getIt<AuthBloc>(),
       getHomeContent: getIt<GetHomeContent>(),
+      locationService: getIt<LocationService>(),
+      updateCurrentLocation: getIt<UpdateCurrentLocation>(),
     ),
   );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/location/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/pill_nav_bar.dart';
 import '../../chat/data/datasources/fake_chat_data_source.dart';
@@ -9,6 +10,7 @@ import '../../chat/data/repositories/chat_repository_impl.dart';
 import '../../chat/domain/usecases/get_chat_sessions.dart';
 import '../../chat/presentation/cubit/chat_cubit.dart';
 import '../../chat/presentation/cubit/chat_state.dart';
+import '../../profile/domain/usecases/update_current_location.dart';
 import '../domain/usecases/get_home_content.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/home_event.dart';
@@ -23,6 +25,8 @@ class MainShell extends StatelessWidget {
     super.key,
     required this.navigationShell,
     required this.getHomeContent,
+    required this.locationService,
+    required this.updateCurrentLocation,
     this.getChatSessions = const GetChatSessions(
       ChatRepositoryImpl(FakeChatDataSource()),
     ),
@@ -30,6 +34,8 @@ class MainShell extends StatelessWidget {
 
   final StatefulNavigationShell navigationShell;
   final GetHomeContent getHomeContent;
+  final LocationService locationService;
+  final UpdateCurrentLocation updateCurrentLocation;
   final GetChatSessions getChatSessions;
 
   @override
@@ -37,8 +43,11 @@ class MainShell extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              HomeBloc(getHomeContent)..add(const HomeStarted()),
+          create: (context) => HomeBloc(
+            getHomeContent,
+            locationService: locationService,
+            updateCurrentLocation: updateCurrentLocation,
+          )..add(const HomeStarted()),
         ),
         BlocProvider(create: (context) => ChatCubit(getChatSessions)..load()),
       ],
