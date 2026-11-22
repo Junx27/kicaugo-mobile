@@ -10,8 +10,8 @@ class PulseBadge extends StatefulWidget {
   const PulseBadge({
     super.key,
     required this.label,
-    this.backgroundColor = AppColors.lavender,
-    this.accentColor = AppColors.primary,
+    this.backgroundColor = AppColors.lavenderGlow,
+    this.accentColor = AppColors.onPink,
     this.icon,
   });
 
@@ -23,6 +23,11 @@ class PulseBadge extends StatefulWidget {
 
   /// Ikon opsional yang menggantikan titik berdenyut.
   final IconData? icon;
+
+  /// Metrik mengikuti chip kategori Beranda agar ukurannya identik.
+  static const double _height = 32;
+  static const double _horizontalPadding = 12;
+  static const double _gap = 4;
 
   @override
   State<PulseBadge> createState() => _PulseBadgeState();
@@ -55,35 +60,40 @@ class _PulseBadgeState extends State<PulseBadge>
         boxShadow: AppTheme.softShadow,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 6,
-          children: [
-            if (widget.icon != null)
-              FadeTransition(
-                opacity: _opacity,
-                child: Icon(
-                  widget.icon,
-                  size: 14,
-                  weight: 700,
-                  color: widget.accentColor,
+        padding: const EdgeInsets.symmetric(
+          horizontal: PulseBadge._horizontalPadding,
+        ),
+        child: SizedBox(
+          height: PulseBadge._height,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: PulseBadge._gap,
+            children: [
+              if (widget.icon != null)
+                FadeTransition(
+                  opacity: _opacity,
+                  child: Icon(
+                    widget.icon,
+                    size: 14,
+                    weight: 700,
+                    color: widget.accentColor,
+                  ),
+                )
+              else
+                FadeTransition(
+                  opacity: _opacity,
+                  child: ColorPill.dot(size: 8, color: widget.accentColor),
                 ),
-              )
-            else
-              FadeTransition(
-                opacity: _opacity,
-                child: ColorPill.dot(size: 8, color: widget.accentColor),
-              ),
-            Flexible(
-              child: Text(
-                widget.label,
-                style: AppTextStyles.eyebrow.copyWith(
-                  color: widget.accentColor,
+              Flexible(
+                child: Text(
+                  widget.label,
+                  style: AppTextStyles.eyebrow.copyWith(
+                    color: widget.accentColor,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

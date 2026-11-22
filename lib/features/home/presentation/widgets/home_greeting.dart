@@ -55,8 +55,6 @@ class HomeGreeting extends StatelessWidget {
         ),
         PulseBadge(
           label: '$liveCount ${HomeStrings.liveSuffix}',
-          backgroundColor: AppColors.error.withValues(alpha: 0.12),
-          accentColor: AppColors.error,
           icon: Icons.sensors_rounded,
         ),
       ],
