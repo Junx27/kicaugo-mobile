@@ -120,6 +120,7 @@ class _HomeContentView extends StatelessWidget {
                                   : name,
                               liveCount: content.profile.liveCount,
                               avatarUrl: content.profile.avatarUrl,
+                              isOrganizer: content.profile.isOrganizer,
                             ),
                           ),
                           const HomeSearchBar(),

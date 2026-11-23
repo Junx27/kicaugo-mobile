@@ -13,12 +13,14 @@ class HomeGreeting extends StatelessWidget {
     required this.name,
     required this.liveCount,
     this.avatarUrl,
+    this.isOrganizer = false,
   });
 
   final String greeting;
   final String name;
   final int liveCount;
   final String? avatarUrl;
+  final bool isOrganizer;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,12 @@ class HomeGreeting extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Flexible(child: Text(greeting, style: AppTextStyles.eyebrow)),
+                  if (isOrganizer)
+                    const Icon(
+                      Icons.verified_rounded,
+                      size: 14,
+                      color: Colors.blue,
+                    ),
                 ],
               ),
               Text(

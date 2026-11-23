@@ -11,6 +11,7 @@ abstract final class HomeContentDto {
     greeting: JsonMapper.string(json, 'message'),
     liveCount: JsonMapper.integer(json, 'live_count'),
     avatarUrl: _stringOrNull(json['avatar']),
+    isOrganizer: json['is_organizer'] == true,
   );
 
   /// Parsing lomba unggulan dari endpoint `/api/v1/home/featured`.

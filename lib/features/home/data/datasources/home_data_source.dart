@@ -72,6 +72,7 @@ class HomeDemoDataSource implements HomeDataSource {
       avatarUrl: null,
       greeting: '',
       liveCount: 14,
+      isOrganizer: false,
     ),
     featured: FeaturedContest(
       title: 'Piala Raja Nusantara 2026',
