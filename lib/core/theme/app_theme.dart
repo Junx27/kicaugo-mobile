@@ -62,6 +62,9 @@ abstract final class AppTheme {
   /// Radius kartu panel besar (hero dan form auth).
   static const double panelRadius = 24;
 
+  /// Radius sudut atas bottom sheet melengkung.
+  static const double sheetRadius = 32;
+
   /// Radius kotak centang.
   static const double checkboxRadius = 6;
 

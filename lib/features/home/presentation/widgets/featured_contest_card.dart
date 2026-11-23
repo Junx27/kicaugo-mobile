@@ -39,6 +39,7 @@ class FeaturedContestCard extends StatelessWidget {
             ),
           ),
           Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _FeaturedMap(contest: contest),
@@ -49,20 +50,10 @@ class FeaturedContestCard extends StatelessWidget {
                   spacing: 10,
                   children: [
                     _Header(distance: contest.distance),
-                    Text(contest.title, style: AppTextStyles.headlineSmall),
+                    _TitleRow(contest: contest),
                     _IconLine(
                       icon: Icons.location_on_rounded,
                       text: contest.schedule,
-                    ),
-                    FilledButton.icon(
-                      onPressed: () => openExternalNavigation(
-                        context: context,
-                        destinationLatitude: contest.latitude,
-                        destinationLongitude: contest.longitude,
-                        destinationQuery: contest.schedule,
-                      ),
-                      icon: const Icon(Icons.directions_rounded, size: 18),
-                      label: const Text(HomeStrings.openNavigation),
                     ),
                     Row(
                       spacing: 8,
@@ -84,7 +75,7 @@ class FeaturedContestCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    _Footer(attendees: contest.attendees),
+                    _NavigationButton(contest: contest),
                   ],
                 ),
               ),
@@ -113,23 +104,49 @@ class _FeaturedMap extends StatelessWidget {
     return VenueMapPreview(
       latitude: latitude,
       longitude: longitude,
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(AppTheme.showcaseRadius),
-        topRight: Radius.circular(AppTheme.showcaseRadius),
-      ),
-      onTap: () => pushVenueMap(
-        context,
-        VenueMapArgs(
-          latitude: latitude,
-          longitude: longitude,
-          title: contest.title,
-          address: contest.schedule,
+      options: VenueMapOptions(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(AppTheme.showcaseRadius),
+          topRight: Radius.circular(AppTheme.showcaseRadius),
+        ),
+        onTap: () => pushVenueMap(
+          context,
+          VenueMapArgs(
+            latitude: latitude,
+            longitude: longitude,
+            title: contest.title,
+            address: contest.schedule,
+            schedule: contest.schedule,
+            distance: contest.distance,
+          ),
         ),
       ),
     );
   }
 }
 
+/// Tombol navigasi eksternal yang selalu jadi elemen terakhir kartu.
+class _NavigationButton extends StatelessWidget {
+  const _NavigationButton({required this.contest});
+
+  final FeaturedContest contest;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      onPressed: () => openExternalNavigation(
+        context: context,
+        destinationLatitude: contest.latitude,
+        destinationLongitude: contest.longitude,
+        destinationQuery: contest.schedule,
+      ),
+      icon: const Icon(Icons.directions_rounded, size: 18),
+      label: const Text(HomeStrings.openNavigation),
+    );
+  }
+}
+
+/// Baris badge: TERDEKAT di kiri, Lihat Detail di kanan.
 class _Header extends StatelessWidget {
   const _Header({required this.distance});
 
@@ -172,7 +189,28 @@ class _Header extends StatelessWidget {
             ),
           ),
         ),
-        const IconPill(label: HomeStrings.mainCategory, backgroundAlpha: 0.7),
+        const _DetailLink(),
+      ],
+    );
+  }
+}
+
+/// Judul lomba sebaris dengan avatar peserta di sebelah kanannya.
+class _TitleRow extends StatelessWidget {
+  const _TitleRow({required this.contest});
+
+  final FeaturedContest contest;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 8,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(contest.title, style: AppTextStyles.headlineSmall),
+        ),
+        _AttendeeStack(attendees: contest.attendees),
       ],
     );
   }
@@ -256,46 +294,21 @@ class _InfoTile extends StatelessWidget {
   }
 }
 
-class _Footer extends StatelessWidget {
-  const _Footer({required this.attendees});
-
-  final Attendees attendees;
+/// Badge "Lihat Detail" di header, menggantikan Kategori Utama.
+class _DetailLink extends StatelessWidget {
+  const _DetailLink();
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 8,
-          children: [
-            _AttendeeStack(attendees: attendees),
-            Text(
-              HomeStrings.confirmed,
-              style: AppTextStyles.label.copyWith(color: AppColors.textPrimary),
-            ),
-          ],
-        ),
-        FilledButton(
-          onPressed: () => showComingSoon(context),
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(0, 40),
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 4,
-            children: [
-              Text(HomeStrings.seeDetail),
-              Icon(Icons.arrow_forward_rounded, size: 16),
-            ],
-          ),
-        ),
-      ],
+    return InkWell(
+      key: const Key('see_detail_link'),
+      onTap: () => showComingSoon(context),
+      child: const IconPill(
+        label: HomeStrings.seeDetail,
+        trailingIcon: Icons.arrow_forward_rounded,
+        iconColor: AppColors.textPrimary,
+        backgroundAlpha: 0.7,
+      ),
     );
   }
 }

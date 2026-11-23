@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rumahkicau_mobile/app.dart';
 import 'package:rumahkicau_mobile/core/location/location_service.dart';
 
+import 'support/fakes.dart';
 import 'support/pump_app.dart';
 
 void main() {
@@ -16,6 +17,7 @@ void main() {
         authBloc: authBloc,
         getHomeContent: defaultGetHomeContent(),
         locationService: const NoLocationService(),
+        routeService: FakeRouteService(),
         updateCurrentLocation: defaultUpdateCurrentLocation(),
       ),
       isA<KicauKuApp>(),

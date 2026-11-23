@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rumahkicau_mobile/core/location/geolocator_location_service.dart';
 import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/core/network/api_client.dart';
+import 'package:rumahkicau_mobile/core/routing/osrm_route_service.dart';
+import 'package:rumahkicau_mobile/core/routing/route_service.dart';
 import 'package:rumahkicau_mobile/di/service_locator.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/api_auth_remote_data_source.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -47,6 +49,8 @@ void main() {
     );
     expect(getIt<CurrentLocationRepository>(), isNotNull);
     expect(getIt<UpdateCurrentLocation>(), isNotNull);
+    // Rute peta tersedia juga di mode demo karena tidak bergantung backend.
+    expect(getIt<RouteService>(), isA<OsrmRouteService>());
   });
 
   test('flag useApi merakit data source API', () async {

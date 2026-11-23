@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'core/constants/app_constants.dart';
 import 'core/location/location_service.dart';
 import 'core/router/app_router.dart';
+import 'core/routing/route_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
@@ -17,12 +18,14 @@ class KicauKuApp extends StatefulWidget {
     required this.authBloc,
     required this.getHomeContent,
     required this.locationService,
+    required this.routeService,
     required this.updateCurrentLocation,
   });
 
   final AuthBloc authBloc;
   final GetHomeContent getHomeContent;
   final LocationService locationService;
+  final RouteService routeService;
   final UpdateCurrentLocation updateCurrentLocation;
 
   @override
@@ -41,6 +44,7 @@ class _KicauKuAppState extends State<KicauKuApp> {
       authBloc: widget.authBloc,
       getHomeContent: widget.getHomeContent,
       locationService: widget.locationService,
+      routeService: widget.routeService,
       updateCurrentLocation: widget.updateCurrentLocation,
       refreshListenable: _refreshNotifier,
     );

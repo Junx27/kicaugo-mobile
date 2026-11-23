@@ -7,6 +7,8 @@ import '../core/location/geolocator_location_service.dart';
 import '../core/location/location_service.dart';
 import '../core/network/api_client.dart';
 import '../core/network/api_logging_interceptor.dart';
+import '../core/routing/osrm_route_service.dart';
+import '../core/routing/route_service.dart';
 import '../features/auth/data/datasources/api_auth_remote_data_source.dart';
 import '../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../features/auth/data/datasources/fake_auth_remote_data_source.dart';
@@ -79,6 +81,9 @@ Future<void> configureDependencies({bool? useApi}) async {
         () => const NoOpCurrentLocationDataSource(),
       );
   }
+
+  // Rute peta tidak bergantung pada backend sendiri, jadi selalu tersedia.
+  getIt.registerLazySingleton<RouteService>(() => OsrmRouteService());
 
   getIt
     ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt()))

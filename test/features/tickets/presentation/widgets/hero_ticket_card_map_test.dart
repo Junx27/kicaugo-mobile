@@ -26,6 +26,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(VenueMapPage), findsOneWidget);
+    // Label pin disembunyikan saat sheet detail terlihat.
     expect(find.text(ticket.event.venue), findsOneWidget);
   });
 

@@ -7,6 +7,7 @@ import 'app.dart';
 import 'core/constants/app_constants.dart';
 import 'core/location/location_service.dart';
 import 'core/logging/app_logger.dart';
+import 'core/routing/route_service.dart';
 import 'di/service_locator.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
@@ -29,6 +30,7 @@ Future<void> main() async {
       authBloc: getIt<AuthBloc>(),
       getHomeContent: getIt<GetHomeContent>(),
       locationService: getIt<LocationService>(),
+      routeService: getIt<RouteService>(),
       updateCurrentLocation: getIt<UpdateCurrentLocation>(),
     ),
   );

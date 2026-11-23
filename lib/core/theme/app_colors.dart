@@ -7,22 +7,23 @@ import 'package:flutter/material.dart';
 /// literal berulang (Sonar S1192). Maksimal tiga warna pastel per layar.
 abstract final class AppColors {
   /// Indigo: tombol, tab aktif, tautan, state terpilih.
-  static const Color primary = Color(0xFF3B30E0);
+  static const Color primary = Color(0xFF4B44B8);
 
   /// Indigo saat ditekan.
-  static const Color primaryPressed = Color(0xFF2E24BD);
+  static const Color primaryPressed = Color(0xFF373294);
 
   /// Primary dengan opasitas 12% untuk indikator navbar.
-  static const Color primaryIndicator = Color(0x1F3B30E0);
+  static const Color primaryIndicator = Color(0x1F4B44B8);
 
   /// Cincin tipis primary 20% untuk penanda terpilih.
-  static const Color primaryRing = Color(0x333B30E0);
+  static const Color primaryRing = Color(0x334B44B8);
 
   /// Cincin fokus input: primary 40%.
-  static const Color primaryFocus = Color(0x663B30E0);
+  static const Color primaryFocus = Color(0x664B44B8);
 
-  /// Latar halaman.
-  static const Color background = Color(0xFFFFFFFF);
+  /// Latar halaman. Sengaja sedikit hangat agar putih murni [surface]
+  /// punya jeda visual; [surface] tetap putih untuk border rute di peta.
+  static const Color background = Color(0xFFFBFAF8);
 
   /// Permukaan kartu, input, dan navbar.
   static const Color surface = Color(0xFFFFFFFF);
@@ -81,18 +82,21 @@ abstract final class AppColors {
   /// Ikon/teks di atas pink.
   static const Color onPink = Color(0xFFD42A58);
 
-  /// Hijau lime lembut (awal gradient).
-  static const Color lime = Color(0xFFE2F7B5);
+  /// Hijau sage lembut (awal gradient).
+  static const Color lime = Color(0xFFE8F0D6);
 
-  /// Hijau lime (akhir gradient, garis tepi chip).
-  static const Color limeStrong = Color(0xFFBDEB86);
+  /// Hijau sage (akhir gradient, garis tepi chip).
+  static const Color limeStrong = Color(0xFFCFDFA9);
 
   /// Ikon/teks di atas lime.
-  static const Color onLime = Color(0xFF3F5A1E);
+  static const Color onLime = Color(0xFF4A5A38);
 
   /// Biru periwinkle (awal gradient).
   static const Color periwinkle = Color(0xFFDCE6FB);
 
   /// Biru periwinkle (akhir gradient).
   static const Color periwinkleStrong = Color(0xFFC9D8F7);
+
+  /// Biru tegas untuk garis rute dan titik lokasi pengguna di peta.
+  static const Color blueStrong = Color(0xFF2563EB);
 }

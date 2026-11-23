@@ -87,6 +87,7 @@ Future<AuthBloc> pumpKicauKuApp(
       authBloc: authBloc,
       getHomeContent: homeUseCase,
       locationService: const NoLocationService(),
+      routeService: FakeRouteService(),
       updateCurrentLocation: defaultUpdateCurrentLocation(),
     ),
   );

@@ -2,24 +2,29 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
+import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/core/utils/external_navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Posisi pengguna palsu untuk menguji origin URL.
-Position fakePosition() => Position(
-  latitude: -6.1,
-  longitude: 106.7,
-  timestamp: DateTime.now(),
-  accuracy: 5,
-  altitude: 0,
-  altitudeAccuracy: 0,
-  heading: 0,
-  headingAccuracy: 0,
-  speed: 0,
-  speedAccuracy: 0,
-);
+/// Lokasi pengguna palsu untuk menguji origin URL.
+class FakeLocationService implements LocationService {
+  const FakeLocationService(this.location);
+
+  final DeviceLocation? location;
+
+  @override
+  Future<DeviceLocation?> readCurrentLocation() async => location;
+}
+
+/// Layanan lokasi yang melempar error, misalnya timeout pembacaan.
+class ThrowingLocationService implements LocationService {
+  const ThrowingLocationService();
+
+  @override
+  Future<DeviceLocation?> readCurrentLocation() =>
+      Future.error(Exception('location timeout'));
+}
 
 /// Tombol dalam [Scaffold] agar [showComingSoon] punya konteks valid.
 Future<void> tapNavigate(
@@ -57,7 +62,9 @@ void main() {
         destinationLatitude: -6.2,
         destinationLongitude: 106.8,
         destinationQuery: 'Arena',
-        readPosition: () async => fakePosition(),
+        locationService: const FakeLocationService(
+          DeviceLocation(latitude: -6.1, longitude: 106.7),
+        ),
         canLaunch: (uri) async => true,
         launch: (uri, mode) async {
           expect(mode, LaunchMode.externalApplication);
@@ -71,6 +78,7 @@ void main() {
     expect(launched.single.toString(), contains('origin=-6.1%2C106.7'));
     expect(launched.single.toString(), contains('destination=-6.2%2C106.8'));
     expect(find.text(AppConstants.comingSoon), findsNothing);
+    expect(find.text(AppConstants.navigationOriginUnavailable), findsNothing);
   });
 
   testWidgets('izin ditolak tetap membuka navigasi tanpa origin', (
@@ -84,7 +92,7 @@ void main() {
         destinationLatitude: -6.2,
         destinationLongitude: 106.8,
         destinationQuery: 'Arena',
-        readPosition: () => Future.error(Exception('location denied')),
+        locationService: const FakeLocationService(null),
         canLaunch: (uri) async => true,
         launch: (uri, mode) async {
           launched.add(uri);
@@ -95,6 +103,32 @@ void main() {
 
     expect(launched, hasLength(1));
     expect(launched.single.toString(), isNot(contains('origin=')));
+    expect(find.text(AppConstants.navigationOriginUnavailable), findsOneWidget);
+  });
+
+  testWidgets('layanan lokasi gagal tetap membuka navigasi tanpa origin', (
+    tester,
+  ) async {
+    final launched = <Uri>[];
+    await tapNavigate(
+      tester,
+      action: (context) => openExternalNavigation(
+        context: context,
+        destinationLatitude: -6.2,
+        destinationLongitude: 106.8,
+        destinationQuery: 'Arena',
+        locationService: const ThrowingLocationService(),
+        canLaunch: (uri) async => true,
+        launch: (uri, mode) async {
+          launched.add(uri);
+          return true;
+        },
+      ),
+    );
+
+    expect(launched, hasLength(1));
+    expect(launched.single.toString(), isNot(contains('origin=')));
+    expect(find.text(AppConstants.navigationOriginUnavailable), findsOneWidget);
   });
 
   testWidgets('tanpa koordinat dan query menampilkan segera hadir', (
@@ -105,7 +139,9 @@ void main() {
       action: (context) => openExternalNavigation(
         context: context,
         destinationQuery: '  ',
-        readPosition: () async => fakePosition(),
+        locationService: const FakeLocationService(
+          DeviceLocation(latitude: -6.1, longitude: 106.7),
+        ),
       ),
     );
 
@@ -123,7 +159,9 @@ void main() {
         destinationLatitude: -6.2,
         destinationLongitude: 106.8,
         destinationQuery: 'Arena',
-        readPosition: () async => fakePosition(),
+        locationService: const FakeLocationService(
+          DeviceLocation(latitude: -6.1, longitude: 106.7),
+        ),
         canLaunch: (uri) async => false,
         launch: (uri, mode) async {
           launched = true;

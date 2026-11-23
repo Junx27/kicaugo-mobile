@@ -10,6 +10,7 @@ class IconPill extends StatelessWidget {
     super.key,
     required this.label,
     this.icon,
+    this.trailingIcon,
     this.iconColor = AppColors.primary,
     this.backgroundColor = AppColors.surface,
     this.backgroundAlpha = 1,
@@ -17,6 +18,9 @@ class IconPill extends StatelessWidget {
 
   final String label;
   final IconData? icon;
+
+  /// Ikon opsional di sisi kanan label (mis. panah pada tautan detail).
+  final IconData? trailingIcon;
   final Color iconColor;
   final Color backgroundColor;
 
@@ -50,6 +54,8 @@ class IconPill extends StatelessWidget {
               ),
             ),
           ),
+          if (trailingIcon != null)
+            Icon(trailingIcon, size: _iconSize, color: iconColor),
         ],
       ),
     );

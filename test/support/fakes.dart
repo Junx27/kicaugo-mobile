@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/error/failure.dart';
 import 'package:rumahkicau_mobile/core/location/location_service.dart';
+import 'package:rumahkicau_mobile/core/routing/route_service.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/fake_auth_remote_data_source.dart';
 import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/entities/user.dart';
@@ -155,6 +156,29 @@ class FakeLocationService implements LocationService {
     readCalls++;
     if (error != null) throw error!;
     return location;
+  }
+}
+
+/// Penyedia rute palsu: hasil, error, dan jeda completer bisa diatur.
+class FakeRouteService implements RouteService {
+  FakeRouteService({this.route, this.error, this.completer});
+
+  RoutePath? route;
+  Object? error;
+  final Completer<RoutePath?>? completer;
+  int fetchCalls = 0;
+
+  @override
+  Future<RoutePath?> fetchRoute({
+    required double originLatitude,
+    required double originLongitude,
+    required double destinationLatitude,
+    required double destinationLongitude,
+  }) {
+    fetchCalls++;
+    if (completer != null) return completer!.future;
+    if (error != null) return Future.error(error!);
+    return Future.value(route);
   }
 }
 
