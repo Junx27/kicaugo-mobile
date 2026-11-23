@@ -43,6 +43,20 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install diff-cover
+        run: pip install diff-cover
+
+      - name: Enforce 100% coverage on changed lines
+        run: |
+          diff-cover coverage/lcov.info \
+            --compare-branch=origin/master \
+            --fail-under=100
+
       - name: Upload coverage
         uses: actions/upload-artifact@v7
         with:
