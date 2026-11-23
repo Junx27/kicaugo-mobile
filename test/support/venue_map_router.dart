@@ -5,6 +5,8 @@ import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/router/venue_map_args.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/pages/venue_map_page.dart';
 
+import 'fakes.dart';
+
 /// Memasang kartu dalam router minimal yang mengenal rute peta penuh.
 Future<void> pumpCardWithVenueMapRouter(
   WidgetTester tester, {
@@ -23,6 +25,8 @@ Future<void> pumpCardWithVenueMapRouter(
           args: state.extra is VenueMapArgs
               ? state.extra as VenueMapArgs
               : null,
+          routeService: FakeRouteService(),
+          locationService: FakeLocationService(),
         ),
       ),
     ],

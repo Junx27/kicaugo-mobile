@@ -29,10 +29,12 @@ void main() {
     });
 
     test('primary indigo dan teks gelap sesuai spesifikasi', () {
-      expect(AppColors.primary, const Color(0xFF3B30E0));
-      expect(AppColors.primaryPressed, const Color(0xFF2E24BD));
+      expect(AppColors.primary, const Color(0xFF4B44B8));
+      expect(AppColors.primaryPressed, const Color(0xFF373294));
       expect(AppColors.textPrimary, const Color(0xFF15122B));
-      expect(AppColors.background, const Color(0xFFFFFFFF));
+      expect(AppColors.background, const Color(0xFFFBFAF8));
+      // Border putih rute peta bergantung pada surface yang tetap murni.
+      expect(AppColors.surface, const Color(0xFFFFFFFF));
     });
 
     test('indikator navbar memakai primary 12%', () {

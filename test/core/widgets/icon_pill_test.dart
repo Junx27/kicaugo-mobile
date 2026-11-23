@@ -35,4 +35,23 @@ void main() {
     expect(find.text('Kacer'), findsOneWidget);
     expect(find.byType(Icon), findsNothing);
   });
+
+  testWidgets('ikon di kanan tampil setelah label', (tester) async {
+    await _pump(
+      tester,
+      const IconPill(
+        label: 'Detail',
+        trailingIcon: Icons.arrow_forward_rounded,
+        iconColor: AppColors.textPrimary,
+      ),
+    );
+
+    final arrow = find.byIcon(Icons.arrow_forward_rounded);
+    expect(arrow, findsOneWidget);
+    expect(tester.widget<Icon>(arrow).color, AppColors.textPrimary);
+    expect(
+      tester.getRect(arrow).left,
+      greaterThan(tester.getRect(find.text('Detail')).right),
+    );
+  });
 }
