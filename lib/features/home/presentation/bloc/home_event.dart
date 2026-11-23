@@ -1,4 +1,4 @@
-import '../../../../core/entities/bird_category.dart';
+import 'dart:async';
 
 /// Event yang diterima [HomeBloc].
 sealed class HomeEvent {
@@ -7,17 +7,38 @@ sealed class HomeEvent {
 
 /// Beranda pertama kali dibuka.
 final class HomeStarted extends HomeEvent {
-  const HomeStarted();
+  const HomeStarted({this.radiusKm = 1, this.categoryId = 1, this.limit = 5});
+
+  final int radiusKm;
+  final int categoryId;
+  final int limit;
 }
 
 /// Pengguna meminta memuat ulang konten.
 final class HomeRetryRequested extends HomeEvent {
-  const HomeRetryRequested();
+  const HomeRetryRequested({
+    this.radiusKm = 1,
+    this.categoryId = 1,
+    this.limit = 5,
+  });
+
+  final int radiusKm;
+  final int categoryId;
+  final int limit;
+}
+
+/// Pengguna menarik daftar Beranda untuk menyegarkan data.
+final class HomeRefreshRequested extends HomeEvent {
+  const HomeRefreshRequested({required this.completer});
+
+  /// Diselesaikan setelah percobaan refresh selesai, berhasil maupun gagal.
+  final Completer<void> completer;
 }
 
 /// Pengguna memilih kategori burung untuk menyaring jadwal populer.
 final class HomeCategorySelected extends HomeEvent {
-  const HomeCategorySelected(this.category);
+  const HomeCategorySelected(this.name);
 
-  final BirdCategory category;
+  /// Nama kategori dari endpoint bird-categories, atau "Semua Lomba".
+  final String name;
 }

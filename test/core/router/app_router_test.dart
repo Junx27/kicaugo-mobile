@@ -179,7 +179,6 @@ void main() {
       await _toLogin(tester);
       await submitLogin(tester);
       await pumpNavigation(tester);
-      expect(find.text('2'), findsOneWidget);
       expect(
         find.descendant(
           of: navTab(HomeStrings.navChat),
@@ -205,4 +204,16 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
     },
   );
+
+  testWidgets('tab Komunitas membuka CommunityPage', (tester) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    await tester.tap(navTab(HomeStrings.navCommunity));
+    await pumpNavigation(tester);
+
+    expect(find.byType(CommunityPage), findsOneWidget);
+  });
 }

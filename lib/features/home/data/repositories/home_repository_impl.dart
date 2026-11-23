@@ -9,5 +9,13 @@ class HomeRepositoryImpl implements HomeRepository {
   final HomeDataSource _dataSource;
 
   @override
-  Future<HomeContent> fetchHomeContent() => _dataSource.fetchHomeContent();
+  Future<HomeContent> fetchHomeContent({
+    int radiusKm = 1,
+    int categoryId = 1,
+    int limit = 5,
+  }) => _dataSource.fetchHomeContent(
+    radiusKm: radiusKm,
+    categoryId: categoryId,
+    limit: limit,
+  );
 }

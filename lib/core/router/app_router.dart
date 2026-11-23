@@ -14,12 +14,14 @@ import '../../features/home/domain/usecases/get_home_content.dart';
 import '../../features/home/presentation/main_shell.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/profile/domain/usecases/update_current_location.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/reminders/presentation/pages/reminders_page.dart';
 import '../../features/schedule/presentation/pages/schedule_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/tickets/presentation/pages/ticket_history_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
+import '../location/location_service.dart';
 import 'app_navigator_observer.dart';
 import 'app_routes.dart';
 
@@ -46,6 +48,8 @@ class AuthRouterNotifier extends ChangeNotifier {
 GoRouter createRouter({
   required AuthBloc authBloc,
   required GetHomeContent getHomeContent,
+  required LocationService locationService,
+  required UpdateCurrentLocation updateCurrentLocation,
   required Listenable refreshListenable,
 }) {
   return GoRouter(
@@ -87,6 +91,8 @@ GoRouter createRouter({
         builder: (context, state, navigationShell) => MainShell(
           navigationShell: navigationShell,
           getHomeContent: getHomeContent,
+          locationService: locationService,
+          updateCurrentLocation: updateCurrentLocation,
         ),
         branches: [
           _branch(AppRoutes.home, (context, state) => const HomePage()),

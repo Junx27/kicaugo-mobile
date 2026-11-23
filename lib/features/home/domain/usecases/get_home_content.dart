@@ -1,11 +1,19 @@
 import '../entities/home_content.dart';
 import '../repositories/home_repository.dart';
 
-/// Usecase untuk mengambil seluruh konten Beranda.
+/// Use case untuk mengambil konten Beranda.
 class GetHomeContent {
   const GetHomeContent(this._repository);
 
   final HomeRepository _repository;
 
-  Future<HomeContent> call() => _repository.fetchHomeContent();
+  Future<HomeContent> call({
+    int radiusKm = 1,
+    int categoryId = 1,
+    int limit = 5,
+  }) => _repository.fetchHomeContent(
+    radiusKm: radiusKm,
+    categoryId: categoryId,
+    limit: limit,
+  );
 }

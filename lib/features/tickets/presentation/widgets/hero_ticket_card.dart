@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/navigation_url_builder.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/pulse_badge.dart';
+import '../../../home/presentation/widgets/venue_map_preview.dart';
 import '../../domain/entities/upcoming_ticket.dart';
 import '../tickets_strings.dart';
 import 'ticket_bits.dart';
@@ -47,6 +51,17 @@ class HeroTicketCard extends StatelessWidget {
                   title: ticket.event.venue,
                   subtitle: ticket.event.address,
                 ),
+                if (ticket.event.latitude != null &&
+                    ticket.event.longitude != null)
+                  VenueMapPreview(
+                    latitude: ticket.event.latitude!,
+                    longitude: ticket.event.longitude!,
+                  ),
+                FilledButton.icon(
+                  onPressed: () => _openTicketNavigation(context, ticket),
+                  icon: const Icon(Icons.directions_rounded, size: 18),
+                  label: const Text('Buka navigasi'),
+                ),
                 BirdStrip(bird: ticket.bird, category: ticket.category),
               ],
             ),
@@ -59,6 +74,43 @@ class HeroTicketCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Membuka aplikasi peta native untuk navigasi ke venue tiket.
+Future<void> _openTicketNavigation(
+  BuildContext context,
+  UpcomingTicket ticket,
+) async {
+  double? originLatitude;
+  double? originLongitude;
+  try {
+    final position = await Geolocator.getCurrentPosition();
+    originLatitude = position.latitude;
+    originLongitude = position.longitude;
+  } catch (_) {
+    // Izin ditolak atau layanan lokasi tidak tersedia; lanjut tanpa origin.
+  }
+
+  final url = buildExternalNavigationUrl(
+    originLatitude: originLatitude,
+    originLongitude: originLongitude,
+    destinationLatitude: ticket.event.latitude,
+    destinationLongitude: ticket.event.longitude,
+    destinationQuery: '${ticket.event.venue} ${ticket.event.address}',
+  );
+  if (url == null) {
+    if (context.mounted) {
+      showComingSoon(context);
+    }
+    return;
+  }
+
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else if (context.mounted) {
+    showComingSoon(context);
   }
 }
 

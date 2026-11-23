@@ -16,7 +16,7 @@ class HomeSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const StadiumBorder(),
+      shape: const StadiumBorder(side: BorderSide(color: AppColors.lavender)),
       shadowColor: AppColors.shadow,
       elevation: 2,
       child: InkWell(

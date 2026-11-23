@@ -12,35 +12,58 @@ class HomeGreeting extends StatelessWidget {
     required this.greeting,
     required this.name,
     required this.liveCount,
+    this.avatarUrl,
+    this.isOrganizer = false,
   });
 
   final String greeting;
   final String name;
   final int liveCount;
+  final String? avatarUrl;
+  final bool isOrganizer;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       spacing: 8,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        CircleAvatar(
+          radius: 18,
+          backgroundImage: (avatarUrl != null && avatarUrl!.isNotEmpty)
+              ? NetworkImage(avatarUrl!)
+              : const AssetImage('assets/avatar/avatar1.jpg'),
+          backgroundColor: AppColors.lavenderGlow,
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(greeting.toUpperCase(), style: AppTextStyles.eyebrow),
+              Row(
+                spacing: 8,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(child: Text(greeting, style: AppTextStyles.eyebrow)),
+                  if (isOrganizer)
+                    const Icon(
+                      Icons.verified_rounded,
+                      size: 14,
+                      color: Colors.blue,
+                    ),
+                ],
+              ),
               Text(
                 'Halo, $name ${HomeStrings.waveEmoji}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.headlineSmall,
+                style: AppTextStyles.title,
               ),
             ],
           ),
         ),
         PulseBadge(
           label: '$liveCount ${HomeStrings.liveSuffix}',
-          backgroundColor: AppColors.lavenderGlow,
-          accentColor: AppColors.onLime,
+          icon: Icons.sensors_rounded,
         ),
       ],
     );

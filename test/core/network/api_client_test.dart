@@ -69,6 +69,19 @@ void main() {
     });
   });
 
+  test('putJson mengirim body dan membuka envelope', () async {
+    adapter.body = '{"status":200,"message":"Profile updated","data":{}}';
+
+    final json = await client.putJson(
+      ApiPaths.meProfileCurrentLocation,
+      body: <String, dynamic>{'latitude': -6.2},
+    );
+
+    expect(json, isEmpty);
+    expect(adapter.recordedOptions!.method, 'PUT');
+    expect(recordedBody(adapter), <String, dynamic>{'latitude': -6.2});
+  });
+
   test('getJson membuka envelope data dari backend', () async {
     adapter.body =
         '{"status":200,"message":"OK","data":{"summary":{"liveCount":2}}}';

@@ -29,6 +29,13 @@ class ApiClient {
     return decodeEnvelope(response.data);
   }
 
+  Future<Map<String, dynamic>> putJson(String path, {Object? body}) async {
+    final response = await _send(
+      (options) => _dio.put<dynamic>(path, data: body, options: options),
+    );
+    return decodeEnvelope(response.data);
+  }
+
   Future<void> postEmpty(String path) async {
     await _send((options) => _dio.post<dynamic>(path, options: options));
   }

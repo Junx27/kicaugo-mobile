@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rumahkicau_mobile/app.dart';
+import 'package:rumahkicau_mobile/core/location/location_service.dart';
 
 import 'support/pump_app.dart';
 
@@ -14,6 +15,8 @@ void main() {
         key: UniqueKey(),
         authBloc: authBloc,
         getHomeContent: defaultGetHomeContent(),
+        locationService: const NoLocationService(),
+        updateCurrentLocation: defaultUpdateCurrentLocation(),
       ),
       isA<KicauKuApp>(),
     );

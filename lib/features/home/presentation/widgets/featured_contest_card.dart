@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_tones.dart';
+import '../../../../core/utils/navigation_url_builder.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/icon_pill.dart';
 import '../../domain/entities/featured_contest.dart';
 import '../home_strings.dart';
+import 'venue_map_preview.dart';
 
 /// Kartu kuning "Lomba Terdekat" dengan info hadiah, slot, dan peserta.
 class FeaturedContestCard extends StatelessWidget {
@@ -46,6 +50,16 @@ class FeaturedContestCard extends StatelessWidget {
                 _IconLine(
                   icon: Icons.location_on_rounded,
                   text: contest.schedule,
+                ),
+                if (contest.latitude != null && contest.longitude != null)
+                  VenueMapPreview(
+                    latitude: contest.latitude!,
+                    longitude: contest.longitude!,
+                  ),
+                FilledButton.icon(
+                  onPressed: () => _openNavigation(context, contest),
+                  icon: const Icon(Icons.directions_rounded, size: 18),
+                  label: const Text('Buka navigasi'),
                 ),
                 Row(
                   spacing: 8,
@@ -244,6 +258,43 @@ class _Footer extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Membuka aplikasi peta native untuk navigasi ke venue lomba.
+Future<void> _openNavigation(
+  BuildContext context,
+  FeaturedContest contest,
+) async {
+  double? originLatitude;
+  double? originLongitude;
+  try {
+    final position = await Geolocator.getCurrentPosition();
+    originLatitude = position.latitude;
+    originLongitude = position.longitude;
+  } catch (_) {
+    // Izin ditolak atau layanan lokasi tidak tersedia; lanjut tanpa origin.
+  }
+
+  final url = buildExternalNavigationUrl(
+    originLatitude: originLatitude,
+    originLongitude: originLongitude,
+    destinationLatitude: contest.latitude,
+    destinationLongitude: contest.longitude,
+    destinationQuery: contest.schedule,
+  );
+  if (url == null) {
+    if (context.mounted) {
+      showComingSoon(context);
+    }
+    return;
+  }
+
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else if (context.mounted) {
+    showComingSoon(context);
   }
 }
 

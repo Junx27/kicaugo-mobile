@@ -57,6 +57,15 @@ abstract final class AppConstants {
   /// Pesan gagal memuat Beranda.
   static const String homeLoadError = 'Gagal memuat data. Coba lagi.';
 
+  /// Batas tunggu shimmer Beranda sebelum menawarkan muat ulang.
+  static const Duration homeShimmerTimeout = Duration(seconds: 3);
+
+  /// Jeda antar percobaan ulang selagi shimmer Beranda masih tampil.
+  static const Duration homeRetryDelay = Duration(milliseconds: 400);
+
+  /// Pesan saat pemuatan Beranda melewati batas tunggu shimmer.
+  static const String homeLoadTimeout = 'Memuat data terlalu lama. Coba lagi.';
+
   /// Label tombol muat ulang.
   static const String retryLabel = 'Coba lagi';
 

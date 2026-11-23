@@ -3,6 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
+import '../core/location/geolocator_location_service.dart';
+import '../core/location/location_service.dart';
 import '../core/network/api_client.dart';
 import '../core/network/api_logging_interceptor.dart';
 import '../features/auth/data/datasources/api_auth_remote_data_source.dart';
@@ -17,11 +19,15 @@ import '../features/auth/domain/usecases/logout_usecase.dart';
 import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/home/data/datasources/api_home_data_source.dart';
-import '../features/home/data/datasources/fake_home_data_source.dart';
 import '../features/home/data/datasources/home_data_source.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
 import '../features/home/domain/repositories/home_repository.dart';
 import '../features/home/domain/usecases/get_home_content.dart';
+import '../features/profile/data/datasources/api_current_location_data_source.dart';
+import '../features/profile/data/datasources/current_location_data_source.dart';
+import '../features/profile/data/repositories/current_location_repository_impl.dart';
+import '../features/profile/domain/repositories/current_location_repository.dart';
+import '../features/profile/domain/usecases/update_current_location.dart';
 
 /// Service locator aplikasi.
 final GetIt getIt = GetIt.instance;
@@ -55,13 +61,23 @@ Future<void> configureDependencies({bool? useApi}) async {
       ..registerLazySingleton<AuthRemoteDataSource>(
         () => ApiAuthRemoteDataSource(getIt()),
       )
-      ..registerLazySingleton<HomeDataSource>(() => ApiHomeDataSource(getIt()));
+      ..registerLazySingleton<HomeDataSource>(() => ApiHomeDataSource(getIt()))
+      ..registerLazySingleton<LocationService>(
+        () => const GeolocatorLocationService(),
+      )
+      ..registerLazySingleton<CurrentLocationDataSource>(
+        () => ApiCurrentLocationDataSource(getIt()),
+      );
   } else {
     getIt
       ..registerLazySingleton<AuthRemoteDataSource>(
         () => FakeAuthRemoteDataSource(),
       )
-      ..registerLazySingleton<HomeDataSource>(() => const FakeHomeDataSource());
+      ..registerLazySingleton<HomeDataSource>(() => const HomeDemoDataSource())
+      ..registerLazySingleton<LocationService>(() => const NoLocationService())
+      ..registerLazySingleton<CurrentLocationDataSource>(
+        () => const NoOpCurrentLocationDataSource(),
+      );
   }
 
   getIt
@@ -80,5 +96,9 @@ Future<void> configureDependencies({bool? useApi}) async {
       dispose: (bloc) => bloc.close(),
     )
     ..registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(getIt()))
-    ..registerLazySingleton(() => GetHomeContent(getIt()));
+    ..registerLazySingleton(() => GetHomeContent(getIt()))
+    ..registerLazySingleton<CurrentLocationRepository>(
+      () => CurrentLocationRepositoryImpl(getIt()),
+    )
+    ..registerLazySingleton(() => UpdateCurrentLocation(getIt()));
 }

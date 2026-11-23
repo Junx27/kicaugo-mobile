@@ -9,6 +9,8 @@ class TicketEvent extends Equatable {
     required this.className,
     required this.venue,
     required this.address,
+    this.latitude,
+    this.longitude,
   });
 
   final String title;
@@ -18,6 +20,10 @@ class TicketEvent extends Equatable {
   final String venue;
   final String address;
 
+  /// Koordinat venue lomba (nullable bila backend belum mengirim).
+  final double? latitude;
+  final double? longitude;
+
   @override
   List<Object?> get props => [
     title,
@@ -26,6 +32,8 @@ class TicketEvent extends Equatable {
     className,
     venue,
     address,
+    latitude,
+    longitude,
   ];
 }
 

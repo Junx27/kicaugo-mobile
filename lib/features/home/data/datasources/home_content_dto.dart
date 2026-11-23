@@ -1,31 +1,21 @@
-import '../../../../core/entities/bird_category.dart';
-import '../../../../core/entities/ticket_status.dart';
 import '../../../../core/network/json_mapper.dart';
-import '../../domain/entities/active_ticket.dart';
+import '../../domain/entities/bird_category_item.dart';
 import '../../domain/entities/featured_contest.dart';
-import '../../domain/entities/home_content.dart';
-import '../../domain/entities/home_stats.dart';
-import '../../domain/entities/schedule_item.dart';
-import '../../domain/entities/upcoming_contest.dart';
+import '../../domain/entities/home_profile.dart';
 
-/// Mapping payload `/api/v1/home` ke entity domain Beranda.
+/// Mapping payload endpoint Beranda ke entity domain.
 abstract final class HomeContentDto {
-  static HomeContent fromJson(Map<String, dynamic> json) => HomeContent(
-    summary: _summary(JsonMapper.object(json['summary'])),
-    featured: _featured(JsonMapper.object(json['featured'])),
-    upcoming: _upcoming(JsonMapper.object(json['upcoming'])),
-    stats: _stats(JsonMapper.object(json['stats'])),
-    activeTicket: _activeTicket(JsonMapper.object(json['activeTicket'])),
-    schedules: _schedules(JsonMapper.list(json, 'schedules')),
+  /// Parsing profil Beranda dari endpoint `/api/v1/home/profile`.
+  static HomeProfile profileFromJson(Map<String, dynamic> json) => HomeProfile(
+    name: JsonMapper.string(json, 'name'),
+    greeting: JsonMapper.string(json, 'message'),
+    liveCount: JsonMapper.integer(json, 'live_count'),
+    avatarUrl: _stringOrNull(json['avatar']),
+    isOrganizer: json['is_organizer'] == true,
   );
 
-  static HomeSummary _summary(Map<String, dynamic> json) => HomeSummary(
-    location: JsonMapper.string(json, 'location'),
-    liveCount: JsonMapper.integer(json, 'liveCount'),
-    activeTicketCount: JsonMapper.integer(json, 'activeTicketCount'),
-  );
-
-  static FeaturedContest _featured(Map<String, dynamic> json) {
+  /// Parsing lomba unggulan dari endpoint `/api/v1/home/featured`.
+  static FeaturedContest featuredFromJson(Map<String, dynamic> json) {
     final attendees = JsonMapper.object(json['attendees']);
     return FeaturedContest(
       title: JsonMapper.string(json, 'title'),
@@ -37,42 +27,43 @@ abstract final class HomeContentDto {
         initials: JsonMapper.strings(attendees, 'initials'),
         others: JsonMapper.integer(attendees, 'others'),
       ),
+      latitude: _doubleOrNull(json['latitude']),
+      longitude: _doubleOrNull(json['longitude']),
     );
   }
 
-  static UpcomingContest _upcoming(Map<String, dynamic> json) =>
-      UpcomingContest(
-        type: JsonMapper.string(json, 'type'),
-        title: JsonMapper.string(json, 'title'),
-        time: JsonMapper.string(json, 'time'),
-        price: JsonMapper.string(json, 'price'),
-        remainingTickets: JsonMapper.integer(json, 'remainingTickets'),
+  /// Parsing daftar kategori dari endpoint `/api/v1/home/bird-categories`.
+  ///
+  /// Envelope backend tidak terurai otomatis karena `data` berupa List,
+  /// sehingga kategori tetap dibaca dari kunci `data`.
+  static List<BirdCategoryItem> birdCategoriesFromJson(
+    Map<String, dynamic> json,
+  ) {
+    final result = <BirdCategoryItem>[];
+    for (final value in JsonMapper.list(json, 'data')) {
+      final item = JsonMapper.object(value);
+      result.add(
+        BirdCategoryItem(
+          id: JsonMapper.integer(item, 'id'),
+          name: JsonMapper.string(item, 'name'),
+          slug: JsonMapper.string(item, 'slug'),
+          icon: _categoryIcon(JsonMapper.string(item, 'icon')),
+        ),
       );
+    }
+    return result;
+  }
 
-  static HomeStats _stats(Map<String, dynamic> json) => HomeStats(
-    badge: JsonMapper.string(json, 'badge'),
-    headline: JsonMapper.string(json, 'headline'),
-    note: JsonMapper.string(json, 'note'),
-    securityNote: JsonMapper.string(json, 'securityNote'),
-  );
+  /// Backend mengirim nama file, sementara widget butuh path aset lengkap.
+  /// Path yang sudah mengandung direktori dibiarkan apa adanya.
+  static String _categoryIcon(String value) =>
+      value.contains('/') ? value : '${BirdCategoryItem.iconDirectory}$value';
 
-  static ActiveTicket _activeTicket(Map<String, dynamic> json) => ActiveTicket(
-    event: JsonMapper.string(json, 'event'),
-    schedule: JsonMapper.string(json, 'schedule'),
-    number: JsonMapper.string(json, 'number'),
-    session: JsonMapper.string(json, 'session'),
-  );
+  static String? _stringOrNull(Object? value) =>
+      value is String && value.isNotEmpty ? value : null;
 
-  static List<ScheduleItem> _schedules(List<Object?> values) => [
-    for (final value in values) _schedule(JsonMapper.object(value)),
-  ];
-
-  static ScheduleItem _schedule(Map<String, dynamic> json) => ScheduleItem(
-    title: JsonMapper.string(json, 'title'),
-    venue: JsonMapper.string(json, 'venue'),
-    date: JsonMapper.string(json, 'date'),
-    price: JsonMapper.string(json, 'price'),
-    status: JsonMapper.enumValue(json, 'status', TicketStatus.values),
-    category: JsonMapper.enumValue(json, 'category', BirdCategory.values),
-  );
+  static double? _doubleOrNull(Object? value) {
+    if (value is num) return value.toDouble();
+    return null;
+  }
 }

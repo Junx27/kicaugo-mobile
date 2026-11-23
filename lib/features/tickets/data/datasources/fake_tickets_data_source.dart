@@ -30,6 +30,8 @@ class FakeTicketsDataSource implements TicketsDataSource {
           className: 'Kelas: Murai Batu Utama (Tiket G-24)',
           venue: 'Batavia Arena Gantangan',
           address: 'Jl. Daan Mogot KM 12, Paddock 3, Jakarta Barat',
+          latitude: -6.150000,
+          longitude: 106.750000,
         ),
         seat: TicketSeat(
           number: '#G-18',
@@ -55,6 +57,8 @@ class FakeTicketsDataSource implements TicketsDataSource {
           className: 'Kelas: Kacer Master Standar B',
           venue: 'Arena Angkasa Halim',
           address: 'Jl. Angkasa Raya 8, Jakarta Timur',
+          latitude: -6.200000,
+          longitude: 106.880000,
         ),
         seat: TicketSeat(
           number: '#G-09',
