@@ -47,7 +47,7 @@ void main() {
 
     expect(demoTickets.props, hasLength(4));
     expect(upcoming.props, hasLength(6));
-    expect(upcoming.event.props, hasLength(6));
+    expect(upcoming.event.props, hasLength(8));
     expect(upcoming.seat.props, hasLength(4));
     expect(upcoming.bird.props, hasLength(4));
     expect(past.props, hasLength(5));
