@@ -16,6 +16,7 @@ class VenueMapPreview extends StatelessWidget {
     required this.longitude,
     this.height = 160,
     this.interactive = false,
+    this.borderRadius,
     this.onTap,
   });
 
@@ -24,14 +25,18 @@ class VenueMapPreview extends StatelessWidget {
   final double height;
   final bool interactive;
 
+  /// Radius klip peta; `null` memakai radius kartu biasa.
+  final BorderRadius? borderRadius;
+
   /// Aksi saat preview diketuk; `null` membiarkan peta menangani gestur sendiri.
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final center = LatLng(latitude, longitude);
+    final radius = borderRadius ?? BorderRadius.circular(AppTheme.cardRadius);
     final map = ClipRRect(
-      borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+      borderRadius: radius,
       child: SizedBox(
         height: height,
         child: FlutterMap(

@@ -20,6 +20,15 @@ const contest = FeaturedContest(
   longitude: 106.8,
 );
 
+const contestWithoutMap = FeaturedContest(
+  title: 'Lomba Tanpa Peta',
+  schedule: 'Minggu • Arena Test',
+  distance: '2 KM',
+  prize: 'Rp 500 Rb',
+  slots: '2 Gantangan',
+  attendees: (initials: <String>['CD'], others: 1),
+);
+
 void main() {
   testWidgets('menampilkan tombol buka navigasi', (tester) async {
     await tester.pumpWidget(
@@ -61,5 +70,40 @@ void main() {
     }
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('peta full-bleed berada di atas badge', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: FeaturedContestCard(contest: contest)),
+      ),
+    );
+    await tester.pump();
+
+    final card = tester.getRect(find.byType(FeaturedContestCard));
+    final map = tester.getRect(find.byType(VenueMapPreview));
+    final nearest = tester.getRect(
+      find.text('${HomeStrings.nearestPrefix} ${contest.distance}'),
+    );
+    final category = tester.getRect(find.text(HomeStrings.mainCategory));
+    final title = tester.getRect(find.text(contest.title));
+
+    expect(map.top, closeTo(card.top, 1));
+    expect(map.width, closeTo(card.width, 1));
+    expect(map.bottom, lessThanOrEqualTo(nearest.top));
+    expect(nearest.top, lessThan(title.top));
+    expect(nearest.left, lessThan(category.left));
+  });
+
+  testWidgets('tanpa koordinat tidak menampilkan peta', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: FeaturedContestCard(contest: contestWithoutMap)),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(VenueMapPreview), findsNothing);
+    expect(find.text(contestWithoutMap.title), findsOneWidget);
   });
 }
