@@ -36,6 +36,9 @@ migrate_working_dir/
 # Konfigurasi production dapat berisi URL/secret lingkungan lokal
 env/production.json
 
+# File secret lokal (jangan pernah di-commit)
+env/secrets.json
+
 # Symbolication related
 app.*.symbols
 
