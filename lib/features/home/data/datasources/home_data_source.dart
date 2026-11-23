@@ -81,6 +81,8 @@ class HomeDemoDataSource implements HomeDataSource {
       prize: 'Rp 50 Jt',
       slots: '12 Gantangan',
       attendees: (initials: <String>['MK', 'BN'], others: 48),
+      latitude: -6.200000,
+      longitude: 106.816666,
     ),
     upcoming: UpcomingContest(
       type: 'Latber Presisi',

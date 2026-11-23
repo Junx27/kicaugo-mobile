@@ -12,6 +12,8 @@ class FeaturedContest extends Equatable {
     required this.prize,
     required this.slots,
     required this.attendees,
+    this.latitude,
+    this.longitude,
   });
 
   final String title;
@@ -23,6 +25,10 @@ class FeaturedContest extends Equatable {
   final String slots;
   final Attendees attendees;
 
+  /// Koordinat venue lomba (nullable bila backend belum mengirim).
+  final double? latitude;
+  final double? longitude;
+
   @override
   List<Object?> get props => [
     title,
@@ -31,5 +37,7 @@ class FeaturedContest extends Equatable {
     prize,
     slots,
     attendees,
+    latitude,
+    longitude,
   ];
 }

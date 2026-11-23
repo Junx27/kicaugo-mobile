@@ -27,6 +27,8 @@ abstract final class HomeContentDto {
         initials: JsonMapper.strings(attendees, 'initials'),
         others: JsonMapper.integer(attendees, 'others'),
       ),
+      latitude: _doubleOrNull(json['latitude']),
+      longitude: _doubleOrNull(json['longitude']),
     );
   }
 
@@ -59,4 +61,9 @@ abstract final class HomeContentDto {
 
   static String? _stringOrNull(Object? value) =>
       value is String && value.isNotEmpty ? value : null;
+
+  static double? _doubleOrNull(Object? value) {
+    if (value is num) return value.toDouble();
+    return null;
+  }
 }
