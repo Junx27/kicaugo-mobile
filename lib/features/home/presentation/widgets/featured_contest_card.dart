@@ -12,7 +12,7 @@ import '../../domain/entities/featured_contest.dart';
 import '../home_strings.dart';
 import 'venue_map_preview.dart';
 
-/// Kartu kuning "Lomba Terdekat" dengan info hadiah, slot, dan peserta.
+/// Kartu kuning "Lomba Terdekat": peta di atas, badge di bawahnya, lalu detail lomba.
 class FeaturedContestCard extends StatelessWidget {
   const FeaturedContestCard({super.key, required this.contest});
 
@@ -38,67 +38,93 @@ class FeaturedContestCard extends StatelessWidget {
               color: AppColors.textPrimary.withValues(alpha: 0.12),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
-              children: [
-                _Header(distance: contest.distance),
-                Text(contest.title, style: AppTextStyles.headlineSmall),
-                _IconLine(
-                  icon: Icons.location_on_rounded,
-                  text: contest.schedule,
-                ),
-                if (contest.latitude != null && contest.longitude != null)
-                  VenueMapPreview(
-                    latitude: contest.latitude!,
-                    longitude: contest.longitude!,
-                    onTap: () => pushVenueMap(
-                      context,
-                      VenueMapArgs(
-                        latitude: contest.latitude!,
-                        longitude: contest.longitude!,
-                        title: contest.title,
-                        address: contest.schedule,
-                      ),
-                    ),
-                  ),
-                FilledButton.icon(
-                  onPressed: () => openExternalNavigation(
-                    context: context,
-                    destinationLatitude: contest.latitude,
-                    destinationLongitude: contest.longitude,
-                    destinationQuery: contest.schedule,
-                  ),
-                  icon: const Icon(Icons.directions_rounded, size: 18),
-                  label: const Text(HomeStrings.openNavigation),
-                ),
-                Row(
-                  spacing: 8,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _FeaturedMap(contest: contest),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 10,
                   children: [
-                    Expanded(
-                      child: _InfoTile(
-                        icon: Icons.payments_rounded,
-                        label: HomeStrings.totalPrize,
-                        value: contest.prize,
-                      ),
+                    _Header(distance: contest.distance),
+                    Text(contest.title, style: AppTextStyles.headlineSmall),
+                    _IconLine(
+                      icon: Icons.location_on_rounded,
+                      text: contest.schedule,
                     ),
-                    Expanded(
-                      child: _InfoTile(
-                        icon: Icons.grid_view_rounded,
-                        label: HomeStrings.availableSlots,
-                        value: contest.slots,
-                        valueColor: AppColors.onLime,
+                    FilledButton.icon(
+                      onPressed: () => openExternalNavigation(
+                        context: context,
+                        destinationLatitude: contest.latitude,
+                        destinationLongitude: contest.longitude,
+                        destinationQuery: contest.schedule,
                       ),
+                      icon: const Icon(Icons.directions_rounded, size: 18),
+                      label: const Text(HomeStrings.openNavigation),
                     ),
+                    Row(
+                      spacing: 8,
+                      children: [
+                        Expanded(
+                          child: _InfoTile(
+                            icon: Icons.payments_rounded,
+                            label: HomeStrings.totalPrize,
+                            value: contest.prize,
+                          ),
+                        ),
+                        Expanded(
+                          child: _InfoTile(
+                            icon: Icons.grid_view_rounded,
+                            label: HomeStrings.availableSlots,
+                            value: contest.slots,
+                            valueColor: AppColors.onLime,
+                          ),
+                        ),
+                      ],
+                    ),
+                    _Footer(attendees: contest.attendees),
                   ],
                 ),
-                _Footer(attendees: contest.attendees),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Peta venue yang menempel di tepi atas kartu sebelum baris badge.
+class _FeaturedMap extends StatelessWidget {
+  const _FeaturedMap({required this.contest});
+
+  final FeaturedContest contest;
+
+  @override
+  Widget build(BuildContext context) {
+    final latitude = contest.latitude;
+    final longitude = contest.longitude;
+    if (latitude == null || longitude == null) {
+      return const SizedBox.shrink();
+    }
+
+    return VenueMapPreview(
+      latitude: latitude,
+      longitude: longitude,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(AppTheme.showcaseRadius),
+        topRight: Radius.circular(AppTheme.showcaseRadius),
+      ),
+      onTap: () => pushVenueMap(
+        context,
+        VenueMapArgs(
+          latitude: latitude,
+          longitude: longitude,
+          title: contest.title,
+          address: contest.schedule,
+        ),
       ),
     );
   }
