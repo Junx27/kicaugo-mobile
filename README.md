@@ -1,8 +1,7 @@
 # KicauGo
 
 Aplikasi mobile Flutter untuk komunitas burung kicau: melihat lomba terdekat,
-mencari tempat penitipan, dan mengelola akun. Seluruh data masih **dummy**
-(in-memory) sehingga aplikasi bisa dicoba tanpa backend.
+mencari tempat penitipan, dan mengelola akun.
 
 Alur utama: **Splash → Login → Beranda** dengan bottom navigation 4 tab
 (Beranda, Lomba, Penitipan, Profil).
