@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rumahkicau_mobile/core/router/app_router.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
+import 'package:rumahkicau_mobile/core/router/venue_map_args.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/auth_strings.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_event.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/login_page.dart';
@@ -13,6 +16,7 @@ import 'package:rumahkicau_mobile/features/help_center/presentation/help_center_
 import 'package:rumahkicau_mobile/features/help_center/presentation/pages/help_center_page.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/home_strings.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/pages/home_page.dart';
+import 'package:rumahkicau_mobile/features/home/presentation/pages/venue_map_page.dart';
 import 'package:rumahkicau_mobile/features/onboarding/presentation/onboarding_strings.dart';
 import 'package:rumahkicau_mobile/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:rumahkicau_mobile/features/reminders/presentation/pages/reminders_page.dart';
@@ -215,5 +219,27 @@ void main() {
     await pumpNavigation(tester);
 
     expect(find.byType(CommunityPage), findsOneWidget);
+  });
+
+  testWidgets('rute peta venue membuka halaman peta penuh', (tester) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    unawaited(
+      GoRouter.of(tester.element(find.byType(HomePage))).push(
+        AppRoutes.venueMap,
+        extra: const VenueMapArgs(
+          latitude: -6.2,
+          longitude: 106.8,
+          title: 'Batavia Arena Gantangan',
+          address: 'Jakarta Barat',
+        ),
+      ),
+    );
+    await pumpNavigation(tester);
+
+    expect(find.byType(VenueMapPage), findsOneWidget);
   });
 }

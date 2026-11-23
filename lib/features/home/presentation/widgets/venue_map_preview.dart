@@ -16,6 +16,7 @@ class VenueMapPreview extends StatelessWidget {
     required this.longitude,
     this.height = 160,
     this.interactive = false,
+    this.onTap,
   });
 
   final double latitude;
@@ -23,10 +24,13 @@ class VenueMapPreview extends StatelessWidget {
   final double height;
   final bool interactive;
 
+  /// Aksi saat preview diketuk; `null` membiarkan peta menangani gestur sendiri.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
     final center = LatLng(latitude, longitude);
-    return ClipRRect(
+    final map = ClipRRect(
       borderRadius: BorderRadius.circular(AppTheme.cardRadius),
       child: SizedBox(
         height: height,
@@ -60,6 +64,24 @@ class VenueMapPreview extends StatelessWidget {
           ],
         ),
       ),
+    );
+
+    if (onTap == null) {
+      return map;
+    }
+
+    // FlutterMap memiliki gesture recognizer sendiri, jadi lapisan transparan
+    // di atasnya yang menangkap tap untuk membuka halaman penuh.
+    return Stack(
+      children: [
+        map,
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+          ),
+        ),
+      ],
     );
   }
 }

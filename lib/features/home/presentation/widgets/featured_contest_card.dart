@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/router/venue_map_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_tones.dart';
-import '../../../../core/utils/navigation_url_builder.dart';
+import '../../../../core/utils/external_navigation.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/icon_pill.dart';
 import '../../domain/entities/featured_contest.dart';
@@ -55,11 +54,25 @@ class FeaturedContestCard extends StatelessWidget {
                   VenueMapPreview(
                     latitude: contest.latitude!,
                     longitude: contest.longitude!,
+                    onTap: () => pushVenueMap(
+                      context,
+                      VenueMapArgs(
+                        latitude: contest.latitude!,
+                        longitude: contest.longitude!,
+                        title: contest.title,
+                        address: contest.schedule,
+                      ),
+                    ),
                   ),
                 FilledButton.icon(
-                  onPressed: () => _openNavigation(context, contest),
+                  onPressed: () => openExternalNavigation(
+                    context: context,
+                    destinationLatitude: contest.latitude,
+                    destinationLongitude: contest.longitude,
+                    destinationQuery: contest.schedule,
+                  ),
                   icon: const Icon(Icons.directions_rounded, size: 18),
-                  label: const Text('Buka navigasi'),
+                  label: const Text(HomeStrings.openNavigation),
                 ),
                 Row(
                   spacing: 8,
@@ -258,43 +271,6 @@ class _Footer extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-/// Membuka aplikasi peta native untuk navigasi ke venue lomba.
-Future<void> _openNavigation(
-  BuildContext context,
-  FeaturedContest contest,
-) async {
-  double? originLatitude;
-  double? originLongitude;
-  try {
-    final position = await Geolocator.getCurrentPosition();
-    originLatitude = position.latitude;
-    originLongitude = position.longitude;
-  } catch (_) {
-    // Izin ditolak atau layanan lokasi tidak tersedia; lanjut tanpa origin.
-  }
-
-  final url = buildExternalNavigationUrl(
-    originLatitude: originLatitude,
-    originLongitude: originLongitude,
-    destinationLatitude: contest.latitude,
-    destinationLongitude: contest.longitude,
-    destinationQuery: contest.schedule,
-  );
-  if (url == null) {
-    if (context.mounted) {
-      showComingSoon(context);
-    }
-    return;
-  }
-
-  final uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  } else if (context.mounted) {
-    showComingSoon(context);
   }
 }
 

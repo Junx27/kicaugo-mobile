@@ -39,6 +39,9 @@ abstract final class AppRoutes {
   /// Riwayat tiket gantangan dan invoice.
   static const String ticketHistory = '/ticket-history';
 
+  /// Halaman peta penuh lokasi venue lomba.
+  static const String venueMap = '/venue-map';
+
   /// Rute yang boleh dibuka tanpa sesi.
   static const Set<String> publicRoutes = <String>{
     splash,
