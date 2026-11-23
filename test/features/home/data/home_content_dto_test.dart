@@ -16,6 +16,7 @@ void main() {
     expect(profile.greeting, 'Selamat siang');
     expect(profile.liveCount, 7);
     expect(profile.avatarUrl, 'https://example.com/avatar.png');
+    expect(profile.isOrganizer, isFalse);
   });
 
   test('profileFromJson menerima avatar null', () {

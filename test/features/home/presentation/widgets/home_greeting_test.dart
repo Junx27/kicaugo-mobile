@@ -32,4 +32,40 @@ void main() {
       debugNetworkImageHttpClientProvider = null;
     }
   });
+
+  testWidgets('menampilkan ikon verified biru bila organizer', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: HomeGreeting(
+            greeting: 'Selamat pagi',
+            name: 'Junx',
+            liveCount: 3,
+            isOrganizer: true,
+          ),
+        ),
+      ),
+    );
+
+    final icon = tester.widget<Icon>(find.byIcon(Icons.verified_rounded));
+    expect(icon.color, Colors.blue);
+  });
+
+  testWidgets('tidak menampilkan ikon verified bila bukan organizer', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: HomeGreeting(
+            greeting: 'Selamat pagi',
+            name: 'Junx',
+            liveCount: 3,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.verified_rounded), findsNothing);
+  });
 }

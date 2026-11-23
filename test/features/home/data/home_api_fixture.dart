@@ -23,6 +23,7 @@ Map<String, dynamic> homeProfilePayload() => <String, dynamic>{
   'avatar': 'https://example.com/avatar.png',
   'message': 'Selamat siang',
   'live_count': 7,
+  'is_organizer': false,
 };
 
 /// Payload profil tanpa avatar untuk menguji field nullable.

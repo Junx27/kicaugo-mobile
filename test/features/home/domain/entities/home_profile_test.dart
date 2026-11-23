@@ -6,7 +6,7 @@ const String greetingText = 'Selamat siang';
 const String avatarUrl = 'https://example.com/avatar.png';
 
 void main() {
-  test('HomeProfile menyimpan keempat field payload profile', () {
+  test('HomeProfile menyimpan kelima field payload profile', () {
     const profile = HomeProfile(
       name: displayName,
       avatarUrl: avatarUrl,
@@ -46,6 +46,6 @@ void main() {
         ),
       ),
     );
-    expect(profile.props, hasLength(4));
+    expect(profile.props, hasLength(5));
   });
 }
