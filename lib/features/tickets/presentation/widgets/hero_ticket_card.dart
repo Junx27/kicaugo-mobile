@@ -56,13 +56,15 @@ class HeroTicketCard extends StatelessWidget {
                   VenueMapPreview(
                     latitude: ticket.event.latitude!,
                     longitude: ticket.event.longitude!,
-                    onTap: () => pushVenueMap(
-                      context,
-                      VenueMapArgs(
-                        latitude: ticket.event.latitude!,
-                        longitude: ticket.event.longitude!,
-                        title: ticket.event.venue,
-                        address: ticket.event.address,
+                    options: VenueMapOptions(
+                      onTap: () => pushVenueMap(
+                        context,
+                        VenueMapArgs(
+                          latitude: ticket.event.latitude!,
+                          longitude: ticket.event.longitude!,
+                          title: ticket.event.venue,
+                          address: ticket.event.address,
+                        ),
                       ),
                     ),
                   ),

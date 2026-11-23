@@ -42,6 +42,10 @@ abstract final class AppConstants {
   /// Teks placeholder untuk fitur yang belum tersedia.
   static const String comingSoon = 'Segera hadir';
 
+  /// Pesan saat lokasi terkini tidak tersedia sebagai origin rute.
+  static const String navigationOriginUnavailable =
+      'Lokasi terkini belum tersedia. Rute dibuka dari tujuan saja.';
+
   /// Pesan gagal login dummy.
   static const String loginFailure =
       'Email/nomor WhatsApp atau kata sandi salah';
@@ -91,6 +95,10 @@ abstract final class AppConstants {
     defaultValue:
         flavorName == stgFlavorName || flavorName == productionFlavorName,
   );
+
+  /// API key tile CARTO Voyager. Disuntikkan lewat
+  /// `--dart-define=CARTO_BASEMAP_KEY=...` dari `env/secrets.json`.
+  static const String basemapKey = String.fromEnvironment('CARTO_BASEMAP_KEY');
 
   /// Batas waktu koneksi dan penerimaan respons API.
   static const Duration apiTimeout = Duration(seconds: 15);

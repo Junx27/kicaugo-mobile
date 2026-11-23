@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../constants/app_constants.dart';
+import '../location/geolocator_location_service.dart';
+import '../location/location_service.dart';
 import '../widgets/app_snack_bar.dart';
 import 'navigation_url_builder.dart';
-
-/// Pembaca posisi pengguna; dapat diganti di test tanpa izin sistem.
-typedef PositionReader = Future<Position> Function();
 
 /// Pemeriksa ketersediaan aplikasi tujuan; dapat diganti di test.
 typedef LaunchChecker = Future<bool> Function(Uri uri);
@@ -16,35 +15,34 @@ typedef UrlLauncher = Future<bool> Function(Uri uri, LaunchMode mode);
 
 /// Membuka aplikasi peta native menuju koordinat venue.
 ///
-/// Origin diambil dari lokasi pengguna bila tersedia. Bila koordinat venue
-/// tidak ada, tujuan fallback ke [destinationQuery]. Kegagalan izin lokasi
-/// tidak membatalkan navigasi.
+/// Origin diambil lewat [LocationService] yang sudah menangani izin dan batas
+/// waktu. Bila lokasi tidak tersedia, navigasi tetap berjalan tanpa origin dan
+/// pengguna diberi tahu. Bila koordinat venue tidak ada, tujuan fallback ke
+/// [destinationQuery].
 Future<void> openExternalNavigation({
   required BuildContext context,
   double? destinationLatitude,
   double? destinationLongitude,
   required String destinationQuery,
-  PositionReader? readPosition,
+  LocationService? locationService,
   LaunchChecker? canLaunch,
   UrlLauncher? launch,
 }) async {
-  final positionReader = readPosition ?? () => Geolocator.getCurrentPosition();
+  final service = locationService ?? const GeolocatorLocationService();
   final launchChecker = canLaunch ?? canLaunchUrl;
   final urlLauncher = launch ?? (uri, mode) => launchUrl(uri, mode: mode);
 
-  double? originLatitude;
-  double? originLongitude;
+  DeviceLocation? location;
   try {
-    final position = await positionReader();
-    originLatitude = position.latitude;
-    originLongitude = position.longitude;
+    location = await service.readCurrentLocation();
   } catch (_) {
-    // Izin ditolak atau layanan lokasi tidak tersedia; lanjut tanpa origin.
+    // Layanan lokasi tidak tersedia; lanjut tanpa origin.
+    location = null;
   }
 
   final url = buildExternalNavigationUrl(
-    originLatitude: originLatitude,
-    originLongitude: originLongitude,
+    originLatitude: location?.latitude,
+    originLongitude: location?.longitude,
     destinationLatitude: destinationLatitude,
     destinationLongitude: destinationLongitude,
     destinationQuery: destinationQuery,
@@ -54,6 +52,10 @@ Future<void> openExternalNavigation({
       showComingSoon(context);
     }
     return;
+  }
+
+  if (location == null && context.mounted) {
+    showAppSnackBar(context, AppConstants.navigationOriginUnavailable);
   }
 
   final uri = Uri.parse(url);

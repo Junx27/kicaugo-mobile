@@ -10,12 +10,18 @@ class VenueMapArgs {
     required this.longitude,
     required this.title,
     required this.address,
+    this.schedule = '',
+    this.distance = '',
   });
 
   final double latitude;
   final double longitude;
   final String title;
   final String address;
+
+  /// Jadwal dan jarak lomba untuk kartu detail di halaman peta.
+  final String schedule;
+  final String distance;
 }
 
 /// Membuka halaman peta penuh untuk sebuah venue dari kartu mana pun.

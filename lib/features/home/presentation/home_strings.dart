@@ -27,8 +27,25 @@ abstract final class HomeStrings {
   static const String showQrHint = 'Tunjukkan QR saat registrasi ulang';
   static const String openTicket = 'Buka E-Tiket';
   static const String openNavigation = 'Buka navigasi';
-  static const String venueMapTitle = 'Peta Venue';
+  static const String venueMapTitle = 'Lokasi Perlombaan';
   static const String venueNotFound = 'Lokasi venue belum tersedia.';
+  static const String backTooltip = 'Kembali';
+  static const String zoomInTooltip = 'Perbesar peta';
+  static const String zoomOutTooltip = 'Perkecil peta';
+  static const String locateTooltip = 'Lokasi venue';
+  static const String routeTooltip = 'Rute dari lokasi saya';
+  static const String routeShown = 'Rute ditampilkan';
+  static const String routeUnavailable =
+      'Rute belum bisa dihitung. Coba lagi sebentar.';
+  static const String routeOriginUnavailable =
+      'Lokasi terkini belum tersedia. Aktifkan izin lokasi untuk melihat rute.';
+  static const String compassTooltip = 'Orientasi peta';
+  static const String copyAddress = 'Salin Alamat';
+  static const String paddockParking = 'Parkir Paddock';
+  static const String addressCopied = 'Alamat venue berhasil disalin.';
+  static const String venueLocated = 'Menampilkan lokasi venue.';
+  static const String parkingInfo =
+      'Info parkir: tersedia area untuk roda dua dan roda empat di lapangan barat gantangan.';
 
   static const String popularTitle = 'Jadwal Gantangan Populer';
   static const String popularSubtitle = 'Pilihan terfavorit minggu ini';

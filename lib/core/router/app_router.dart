@@ -23,6 +23,7 @@ import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/tickets/presentation/pages/ticket_history_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
 import '../location/location_service.dart';
+import '../routing/route_service.dart';
 import 'app_navigator_observer.dart';
 import 'app_routes.dart';
 import 'venue_map_args.dart';
@@ -51,6 +52,7 @@ GoRouter createRouter({
   required AuthBloc authBloc,
   required GetHomeContent getHomeContent,
   required LocationService locationService,
+  required RouteService routeService,
   required UpdateCurrentLocation updateCurrentLocation,
   required Listenable refreshListenable,
 }) {
@@ -93,7 +95,11 @@ GoRouter createRouter({
         path: AppRoutes.venueMap,
         builder: (context, state) {
           final extra = state.extra;
-          return VenueMapPage(args: extra is VenueMapArgs ? extra : null);
+          return VenueMapPage(
+            args: extra is VenueMapArgs ? extra : null,
+            routeService: routeService,
+            locationService: locationService,
+          );
         },
       ),
       StatefulShellRoute.indexedStack(
