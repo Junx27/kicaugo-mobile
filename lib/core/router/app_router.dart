@@ -13,6 +13,7 @@ import '../../features/help_center/presentation/pages/help_center_page.dart';
 import '../../features/home/domain/usecases/get_home_content.dart';
 import '../../features/home/presentation/main_shell.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/home/presentation/pages/venue_map_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/domain/usecases/update_current_location.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
@@ -24,6 +25,7 @@ import '../../features/tickets/presentation/pages/tickets_page.dart';
 import '../location/location_service.dart';
 import 'app_navigator_observer.dart';
 import 'app_routes.dart';
+import 'venue_map_args.dart';
 
 /// Jembatan stream [AuthBloc] ke [Listenable] milik `GoRouter`.
 class AuthRouterNotifier extends ChangeNotifier {
@@ -86,6 +88,13 @@ GoRouter createRouter({
       GoRoute(
         path: AppRoutes.ticketHistory,
         builder: (context, state) => const TicketHistoryPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.venueMap,
+        builder: (context, state) {
+          final extra = state.extra;
+          return VenueMapPage(args: extra is VenueMapArgs ? extra : null);
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => MainShell(

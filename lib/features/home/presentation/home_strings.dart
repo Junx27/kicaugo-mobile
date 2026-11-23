@@ -26,6 +26,9 @@ abstract final class HomeStrings {
   static const String scanToEnter = 'SCAN MASUK';
   static const String showQrHint = 'Tunjukkan QR saat registrasi ulang';
   static const String openTicket = 'Buka E-Tiket';
+  static const String openNavigation = 'Buka navigasi';
+  static const String venueMapTitle = 'Peta Venue';
+  static const String venueNotFound = 'Lokasi venue belum tersedia.';
 
   static const String popularTitle = 'Jadwal Gantangan Populer';
   static const String popularSubtitle = 'Pilihan terfavorit minggu ini';
