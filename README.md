@@ -445,7 +445,8 @@ Secret GitHub Actions yang dipakai:
 - `SONAR_TOKEN` — token autentikasi SonarCloud (wajib)
 - `GITHUB_TOKEN` — disediakan otomatis oleh GitHub
 
-Semua action di-pin ke full commit SHA, bukan tag floating. Dependensi CI juga
+Action pihak ketiga (`subosito/flutter-action`) dan action SonarCloud di-pin ke
+full commit SHA. Action resmi GitHub memakai tag versi mayor. Dependensi CI juga
 terkunci: `flutter pub get --enforce-lockfile` memakai `pubspec.lock`, dan
 `pip install --require-hashes --only-binary :all: -r requirements-ci.txt`
 memakai hash wheel untuk Python 3.12 di Linux. Ini menghilangkan temuan
