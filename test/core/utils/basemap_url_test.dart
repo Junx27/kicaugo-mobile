@@ -1,23 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
 import 'package:rumahkicau_mobile/core/utils/basemap_url.dart';
 
 void main() {
-  const fakeKey = 'test-key';
-
-  test('memakai template tile CARTO Voyager', () {
+  test('memakai template tile backend', () {
     expect(
-      BasemapUrl.tileTemplate(fakeKey),
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/'
-      '{z}/{x}/{y}{r}.png?key=$fakeKey',
+      BasemapUrl.tileTemplate(AppConstants.apiBaseUrl),
+      '${AppConstants.apiBaseUrl}/api/v1/basemap/tiles/{z}/{x}/{y}',
     );
   });
 
-  test('template memakai subdomain, retina, dan API key', () {
-    final url = BasemapUrl.tileTemplate(fakeKey);
+  test('template memakai placeholder z/x/y tanpa key', () {
+    final url = BasemapUrl.tileTemplate(AppConstants.apiBaseUrl);
 
-    expect(url, contains('{s}'));
-    expect(url, contains('{r}'));
-    expect(url, contains('key=$fakeKey'));
-    expect(url, isNot(contains('tile.openstreetmap.org')));
+    expect(url, contains('{z}'));
+    expect(url, contains('{x}'));
+    expect(url, contains('{y}'));
+    expect(url, isNot(contains('cartocdn')));
+    expect(url, isNot(contains('key=')));
   });
 }
