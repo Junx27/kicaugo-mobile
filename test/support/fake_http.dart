@@ -12,12 +12,18 @@ class FakeTokenProvider implements TokenProvider {
 
   @override
   Future<String?> readToken() async => token;
+
+  @override
+  String? get accessToken => token;
 }
 
 /// Token provider yang selalu gagal, untuk menguji jalur error tak dikenal.
 class ThrowingTokenProvider implements TokenProvider {
   @override
   Future<String?> readToken() async => throw StateError('storage down');
+
+  @override
+  String? get accessToken => null;
 }
 
 /// Adapter Dio yang mengembalikan respons tertentu tanpa membuka jaringan.

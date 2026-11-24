@@ -50,4 +50,11 @@ class SharedPreferencesSessionStorage implements SessionStorage {
     if (token == null || token.isEmpty) return null;
     return token;
   }
+
+  @override
+  String? get accessToken {
+    final token = _prefs.getString(_tokenKey);
+    if (token == null || token.isEmpty) return null;
+    return token;
+  }
 }
