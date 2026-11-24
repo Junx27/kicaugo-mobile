@@ -445,9 +445,11 @@ Secret GitHub Actions yang dipakai:
 - `SONAR_TOKEN` — token autentikasi SonarCloud (wajib)
 - `GITHUB_TOKEN` — disediakan otomatis oleh GitHub
 
-Action `SonarSource/sonarcloud-github-action` di-pin ke full commit SHA, bukan
-tag `@master`, karena SonarCloud menandai tag floating sebagai temuan security
-pada kode CI.
+Semua action di-pin ke full commit SHA, bukan tag floating. Dependensi CI juga
+terkunci: `flutter pub get --enforce-lockfile` memakai `pubspec.lock`, dan
+`pip install --require-hashes --only-binary :all: -r requirements-ci.txt`
+memakai hash wheel untuk Python 3.12 di Linux. Ini menghilangkan temuan
+supply-chain pada kode CI.
 
 ### Ambang kualitas yang dipaksa CI
 
@@ -456,17 +458,17 @@ temuan di kode lama tetap bisa lolos. Ada pula *fudge factor* yang mengabaikan
 coverage dan duplication bila baris baru kurang dari 20. Untuk menghindari itu,
 `scripts/check_sonar_thresholds.sh` memanggil `/api/measures/component` dan
 menggagalkan job bila syarat pada tabel di atas tidak terpenuhi — untuk
-**Overall code maupun New Code**.
+**Overall code maupun New Code**. Build PR menilai analisis PR tersebut;
+build `master` menilai baseline `master`.
 
 Aturan bisa diubah lewat environment variable `SONAR_MIN_COVERAGE`,
 `SONAR_MAX_DUPLICATION`, dan `SONAR_PROJECT_KEY`. Script membutuhkan `jq`
 (tersedia di runner GitHub) dan `SONAR_TOKEN` dari GitHub Secrets.
 
-Konsekuensinya, gate akan gagal sampai temuan yang ada dibereskan. Analisis
-PR #26 sudah memenuhi seluruh ambang (coverage 100%, rating A untuk Security,
-Reliability, dan Maintainability). Baseline `master` masih menyimpan hasil
-lama — Security **C** (7 isu), Reliability **C** (1 isu), dan coverage
-**62,8%** — dan baru diperbarui setelah PR di-merge.
+Analisis PR #26 memenuhi seluruh ambang: coverage 100% dan rating A untuk
+Security, Reliability, dan Maintainability. Gate pada build PR kini hijau.
+Baseline `master` dinilai terpisah saat workflow berjalan di `master` setelah
+merge.
 
 ### Warning baseline `master`
 
@@ -481,11 +483,10 @@ belum punya baseline branch `master` sebagai pembanding *New Code*, karena
 workflow baru pernah jalan di branch PR. Baseline terbentuk setelah PR
 di-merge: push ke `master` memicu workflow, lalu warning hilang.
 
-Gate CI membaca metrik `master` dari analisis terakhir branch tersebut, jadi
-pada build PR nilai itu masih mencerminkan baseline sebelum merge. Di sinilah
-sisa kegagalan CI berasal meski metrik PR sudah lolos. Setelah merge, baseline
-`master` diperbarui — pastikan temuan Security/Reliability yang tersisa sudah
-dibereskan agar Quality Gate lolos saat baseline dibentuk.
+Gate CI tidak lagi membaca metrik `master` pada build PR, karena nilainya
+masih mencerminkan hasil sebelum merge. Baseline `master` diperiksa saat
+workflow jalan di `master` setelah PR di-merge, bersamaan dengan hilangnya
+warning di atas.
 
 ## Di luar lingkup
 
