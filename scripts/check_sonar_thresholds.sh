@@ -12,41 +12,24 @@ INTERVAL=10
 # SonarCloud memakai sqale_rating untuk maintainability Overall code.
 METRICS='security_rating,reliability_rating,sqale_rating,security_hotspots_reviewed,coverage,duplicated_lines_density,new_security_rating,new_reliability_rating,new_maintainability_rating,new_security_hotspots_reviewed,new_coverage,new_duplicated_lines_density,new_lines'
 
-curl_args=(
-  --silent --show-error
-  --user "${SONAR_TOKEN}:"
-  --get 'https://sonarcloud.io/api/measures/component'
-  --data-urlencode "component=${PROJECT_KEY}"
-  --data-urlencode "metricKeys=${METRICS}"
-)
-
-# Analisis PR memakai pullRequest, analisis push ke master memakai branch.
+# Analisis PR saja tidak cukup: rating Overall di PR bisa berbeda dari master.
+contexts=()
 if [[ -n "${PR_NUMBER:-}" ]]; then
-  curl_args+=(--data-urlencode "pullRequest=${PR_NUMBER}")
-else
-  curl_args+=(--data-urlencode "branch=${BRANCH_NAME:-master}")
+  contexts+=("pullRequest|${PR_NUMBER}|PR ${PR_NUMBER}")
 fi
+contexts+=("branch|master|master")
 
-# Hasil analisis belum langsung tersedia setelah scanner selesai upload.
+failures=()
 response=''
-for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
-  response="$(curl "${curl_args[@]}" || true)"
-  if printf '%s' "$response" | jq -e '.errors' >/dev/null 2>&1; then
-    echo 'Gagal mengambil metrik SonarCloud:'
-    printf '%s\n' "$response"
-    exit 1
-  fi
-  if printf '%s' "$response" |
-    jq -e '.component.measures | length > 0' >/dev/null 2>&1; then
-    break
-  fi
-  if ((attempt == MAX_ATTEMPTS)); then
-    echo "Gagal mengambil metrik SonarCloud setelah ${MAX_ATTEMPTS} percobaan."
-    printf '%s\n' "$response"
-    exit 1
-  fi
-  sleep "$INTERVAL"
-done
+
+fetch_measures() {
+  curl --silent --show-error \
+    --user "${SONAR_TOKEN}:" \
+    --get 'https://sonarcloud.io/api/measures/component' \
+    --data-urlencode "component=${PROJECT_KEY}" \
+    --data-urlencode "metricKeys=${METRICS}" \
+    --data-urlencode "$1=$2"
+}
 
 metric_value() {
   printf '%s' "$response" | jq -r --arg key "$1" \
@@ -64,13 +47,17 @@ rating_label() {
   esac
 }
 
-failures=()
-
 check_rating() {
-  local key="$1" label="$2" value
+  local key="$1" label="$2" value score
   value="$(metric_value "$key")"
-  if [[ "$value" != '1' ]]; then
-    failures+=("${label}: $(rating_label "$value") (wajib A)")
+  if [[ "$value" == 'nan' ]]; then
+    failures+=("${label}: metrik tidak tersedia")
+    return
+  fi
+  # Web API mengembalikan rating sebagai "1.0", bukan "1".
+  score="$(awk -v v="$value" 'BEGIN { printf "%d", v + 0 }')"
+  if ((score != 1)); then
+    failures+=("${label}: $(rating_label "$score") (wajib A)")
   fi
 }
 
@@ -90,24 +77,54 @@ check_number() {
   fi
 }
 
-# Overall code: kode lama ikut dinilai, tidak seperti gate bawaan SonarCloud.
-check_rating security_rating 'Security (overall)'
-check_rating reliability_rating 'Reliability (overall)'
-check_rating sqale_rating 'Maintainability (overall)'
-check_number security_hotspots_reviewed 'Hotspots reviewed (overall)' ge 100
-check_number coverage 'Coverage (overall)' ge "$MIN_COVERAGE"
-check_number duplicated_lines_density 'Duplication (overall)' le "$MAX_DUPLICATION"
+check_context() {
+  local label="$1"
+  check_rating security_rating "${label} Security (overall)"
+  check_rating reliability_rating "${label} Reliability (overall)"
+  check_rating sqale_rating "${label} Maintainability (overall)"
+  check_number security_hotspots_reviewed "${label} Hotspots reviewed (overall)" ge 100
+  check_number coverage "${label} Coverage (overall)" ge "$MIN_COVERAGE"
+  check_number duplicated_lines_density "${label} Duplication (overall)" le "$MAX_DUPLICATION"
 
-# New code dilewati bila tidak ada baris baru (misal push pertama ke master).
-new_lines="$(metric_value new_lines)"
-if [[ "$new_lines" != 'nan' && "$new_lines" != '0' ]]; then
-  check_rating new_security_rating 'Security (new code)'
-  check_rating new_reliability_rating 'Reliability (new code)'
-  check_rating new_maintainability_rating 'Maintainability (new code)'
-  check_number new_security_hotspots_reviewed 'Hotspots reviewed (new code)' ge 100
-  check_number new_coverage 'Coverage (new code)' ge "$MIN_COVERAGE"
-  check_number new_duplicated_lines_density 'Duplication (new code)' le "$MAX_DUPLICATION"
-fi
+  # New code dilewati bila tidak ada baris baru.
+  local new_lines
+  new_lines="$(metric_value new_lines)"
+  if [[ "$new_lines" != 'nan' && "$new_lines" != '0' && "$new_lines" != '0.0' ]]; then
+    check_rating new_security_rating "${label} Security (new code)"
+    check_rating new_reliability_rating "${label} Reliability (new code)"
+    check_rating new_maintainability_rating "${label} Maintainability (new code)"
+    check_number new_security_hotspots_reviewed "${label} Hotspots reviewed (new code)" ge 100
+    check_number new_coverage "${label} Coverage (new code)" ge "$MIN_COVERAGE"
+    check_number new_duplicated_lines_density "${label} Duplication (new code)" le "$MAX_DUPLICATION"
+  fi
+}
+
+for context in "${contexts[@]}"; do
+  IFS='|' read -r param value label <<<"$context"
+
+  # Hasil analisis belum langsung tersedia setelah scanner selesai upload.
+  response=''
+  for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
+    response="$(fetch_measures "$param" "$value" || true)"
+    if printf '%s' "$response" | jq -e '.errors' >/dev/null 2>&1; then
+      echo "Gagal mengambil metrik SonarCloud (${label}):"
+      printf '%s\n' "$response"
+      exit 1
+    fi
+    if printf '%s' "$response" |
+      jq -e '.component.measures | length > 0' >/dev/null 2>&1; then
+      break
+    fi
+    if ((attempt == MAX_ATTEMPTS)); then
+      echo "Gagal mengambil metrik SonarCloud (${label}) setelah ${MAX_ATTEMPTS} percobaan."
+      printf '%s\n' "$response"
+      exit 1
+    fi
+    sleep "$INTERVAL"
+  done
+
+  check_context "[$label]"
+done
 
 if ((${#failures[@]} > 0)); then
   echo 'SonarCloud quality threshold gagal:'
