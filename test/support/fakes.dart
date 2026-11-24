@@ -141,6 +141,9 @@ class InMemorySessionStorage implements SessionStorage {
 
   @override
   Future<String?> readToken() async => _user?.token;
+
+  @override
+  String? get accessToken => _user?.token;
 }
 
 /// Pembaca lokasi palsu: hasil, error, dan jumlah pemanggilan bisa diatur.

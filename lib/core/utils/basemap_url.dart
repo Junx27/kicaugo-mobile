@@ -1,11 +1,11 @@
-/// Pembangun URL tile CARTO Voyager.
+/// Pembangun URL tile peta lewat backend (proxy CARTO).
 ///
-/// Placeholder `{s}` (subdomain) dan `{r}` (retina `@2x`) diganti `flutter_map`.
-/// API key disuntikkan lewat `--dart-define=CARTO_BASEMAP_KEY=...` dari
-/// `env/secrets.json`; nilainya tidak pernah ditanam di source.
+/// Token Bearer TIDAK ditanam di URL; diset lewat `NetworkTileProvider.headers`.
+/// `apiBaseUrl` diambil dari `AppConstants.apiBaseUrl`.
 abstract final class BasemapUrl {
-  /// Template tile Voyager dengan key dari environment.
-  static String tileTemplate(String key) =>
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/'
-      '{z}/{x}/{y}{r}.png?key=$key';
+  const BasemapUrl._();
+
+  /// Template tile backend. Placeholder `{z}/{x}/{y}` diganti `flutter_map`.
+  static String tileTemplate(String apiBaseUrl) =>
+      '$apiBaseUrl/api/v1/basemap/tiles/{z}/{x}/{y}';
 }

@@ -96,10 +96,6 @@ abstract final class AppConstants {
         flavorName == stgFlavorName || flavorName == productionFlavorName,
   );
 
-  /// API key tile CARTO Voyager. Disuntikkan lewat
-  /// `--dart-define=CARTO_BASEMAP_KEY=...` dari `env/secrets.json`.
-  static const String basemapKey = String.fromEnvironment('CARTO_BASEMAP_KEY');
-
   /// Batas waktu koneksi dan penerimaan respons API.
   static const Duration apiTimeout = Duration(seconds: 15);
 

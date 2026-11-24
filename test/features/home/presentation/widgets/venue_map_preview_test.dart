@@ -7,6 +7,20 @@ import 'package:rumahkicau_mobile/core/routing/route_service.dart';
 import 'package:rumahkicau_mobile/core/theme/app_colors.dart';
 import 'package:rumahkicau_mobile/core/utils/basemap_url.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/widgets/venue_map_preview.dart';
+import 'package:url_launcher_platform_interface/link.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
+import '../../../../support/fake_http.dart';
+
+class _RecordingMapPlatform extends UrlLauncherPlatform {
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> canLaunch(String url) async => true;
+
+  @override
+  Future<bool> launchUrl(String url, LaunchOptions options) async => true;
+}
 
 const _firstVenue = LatLng(-6.2, 106.8);
 const _secondVenue = LatLng(-7.1, 110.3);
@@ -167,45 +181,20 @@ void main() {
     expect(decoration.border, isNotNull);
   });
 
-  testWidgets('tile memakai CARTO Voyager dengan atribusi', (tester) async {
+  testWidgets('tile memakai backend dengan atribusi terlihat', (tester) async {
     await _pumpPreview(tester, _firstVenue);
     await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     final tile = tester.widget<TileLayer>(find.byType(TileLayer));
-    expect(tile.urlTemplate, BasemapUrl.tileTemplate(AppConstants.basemapKey));
-    expect(tile.urlTemplate, contains('cartocdn'));
-    expect(tile.urlTemplate, contains('{s}'));
-    expect(tile.urlTemplate, contains('{r}'));
-    expect(tile.urlTemplate, contains('key='));
-    expect(tile.subdomains, <String>['a', 'b', 'c', 'd']);
-    expect(tile.resolvedRetinaMode, RetinaMode.server);
-    final tileFilter = find.byWidgetPredicate(
-      (widget) => widget is ColorFiltered && widget.child is TileLayer,
-    );
-    expect(tileFilter, findsOneWidget);
-    expect(tester.widget<ColorFiltered>(tileFilter).colorFilter, isNotNull);
-
-    // Nada CARTO dipetakan ke rata-rata OSM tanpa memotong piksel terang.
-    const matrix = VenueMapPreview.tileColorMatrix;
-    expect(matrix[0], 1.1);
-    expect(matrix[4], closeTo(-50.5, 0.01));
-    expect(matrix[9], closeTo(-47, 0.01));
-    expect(matrix[14], closeTo(-39.9, 0.01));
-    expect(find.byType(RichAttributionWidget), findsOneWidget);
-  });
-
-  testWidgets('popup atribusi bisa dibuka lalu ditutup', (tester) async {
-    await _pumpPreview(tester, _firstVenue);
-    await tester.pump();
-
-    await tester.tap(find.byTooltip('Atribusi peta'));
-    await tester.pump(const Duration(milliseconds: 350));
-    expect(find.text('© OpenStreetMap contributors'), findsOneWidget);
+    expect(tile.urlTemplate, BasemapUrl.tileTemplate(AppConstants.apiBaseUrl));
+    expect(tile.urlTemplate, contains('/api/v1/basemap/tiles/'));
+    expect(tile.urlTemplate, contains('{z}'));
+    expect(tile.urlTemplate, contains('{x}'));
+    expect(tile.urlTemplate, contains('{y}'));
+    expect(tile.subdomains, <String>[]);
     expect(find.text('© CARTO'), findsOneWidget);
-
-    await tester.tap(find.byTooltip('Tutup atribusi'));
-    await tester.pump(const Duration(milliseconds: 350));
-    expect(find.byTooltip('Atribusi peta'), findsOneWidget);
+    expect(find.text('© OpenStreetMap contributors'), findsOneWidget);
   });
 
   testWidgets('tanpa rute tidak ada polyline maupun titik asal', (
@@ -235,5 +224,100 @@ void main() {
 
     expect(find.byType(PolylineLayer), findsNothing);
     expect(find.byKey(const Key('venue_route_origin')), findsNothing);
+  });
+
+  testWidgets('token provider dipakai untuk header (sinkron)', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: VenueMapPreview(
+            latitude: _firstVenue.latitude,
+            longitude: _firstVenue.longitude,
+            tokenProvider: FakeTokenProvider('secret-token'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(TileLayer), findsOneWidget);
+  });
+
+  testWidgets('perubahan token tanpa perubahan koordinat', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: VenueMapPreview(
+            latitude: _firstVenue.latitude,
+            longitude: _firstVenue.longitude,
+            tokenProvider: FakeTokenProvider('token-a'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: VenueMapPreview(
+            latitude: _firstVenue.latitude,
+            longitude: _firstVenue.longitude,
+            tokenProvider: FakeTokenProvider('token-b'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(TileLayer), findsOneWidget);
+  });
+
+  testWidgets('perubahan token membangun ulang tile provider', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: VenueMapPreview(
+            latitude: _firstVenue.latitude,
+            longitude: _firstVenue.longitude,
+            tokenProvider: FakeTokenProvider('token-a'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: VenueMapPreview(
+            latitude: _secondVenue.latitude,
+            longitude: _secondVenue.longitude,
+            tokenProvider: FakeTokenProvider('token-b'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(TileLayer), findsOneWidget);
+  });
+
+  testWidgets('atribusi dapat diklik', (tester) async {
+    final previous = UrlLauncherPlatform.instance;
+    final platform = _RecordingMapPlatform();
+    UrlLauncherPlatform.instance = platform;
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    await _pumpPreview(tester, _firstVenue);
+    await tester.pump();
+
+    await tester.tap(find.text('© CARTO'));
+    await tester.pump();
+    await tester.tap(find.text('© OpenStreetMap contributors'));
+    await tester.pump();
+
+    expect(find.text('© CARTO'), findsOneWidget);
   });
 }

@@ -57,11 +57,10 @@ secret produksi tidak ter-commit; salin `env/production.example.json` sebagai
 pintasan awal. Jangan menaruh `LOG_COLOR` di file env — nilainya sudah menjadi
 default kompilasi dan diatur lewat `--dart-define` bila perlu diubah.
 
-Tile peta memakai CARTO Voyager. API key-nya dibaca dari `env/secrets.json`
-lewat `--dart-define=CARTO_BASEMAP_KEY` dan **jangan pernah di-commit**. File
-`env/secrets.json` sudah masuk `.gitignore`; minta salinannya dari admin bila
-belum ada. Atribusi "OpenStreetMap contributors" dan "CARTO" wajib tampil di
-peta. Periksa kuota dan kebijakan CARTO sebelum dipakai produksi.
+Tile peta memakai proxy backend (`/api/v1/basemap/tiles/{z}/{x}/{y}`) yang
+meneruskan ke CARTO Voyager. Token Bearer diset otomatis dari sesi login;
+mobile tidak menyimpan key CARTO. Atribusi "OpenStreetMap contributors" dan
+"CARTO" wajib tetap terlihat di peta.
 
 Di **VS Code**, buka panel *Run and Debug*. Konfigurasi di `.vscode/launch.json`
 terbagi tiga kelompok:
