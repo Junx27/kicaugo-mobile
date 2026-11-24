@@ -104,4 +104,32 @@ void main() {
 
     expect(await storage.readToken(), isNull);
   });
+
+  test('accessToken null bila belum ada token', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final prefs = await SharedPreferences.getInstance();
+    final storage = SharedPreferencesSessionStorage(prefs);
+
+    expect(storage.accessToken, isNull);
+  });
+
+  test('accessToken mengembalikan token yang tersimpan', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      'session_token': 'jwt-token',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final storage = SharedPreferencesSessionStorage(prefs);
+
+    expect(storage.accessToken, 'jwt-token');
+  });
+
+  test('accessToken null untuk token kosong', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      'session_token': '',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final storage = SharedPreferencesSessionStorage(prefs);
+
+    expect(storage.accessToken, isNull);
+  });
 }
