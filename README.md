@@ -19,7 +19,7 @@ Badge di atas langsung dari SonarCloud. Snapshot metrik per **24 Nov 2026**:
 
 | Metrik | Nilai | Target (dipaksa CI) |
 | --- | --- | --- |
-| Quality Gate | `Not computed` | Passed |
+| Quality Gate | `Passed` (bawaan) / **failed** (CI) | Passed |
 | Security | **C** — 7 isu | A |
 | Reliability | **C** — 1 isu | A |
 | Maintainability | **A** — 0 isu | A |
@@ -27,9 +27,11 @@ Badge di atas langsung dari SonarCloud. Snapshot metrik per **24 Nov 2026**:
 | Coverage | **62,8%** | 100% |
 | Duplication | **1,2%** | ≤ 3% |
 
-`Not computed` berarti SonarCloud belum punya baseline analisis `master`;
-detailnya di bagian [CI & Quality Gate](#ci--quality-gate). Kolom target
-mengikuti aturan yang dipaksa CI, bukan gate bawaan SonarCloud.
+Gate bawaan SonarCloud melaporkan `Passed` karena hanya menilai *New Code*
+dan mengabaikan coverage/duplication bila baris baru sedikit. Gate CI
+mengevaluasi Overall **dan** New Code untuk PR maupun `master`, sehingga
+gagal pada Security C, Reliability C, dan Coverage 62,8%. Detailnya di
+bagian [CI & Quality Gate](#ci--quality-gate).
 
 Sebagai pembanding, verifikasi lokal `flutter test --coverage` menghasilkan
 **582 test lulus**, `flutter analyze` bersih, dan lcov mencatat **99,8%**
