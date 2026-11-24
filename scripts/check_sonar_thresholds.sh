@@ -9,7 +9,8 @@ MAX_DUPLICATION="${SONAR_MAX_DUPLICATION:-3}"
 MAX_ATTEMPTS=12
 INTERVAL=10
 
-METRICS='security_rating,reliability_rating,maintainability_rating,security_hotspots_reviewed,coverage,duplicated_lines_density,new_security_rating,new_reliability_rating,new_maintainability_rating,new_security_hotspots_reviewed,new_coverage,new_duplicated_lines_density,new_lines'
+# SonarCloud memakai sqale_rating untuk maintainability Overall code.
+METRICS='security_rating,reliability_rating,sqale_rating,security_hotspots_reviewed,coverage,duplicated_lines_density,new_security_rating,new_reliability_rating,new_maintainability_rating,new_security_hotspots_reviewed,new_coverage,new_duplicated_lines_density,new_lines'
 
 curl_args=(
   --silent --show-error
@@ -30,6 +31,11 @@ fi
 response=''
 for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
   response="$(curl "${curl_args[@]}" || true)"
+  if printf '%s' "$response" | jq -e '.errors' >/dev/null 2>&1; then
+    echo 'Gagal mengambil metrik SonarCloud:'
+    printf '%s\n' "$response"
+    exit 1
+  fi
   if printf '%s' "$response" |
     jq -e '.component.measures | length > 0' >/dev/null 2>&1; then
     break
@@ -87,7 +93,7 @@ check_number() {
 # Overall code: kode lama ikut dinilai, tidak seperti gate bawaan SonarCloud.
 check_rating security_rating 'Security (overall)'
 check_rating reliability_rating 'Reliability (overall)'
-check_rating maintainability_rating 'Maintainability (overall)'
+check_rating sqale_rating 'Maintainability (overall)'
 check_number security_hotspots_reviewed 'Hotspots reviewed (overall)' ge 100
 check_number coverage 'Coverage (overall)' ge "$MIN_COVERAGE"
 check_number duplicated_lines_density 'Duplication (overall)' le "$MAX_DUPLICATION"
