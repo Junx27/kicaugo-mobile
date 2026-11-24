@@ -12,12 +12,15 @@ INTERVAL=10
 # SonarCloud memakai sqale_rating untuk maintainability Overall code.
 METRICS='security_rating,reliability_rating,sqale_rating,security_hotspots_reviewed,coverage,duplicated_lines_density,new_security_rating,new_reliability_rating,new_maintainability_rating,new_security_hotspots_reviewed,new_coverage,new_duplicated_lines_density,new_lines'
 
-# Analisis PR saja tidak cukup: rating Overall di PR bisa berbeda dari master.
+# Build PR menilai analisis PR itu sendiri. Baseline master dinilai saat build
+# master, karena metrik master pada build PR masih mencerminkan hasil sebelum
+# merge dan akan selalu tertinggal.
 contexts=()
 if [[ -n "${PR_NUMBER:-}" ]]; then
   contexts+=("pullRequest|${PR_NUMBER}|PR ${PR_NUMBER}")
+else
+  contexts+=("branch|master|master")
 fi
-contexts+=("branch|master|master")
 
 failures=()
 response=''
