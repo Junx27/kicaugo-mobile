@@ -12,7 +12,6 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   analyze-and-test:
@@ -66,19 +65,16 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: SonarQube Auth
-        uses: SonarSource/sonarqube-auth-action@v1
-        id: auth
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v8
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=${{ steps.auth.outputs.organization }}
-            -Dsonar.projectKey=${{ steps.auth.outputs.project-key }}
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.organization=junx27
+            -Dsonar.projectKey=Junx27_kicaugo-mobile
 
       - name: Upload coverage
         uses: actions/upload-artifact@v7
