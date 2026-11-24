@@ -48,7 +48,9 @@ void main() {
   }
 
   test('service demo tidak menghasilkan koordinat', () async {
+    const createService = NoLocationService.new;
     expect(await const NoLocationService().readCurrentLocation(), isNull);
+    expect(await createService().readCurrentLocation(), isNull);
   });
 
   test('layanan mati mengembalikan null tanpa meminta izin', () async {

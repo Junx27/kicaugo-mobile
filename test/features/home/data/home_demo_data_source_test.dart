@@ -8,7 +8,12 @@ void main() {
     final content = await const HomeDemoDataSource(
       delay: Duration.zero,
     ).fetchHomeContent();
+    const createSource = HomeDemoDataSource.new;
+    final runtimeContent = await createSource(
+      delay: Duration.zero,
+    ).fetchHomeContent();
 
+    expect(runtimeContent, content);
     expect(content, HomeDemoDataSource.content);
     expect(content.profile.liveCount, 14);
     expect(content.categories, HomeDemoDataSource.categories);
