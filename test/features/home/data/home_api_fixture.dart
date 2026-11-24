@@ -2,6 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
 
+/// Payload `/api/v1/home/upcoming` sesuai kontrak backend.
+Map<String, dynamic> homeUpcomingPayload() => <String, dynamic>{
+  'type': 'Upcoming Event',
+  'title': 'Latpres Cucak Ijo Jamblangan',
+  'time': '24 Nov 2026 17:00',
+  'price': 'Rp 100.000',
+  'remaining_tickets': 120,
+};
+
 /// Payload `/api/v1/home/featured` sesuai kontrak backend.
 Map<String, dynamic> homeFeaturedPayload({
   String title = 'Piala Raja Nusantara 2026',

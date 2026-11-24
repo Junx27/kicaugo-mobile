@@ -29,6 +29,7 @@ void main() {
           homeFeaturedPayload(title: featuredTitle),
         ),
         ApiPaths.homeBirdCategories: jsonEncode(homeBirdCategoriesPayload()),
+        ApiPaths.homeUpcoming: jsonEncode(homeUpcomingPayload()),
       },
     );
     dataSource = ApiHomeDataSource(
@@ -53,7 +54,9 @@ void main() {
       expect(content.featured.attendees.initials, <String>['MK', 'BN']);
       expect(content.featured.attendees.others, 48);
       expect(content.categories, HomeDemoDataSource.categories);
-      expect(content.upcoming, HomeDemoDataSource.content.upcoming);
+      expect(content.upcoming.type, 'Upcoming Event');
+      expect(content.upcoming.title, 'Latpres Cucak Ijo Jamblangan');
+      expect(content.upcoming.remainingTickets, 120);
       expect(content.stats, HomeDemoDataSource.content.stats);
       expect(content.activeTicket, HomeDemoDataSource.content.activeTicket);
       expect(content.schedules, HomeDemoDataSource.content.schedules);
@@ -73,6 +76,7 @@ void main() {
         'data': homeFeaturedPayload(title: featuredTitle),
       }),
       ApiPaths.homeBirdCategories: jsonEncode(homeBirdCategoriesPayload()),
+      ApiPaths.homeUpcoming: jsonEncode(homeUpcomingPayload()),
     };
 
     final content = await dataSource.fetchHomeContent();
@@ -85,7 +89,7 @@ void main() {
   test('meminta kategori terakhir dengan header Bearer', () async {
     await dataSource.fetchHomeContent();
 
-    expect(adapter.recordedOptions?.path, ApiPaths.homeBirdCategories);
+    expect(adapter.recordedOptions?.path, ApiPaths.homeUpcoming);
     expect(
       adapter.recordedOptions?.headers['Authorization'],
       'Bearer jwt-token',

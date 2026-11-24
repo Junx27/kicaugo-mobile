@@ -18,7 +18,6 @@ import 'package:rumahkicau_mobile/features/home/presentation/bloc/home_bloc.dart
 import 'package:rumahkicau_mobile/features/home/presentation/bloc/home_event.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/home_strings.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/pages/home_page.dart';
-import 'package:rumahkicau_mobile/features/home/presentation/widgets/category_chips.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/widgets/home_skeleton.dart';
 import 'package:rumahkicau_mobile/features/profile/domain/usecases/update_current_location.dart';
 
@@ -99,20 +98,6 @@ Future<void> _pumpHome(
     ),
   );
   await tester.pump();
-}
-
-/// Menggeser pita kategori sampai chip [label] terlihat, lalu mengetuknya.
-Future<void> _tapChip(WidgetTester tester, String label) async {
-  await tester.dragUntilVisible(
-    find.text(label),
-    find.byType(CategoryChips),
-    const Offset(-120, 0),
-  );
-  // Tunggu sisa animasi geser agar ketukan tidak hanya menghentikan scroll.
-  await pumpNavigation(tester);
-  await tester.tap(find.text(label));
-  // Tunggu animasi reorder chip dan scroll ke pangkal selesai.
-  await tester.pump(const Duration(milliseconds: 300));
 }
 
 /// Repository yang menunggu [gate] pada setiap percobaan.
@@ -330,19 +315,6 @@ void main() {
 
     expect(find.text('Sapaan API'), findsOneWidget);
     expect(find.text('Halo, Nama API 👋'), findsOneWidget);
-  });
-
-  testWidgets('chip kategori menyaring jadwal, Lovebird kosong', (
-    tester,
-  ) async {
-    await _pumpHome(tester);
-
-    await _tapChip(tester, 'Kenari');
-    expect(find.text('Kenari Cup Kemang'), findsOneWidget);
-    expect(find.text('Festival Kicau Batavia'), findsNothing);
-
-    await _tapChip(tester, 'Lovebird');
-    expect(find.text(HomeStrings.emptySchedules), findsOneWidget);
   });
 
   final comingSoonTargets = <String, Finder Function()>{

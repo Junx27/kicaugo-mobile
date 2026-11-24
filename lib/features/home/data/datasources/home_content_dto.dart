@@ -2,6 +2,7 @@ import '../../../../core/network/json_mapper.dart';
 import '../../domain/entities/bird_category_item.dart';
 import '../../domain/entities/featured_contest.dart';
 import '../../domain/entities/home_profile.dart';
+import '../../domain/entities/upcoming_contest.dart';
 
 /// Mapping payload endpoint Beranda ke entity domain.
 abstract final class HomeContentDto {
@@ -13,6 +14,16 @@ abstract final class HomeContentDto {
     avatarUrl: _stringOrNull(json['avatar']),
     isOrganizer: json['is_organizer'] == true,
   );
+
+  /// Parsing lomba yang segera berlangsung dari endpoint `/api/v1/home/upcoming`.
+  static UpcomingContest upcomingFromJson(Map<String, dynamic> json) =>
+      UpcomingContest(
+        type: JsonMapper.string(json, 'type'),
+        title: JsonMapper.string(json, 'title'),
+        time: JsonMapper.string(json, 'time'),
+        price: JsonMapper.string(json, 'price'),
+        remainingTickets: JsonMapper.integer(json, 'remaining_tickets'),
+      );
 
   /// Parsing lomba unggulan dari endpoint `/api/v1/home/featured`.
   static FeaturedContest featuredFromJson(Map<String, dynamic> json) {
