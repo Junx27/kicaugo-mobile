@@ -6,6 +6,36 @@ mencari tempat penitipan, dan mengelola akun.
 Alur utama: **Splash → Login → Beranda** dengan bottom navigation 4 tab
 (Beranda, Lomba, Penitipan, Profil).
 
+## Status SonarCloud
+
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Junx27_kicaugo-mobile&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Junx27_kicaugo-mobile)
+[![Security](https://sonarcloud.io/api/project_badges/measure?project=Junx27_kicaugo-mobile&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Junx27_kicaugo-mobile)
+[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=Junx27_kicaugo-mobile&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Junx27_kicaugo-mobile)
+[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=Junx27_kicaugo-mobile&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Junx27_kicaugo-mobile)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Junx27_kicaugo-mobile&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Junx27_kicaugo-mobile)
+[![Duplication](https://sonarcloud.io/api/project_badges/measure?project=Junx27_kicaugo-mobile&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Junx27_kicaugo-mobile)
+
+Badge di atas langsung dari SonarCloud. Snapshot metrik per **24 Nov 2026**:
+
+| Metrik | Nilai | Target (direncanakan) |
+| --- | --- | --- |
+| Quality Gate | `Not computed` | Passed |
+| Security | **C** — 7 isu | A |
+| Reliability | **C** — 1 isu | A |
+| Maintainability | **A** — 0 isu | A |
+| Hotspots reviewed | **100%** | 100% |
+| Coverage | **62,8%** | 100% |
+| Duplication | **1,2%** | ≤ 3% |
+
+`Not computed` berarti SonarCloud belum punya baseline analisis `master`;
+detailnya di bagian [CI & Quality Gate](#ci--quality-gate). Kolom target
+merujuk pada aturan ketat yang direncanakan, bukan gate bawaan SonarCloud.
+
+Sebagai pembanding, verifikasi lokal `flutter test --coverage` menghasilkan
+**582 test lulus**, `flutter analyze` bersih, dan lcov mencatat **99,8%**
+(6.461/6.477 baris). Perbedaan dengan angka SonarCloud perlu ditelusuri lebih
+lanjut karena cakupan file tiap laporan coverage tidak selalu sama.
+
 ## Prasyarat
 
 - Flutter stable (diuji pada Flutter 3.38.6 / Dart 3.10.7)
