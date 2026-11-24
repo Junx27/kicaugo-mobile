@@ -18,7 +18,7 @@ import '../widgets/category_chips.dart';
 import '../widgets/community_banner.dart';
 import '../widgets/featured_contest_card.dart';
 import '../widgets/home_greeting.dart';
-import '../widgets/home_search_bar.dart';
+
 import '../widgets/home_skeleton.dart';
 import '../widgets/home_stats_card.dart';
 import '../widgets/popular_schedule_list.dart';
@@ -123,7 +123,6 @@ class _HomeContentView extends StatelessWidget {
                               isOrganizer: content.profile.isOrganizer,
                             ),
                           ),
-                          const HomeSearchBar(),
                         ],
                       ),
                     ),

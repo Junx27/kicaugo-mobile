@@ -346,8 +346,6 @@ void main() {
   });
 
   final comingSoonTargets = <String, Finder Function()>{
-    'cari': () => find.text(HomeStrings.searchHint),
-    'filter': () => find.byTooltip(HomeStrings.filterTooltip),
     'detail': () => find.text(HomeStrings.seeDetail),
     'e-tiket': () => find.text(HomeStrings.openTicket),
     'lihat semua': () => find.text(HomeStrings.seeAll),
