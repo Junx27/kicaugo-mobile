@@ -1,56 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:get_it/get_it.dart';
 import 'package:latlong2/latlong.dart';
-
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/routing/route_service.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/basemap_url.dart';
-import '../../../../core/widgets/status_dot.dart';
-
-/// Transformasi warna tile CARTO agar nadanya mendekati tile OSM publik.
-///
-/// Rata-rata sampel CARTO (245,240,229) dipetakan ke rata-rata OSM
-/// (219,217,212). Kemiringan 1.10 menjaga label dan tepi jalan tetap tajam;
-/// offset per kanal menggelapkan sekaligus mengurangi kehangatan CARTO.
-/// Pendekatan lama `1.5x - 64` memusatkan kontras pada 128 dan membuat hampir
-/// semua piksel tile terang ter-clip ke putih.
-const double _tileColorGain = 1.1;
-const double _tileRedOffset = 219 - _tileColorGain * 245;
-const double _tileGreenOffset = 217 - _tileColorGain * 240;
-const double _tileBlueOffset = 212 - _tileColorGain * 229;
-const ColorFilter _tileColorFilter = ColorFilter.matrix(
-  VenueMapPreview.tileColorMatrix,
-);
-
-/// Ukuran tombol atribusi ringkas agar tidak menutupi preview 160 px.
-const double _attributionIconSize = 16;
-const double _attributionButtonSize = 24;
-
-/// Tombol buka/tutup popup atribusi dengan ukuran yang seragam.
-Widget _attributionButton({
-  required IconData icon,
-  required String tooltip,
-  required VoidCallback onPressed,
-}) {
-  return IconButton(
-    onPressed: onPressed,
-    tooltip: tooltip,
-    icon: Icon(
-      icon,
-      size: _attributionIconSize,
-      color: AppColors.textSecondary,
-    ),
-    visualDensity: VisualDensity.compact,
-    padding: EdgeInsets.zero,
-    constraints: const BoxConstraints.tightFor(
-      width: _attributionButtonSize,
-      height: _attributionButtonSize,
-    ),
-  );
-}
+import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
+import 'package:rumahkicau_mobile/core/network/token_provider.dart';
+import 'package:rumahkicau_mobile/core/routing/route_service.dart';
+import 'package:rumahkicau_mobile/core/theme/app_colors.dart';
+import 'package:rumahkicau_mobile/core/theme/app_text_styles.dart';
+import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
+import 'package:rumahkicau_mobile/core/utils/basemap_url.dart';
+import 'package:rumahkicau_mobile/core/widgets/status_dot.dart';
+import 'package:rumahkicau_mobile/features/auth/data/datasources/session_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Opsi tampilan dan kontrol untuk [VenueMapPreview].
 class VenueMapOptions {
@@ -99,59 +60,32 @@ class VenueMapPreview extends StatefulWidget {
     required this.longitude,
     this.options = const VenueMapOptions(),
     this.route,
+    this.tokenProvider,
   });
 
   final double latitude;
   final double longitude;
   final VenueMapOptions options;
-
-  /// Rute dari lokasi pengguna ke venue; null berarti tidak digambar.
   final RoutePath? route;
+
+  /// Sumber token Bearer (opsional). Bila null, widget mencoba `getIt<SessionStorage>`.
+  final TokenProvider? tokenProvider;
 
   /// Zoom awal peta; dipakai tombol "orientasi" halaman untuk reset tampilan.
   /// Satu level di atas 14 menampilkan lebih banyak detail jalan di preview.
   static const double defaultZoom = 15;
-
-  /// Matrix warna tile CARTO yang disamakan ke nada OSM. Diekspos sebagai
-  /// token tema supaya test bisa mengunci nilainya.
-  static const List<double> tileColorMatrix = <double>[
-    _tileColorGain,
-    0,
-    0,
-    0,
-    _tileRedOffset,
-    0,
-    _tileColorGain,
-    0,
-    0,
-    _tileGreenOffset,
-    0,
-    0,
-    _tileColorGain,
-    0,
-    _tileBlueOffset,
-    0,
-    0,
-    0,
-    1,
-    0,
-  ];
-
-  static const double _routeStrokeWidth = 4;
-  static const double _routeBorderWidth = 2;
-  static const double _originMarkerSize = 22;
 
   @override
   State<VenueMapPreview> createState() => _VenueMapPreviewState();
 }
 
 class _VenueMapPreviewState extends State<VenueMapPreview> {
-  /// `initialCenter` hanya dipakai FlutterMap saat pertama kali dibuat, jadi
-  /// perubahan koordinat setelah itu harus memindahkan kamera lewat controller.
-
   late final MapController _controller;
   late final bool _ownsController;
   bool _mapReady = false;
+
+  NetworkTileProvider? _tileProvider;
+  String? _tileProviderToken;
 
   @override
   void initState() {
@@ -159,12 +93,7 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
     final external = widget.options.controller;
     _ownsController = external == null;
     _controller = external ?? MapController();
-  }
-
-  @override
-  void dispose() {
-    if (_ownsController) _controller.dispose();
-    super.dispose();
+    _rebuildTileProvider(_resolveToken(widget.tokenProvider));
   }
 
   @override
@@ -174,11 +103,48 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
         oldWidget.latitude != widget.latitude ||
         oldWidget.longitude != widget.longitude;
     // Sebelum frame pertama, `initialCenter` baru akan dipakai saat render.
-    if (!changed || !_mapReady) return;
+    if (!changed || !_mapReady) {
+      // Token bisa berubah tanpa perubahan koordinat.
+      final newToken = _resolveToken(widget.tokenProvider);
+      if (newToken != _tileProviderToken) {
+        _rebuildTileProvider(newToken);
+      }
+      return;
+    }
     _controller.move(
       LatLng(widget.latitude, widget.longitude),
       _controller.camera.zoom,
     );
+    final newToken = _resolveToken(widget.tokenProvider);
+    if (newToken != _tileProviderToken) {
+      _rebuildTileProvider(newToken);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tileProvider?.dispose();
+    if (_ownsController) _controller.dispose();
+    super.dispose();
+  }
+
+  String? _resolveToken(TokenProvider? provider) {
+    if (provider != null) return provider.accessToken;
+    try {
+      return GetIt.I<SessionStorage>().accessToken;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _rebuildTileProvider(String? token) {
+    _tileProvider?.dispose();
+    final headers = <String, String>{
+      'User-Agent': 'com.kicaugo.mobile',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+    _tileProvider = NetworkTileProvider(headers: headers);
+    _tileProviderToken = token;
   }
 
   void _handleMapReady() {
@@ -205,6 +171,7 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
           options: MapOptions(
             initialCenter: center,
             initialZoom: VenueMapPreview.defaultZoom,
+            maxZoom: 20,
             onMapReady: _handleMapReady,
             interactionOptions: InteractionOptions(
               flags: options.interactive
@@ -213,16 +180,14 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
             ),
           ),
           children: [
-            ColorFiltered(
-              // Kontras ringan mempertegas tepi jalan dan label tanpa mengubah
-              // warna overlay di atasnya.
-              colorFilter: _tileColorFilter,
-              child: TileLayer(
-                urlTemplate: BasemapUrl.tileTemplate(AppConstants.basemapKey),
-                subdomains: const ['a', 'b', 'c', 'd'],
-                retinaMode: true,
-                userAgentPackageName: 'com.kicaugo.mobile',
-              ),
+            TileLayer(
+              urlTemplate: BasemapUrl.tileTemplate(AppConstants.apiBaseUrl),
+              tileProvider: _tileProvider,
+              subdomains: const <String>[],
+              retinaMode: RetinaMode.isHighDensity(context),
+              maxZoom: 20,
+              maxNativeZoom: 18,
+              userAgentPackageName: 'com.kicaugo.mobile',
             ),
             if (hasRoute)
               PolylineLayer(
@@ -230,9 +195,9 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
                   Polyline(
                     points: routePoints,
                     color: AppColors.blueStrong,
-                    strokeWidth: VenueMapPreview._routeStrokeWidth,
+                    strokeWidth: 4,
                     borderColor: AppColors.surface,
-                    borderStrokeWidth: VenueMapPreview._routeBorderWidth,
+                    borderStrokeWidth: 2,
                   ),
                 ],
               ),
@@ -241,8 +206,8 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
                 if (hasRoute)
                   Marker(
                     point: routePoints.first,
-                    width: VenueMapPreview._originMarkerSize,
-                    height: VenueMapPreview._originMarkerSize,
+                    width: 22,
+                    height: 22,
                     child: const _OriginDot(),
                   ),
                 Marker(
@@ -266,40 +231,25 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
                 ),
               ],
             ),
-            // Atribusi wajib untuk tile CARTO/OSM; dibuat ringkas agar tidak
-            // mendominasi preview kartu yang tingginya hanya 160 px.
-            RichAttributionWidget(
-              alignment: AttributionAlignment.bottomRight,
-              showFlutterMapAttribution: false,
-              popupBackgroundColor: AppColors.surface,
-              permanentHeight: _attributionIconSize,
-              attributions: const [
-                TextSourceAttribution('OpenStreetMap contributors'),
-                TextSourceAttribution('CARTO'),
-              ],
-              openButton: (context, open) => _attributionButton(
-                icon: Icons.info_outline,
-                tooltip: 'Atribusi peta',
-                onPressed: open,
-              ),
-              closeButton: (context, close) => _attributionButton(
-                icon: Icons.close,
-                tooltip: 'Tutup atribusi',
-                onPressed: close,
-              ),
-            ),
           ],
         ),
       ),
     );
 
+    const attribution = Positioned(
+      right: 8,
+      bottom: 4,
+      child: _MapAttribution(),
+    );
+
     final onTap = options.onTap;
     if (onTap == null) {
-      return map;
+      return Stack(children: [map, attribution]);
     }
 
     // FlutterMap memiliki gesture recognizer sendiri, jadi lapisan transparan
     // di atasnya yang menangkap tap untuk membuka halaman penuh.
+    // Atribusi diletakkan DI ATAS overlay agar tetap bisa diklik (kanan bawah).
     return Stack(
       children: [
         map,
@@ -309,15 +259,13 @@ class _VenueMapPreviewState extends State<VenueMapPreview> {
             onTap: onTap,
           ),
         ),
+        attribution,
       ],
     );
   }
 }
 
 /// Pin venue dengan label melayang dan riak lembut seperti desain.
-///
-/// Riak sengaja statis: animasi berulang membuat `pumpAndSettle` di test
-/// tidak pernah selesai dan tidak memberi informasi bagi pengguna.
 class _VenuePin extends StatelessWidget {
   const _VenuePin({required this.label, required this.showLabel, this.onTap});
 
@@ -427,6 +375,60 @@ class _OriginDot extends StatelessWidget {
         border: Border.all(
           color: AppColors.surface,
           width: _OriginDot._borderWidth,
+        ),
+      ),
+    );
+  }
+}
+
+/// Atribusi CARTO/OSM yang selalu terlihat (tidak disembunyikan di popup)
+/// dan dapat diklik.
+class _MapAttribution extends StatelessWidget {
+  const _MapAttribution();
+
+  static const String _osmUrl = 'https://www.openstreetmap.org/copyright';
+  static const String _cartoUrl = 'https://carto.com/attribution/';
+
+  Future<void> _open(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(AppTheme.pillRadius),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerRight,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: () => _open(_osmUrl),
+              child: const Text(
+                '© OpenStreetMap contributors',
+                style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+              ),
+            ),
+            const Text(
+              ', ',
+              style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+            ),
+            GestureDetector(
+              onTap: () => _open(_cartoUrl),
+              child: const Text(
+                '© CARTO',
+                style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+              ),
+            ),
+          ],
         ),
       ),
     );
