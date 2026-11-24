@@ -76,6 +76,13 @@ jobs:
             -Dsonar.organization=junx27
             -Dsonar.projectKey=Junx27_kicaugo-mobile
 
+      - name: Enforce SonarCloud thresholds
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.ref_name }}
+        run: bash scripts/check_sonar_thresholds.sh
+
       - name: Upload coverage
         uses: actions/upload-artifact@v7
         with:

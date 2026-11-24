@@ -377,7 +377,8 @@ pada pull request (`opened`, `synchronize`, `reopened`). Urutan pemeriksaannya:
 2. `flutter analyze`
 3. `flutter test --coverage` → menghasilkan `coverage/lcov.info`
 4. `diff-cover coverage/lcov.info --compare-branch=origin/master --fail-under=100`
-5. SonarCloud Scan → Quality Gate
+5. SonarCloud Scan
+6. `scripts/check_sonar_thresholds.sh` → cek ambang via Web API
 
 Gate yang harus lolos sebelum PR di-merge:
 
@@ -387,7 +388,10 @@ Gate yang harus lolos sebelum PR di-merge:
 | Analyze | `No issues found!` |
 | Test | Semua unit/widget test lulus |
 | Coverage baris baru | **100%** terhadap `origin/master` (`diff-cover`) |
-| SonarCloud Quality Gate | **Security Rating on New Code ≥ A** |
+| Sonar rating (overall + new code) | Security, Reliability, Maintainability = **A** |
+| Hotspots reviewed | **100%** (overall + new code) |
+| Sonar coverage | **≥ 100%** (overall + new code) |
+| Duplication | **≤ 3%** (overall + new code) |
 
 ### Konfigurasi SonarCloud
 
@@ -407,6 +411,23 @@ Secret GitHub Actions yang dipakai:
 Action `SonarSource/sonarcloud-github-action` di-pin ke full commit SHA, bukan
 tag `@master`, karena SonarCloud menandai tag floating sebagai temuan security
 pada kode CI.
+
+### Ambang kualitas yang dipaksa CI
+
+Gate bawaan SonarCloud hanya menilai *New Code* saat analisis PR, sehingga
+temuan di kode lama tetap bisa lolos. Ada pula *fudge factor* yang mengabaikan
+coverage dan duplication bila baris baru kurang dari 20. Untuk menghindari itu,
+`scripts/check_sonar_thresholds.sh` memanggil `/api/measures/component` dan
+menggagalkan job bila syarat pada tabel di atas tidak terpenuhi — untuk
+**Overall code maupun New Code**.
+
+Aturan bisa diubah lewat environment variable `SONAR_MIN_COVERAGE`,
+`SONAR_MAX_DUPLICATION`, dan `SONAR_PROJECT_KEY`. Script membutuhkan `jq`
+(tersedia di runner GitHub) dan `SONAR_TOKEN` dari GitHub Secrets.
+
+Konsekuensinya, gate akan gagal sampai temuan yang ada dibereskan: pada saat
+aturan ini diterapkan, SonarCloud mencatat Security **C** (7 isu), Reliability
+**C** (1 isu), dan coverage **62,8%** pada kode keseluruhan.
 
 ### Warning baseline `master`
 
