@@ -14,7 +14,6 @@ import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
 import '../home_strings.dart';
 import '../widgets/active_ticket_card.dart';
-import '../widgets/category_chips.dart';
 import '../widgets/community_banner.dart';
 import '../widgets/featured_contest_card.dart';
 import '../widgets/home_greeting.dart';
@@ -127,13 +126,6 @@ class _HomeContentView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    CategoryChips(
-                      categories: content.categories,
-                      selectedName: state.categoryName,
-                      onSelected: (name) => context.read<HomeBloc>().add(
-                        HomeCategorySelected(name),
-                      ),
-                    ),
                     const SizedBox(height: 16),
                     Padding(
                       padding: _gutter,
