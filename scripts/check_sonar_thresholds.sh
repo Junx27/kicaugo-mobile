@@ -25,6 +25,29 @@ fi
 failures=()
 response=''
 
+# Scanner meng-upload laporan lebih dulu daripada server memprosesnya. Tanpa
+# penungguan ini, metrik yang dibaca masih berasal dari analisis sebelumnya.
+for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
+  ce_response="$(curl --silent --show-error --user "${SONAR_TOKEN}:" \
+    --get 'https://sonarcloud.io/api/ce/component' \
+    --data-urlencode "component=${PROJECT_KEY}" || true)"
+  ce_status="$(printf '%s' "$ce_response" | jq -r '.current.status // empty' || true)"
+  if [[ "$ce_status" == 'SUCCESS' ]]; then
+    break
+  fi
+  if [[ "$ce_status" == 'FAILED' || "$ce_status" == 'CANCELED' ]]; then
+    echo "Pemrosesan laporan SonarCloud ${ce_status}:"
+    printf '%s\n' "$ce_response"
+    exit 1
+  fi
+  if ((attempt == MAX_ATTEMPTS)); then
+    echo "Pemrosesan laporan SonarCloud belum selesai setelah ${MAX_ATTEMPTS} percobaan."
+    printf '%s\n' "$ce_response"
+    exit 1
+  fi
+  sleep "$INTERVAL"
+done
+
 fetch_measures() {
   curl --silent --show-error \
     --user "${SONAR_TOKEN}:" \

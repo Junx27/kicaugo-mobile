@@ -459,7 +459,9 @@ coverage dan duplication bila baris baru kurang dari 20. Untuk menghindari itu,
 `scripts/check_sonar_thresholds.sh` memanggil `/api/measures/component` dan
 menggagalkan job bila syarat pada tabel di atas tidak terpenuhi — untuk
 **Overall code maupun New Code**. Build PR menilai analisis PR tersebut;
-build `master` menilai baseline `master`.
+build `master` menilai baseline `master`. Script menunggu status task CE
+`SUCCESS` lewat `/api/ce/component` sebelum membaca metrik, supaya tidak
+mengambil hasil analisis lama saat server masih memproses laporan.
 
 Aturan bisa diubah lewat environment variable `SONAR_MIN_COVERAGE`,
 `SONAR_MAX_DUPLICATION`, dan `SONAR_PROJECT_KEY`. Script membutuhkan `jq`
