@@ -368,6 +368,63 @@ Status verifikasi terakhir:
   bug `lipo` saat memverifikasi arsitektur ganda. Gunakan `flutter run`
   (destination simulator spesifik) untuk menjalankan aplikasi.
 
+## CI & Quality Gate
+
+Workflow `.github/workflows/flutter-ci.yml` jalan pada `push` ke `master` dan
+pada pull request (`opened`, `synchronize`, `reopened`). Urutan pemeriksaannya:
+
+1. `dart format --output=none --set-exit-if-changed lib test`
+2. `flutter analyze`
+3. `flutter test --coverage` → menghasilkan `coverage/lcov.info`
+4. `diff-cover coverage/lcov.info --compare-branch=origin/master --fail-under=100`
+5. SonarCloud Scan → Quality Gate
+
+Gate yang harus lolos sebelum PR di-merge:
+
+| Gate | Syarat |
+| --- | --- |
+| Format | Tidak ada file yang berubah setelah `dart format` |
+| Analyze | `No issues found!` |
+| Test | Semua unit/widget test lulus |
+| Coverage baris baru | **100%** terhadap `origin/master` (`diff-cover`) |
+| SonarCloud Quality Gate | **Security Rating on New Code ≥ A** |
+
+### Konfigurasi SonarCloud
+
+Tersimpan di `sonar-project.properties` dan di workflow:
+
+- Host: `https://sonarcloud.io`
+- Organization: `junx27`
+- Project key: `Junx27_kicaugo-mobile`
+- Sumber `lib`, test `test`, laporan coverage `coverage/lcov.info`
+- File generated (`*.g.dart`, `*.freezed.dart`, `generated/`) dikecualikan
+
+Secret GitHub Actions yang dipakai:
+
+- `SONAR_TOKEN` — token autentikasi SonarCloud (wajib)
+- `GITHUB_TOKEN` — disediakan otomatis oleh GitHub
+
+Action `SonarSource/sonarcloud-github-action` di-pin ke full commit SHA, bukan
+tag `@master`, karena SonarCloud menandai tag floating sebagai temuan security
+pada kode CI.
+
+### Warning baseline `master`
+
+Pada project yang baru terhubung, SonarCloud bisa menampilkan:
+
+```text
+Warning: 'master' branch has not been analyzed yet.
+```
+
+Ini **bukan kegagalan scan** — analisis PR tetap berjalan dan check tetap pass.
+Artinya SonarCloud belum punya baseline branch `master` sebagai pembanding
+*New Code*, karena workflow baru pernah jalan di branch PR. Baseline terbentuk
+setelah PR di-merge: push ke `master` memicu workflow, lalu warning hilang.
+
+Catatan: pada analisis pertama `master`, SonarCloud dapat menganggap sebagian
+besar kode sebagai *New Code*. Pastikan tidak ada temuan security lain agar
+Quality Gate tetap lolos saat baseline dibentuk.
+
 ## Di luar lingkup
 
 Backend/API nyata, registrasi akun, Google Sign-In sungguhan, detail lomba,
