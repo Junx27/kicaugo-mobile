@@ -32,12 +32,15 @@ class ApiHomeDataSource implements HomeDataSource {
     final categoriesJson = await _client.getJson(ApiPaths.homeBirdCategories);
     final categories = HomeContentDto.birdCategoriesFromJson(categoriesJson);
 
+    final upcomingJson = await _client.getJson(ApiPaths.homeUpcoming);
+    final upcoming = HomeContentDto.upcomingFromJson(upcomingJson);
+
     // Bagian yang belum disediakan backend masih memakai data contoh.
     const demo = HomeDemoDataSource.content;
     return HomeContent(
       profile: profile,
       featured: featured,
-      upcoming: demo.upcoming,
+      upcoming: upcoming,
       stats: demo.stats,
       activeTicket: demo.activeTicket,
       schedules: demo.schedules,
