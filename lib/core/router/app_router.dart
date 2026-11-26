@@ -9,6 +9,10 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/chat/presentation/pages/chat_page.dart';
 import '../../features/community/presentation/pages/community_page.dart';
+import '../../features/event/domain/entities/contest_detail.dart';
+import '../../features/event/domain/entities/featured_contest.dart';
+import '../../features/event/domain/usecases/get_contest_detail.dart';
+import '../../features/event/presentation/pages/contest_detail_page.dart';
 import '../../features/help_center/presentation/pages/help_center_page.dart';
 import '../../features/home/domain/usecases/get_home_content.dart';
 import '../../features/home/presentation/main_shell.dart';
@@ -20,7 +24,9 @@ import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/reminders/presentation/pages/reminders_page.dart';
 import '../../features/schedule/presentation/pages/schedule_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
+import '../../features/tickets/domain/entities/ticket_selection_item.dart';
 import '../../features/tickets/presentation/pages/ticket_history_page.dart';
+import '../../features/tickets/presentation/pages/ticket_selection_page.dart';
 import '../../features/tickets/presentation/pages/tickets_page.dart';
 import '../location/location_service.dart';
 import '../routing/route_service.dart';
@@ -51,6 +57,7 @@ class AuthRouterNotifier extends ChangeNotifier {
 GoRouter createRouter({
   required AuthBloc authBloc,
   required GetHomeContent getHomeContent,
+  required GetContestDetail getContestDetail,
   required LocationService locationService,
   required RouteService routeService,
   required UpdateCurrentLocation updateCurrentLocation,
@@ -102,6 +109,16 @@ GoRouter createRouter({
           );
         },
       ),
+      GoRoute(
+        path: AppRoutes.eventDetail,
+        builder: (context, state) =>
+            _buildEventDetailPage(state.extra, getContestDetail),
+      ),
+      GoRoute(
+        path: AppRoutes.ticketSelection,
+        builder: (context, state) =>
+            TicketSelectionPage(item: _toTicketSelectionItem(state.extra)),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => MainShell(
           navigationShell: navigationShell,
@@ -129,6 +146,35 @@ StatefulShellBranch _branch(String path, GoRouterWidgetBuilder builder) {
   return StatefulShellBranch(
     routes: [GoRoute(path: path, builder: builder)],
   );
+}
+
+ContestDetailPage _buildEventDetailPage(
+  Object? extra,
+  GetContestDetail getContestDetail,
+) {
+  if (extra is FeaturedContest) {
+    return ContestDetailPage(
+      contest: extra,
+      getContestDetail: getContestDetail,
+    );
+  }
+  final id = extra is int ? extra : null;
+  return ContestDetailPage(id: id, getContestDetail: getContestDetail);
+}
+
+/// Menyesuaikan kelas lomba dari detail event ke entitas domain tiket.
+TicketSelectionItem? _toTicketSelectionItem(Object? extra) {
+  if (extra is TicketSelectionItem) return extra;
+  if (extra is ContestClass) {
+    return TicketSelectionItem(
+      id: extra.id,
+      name: extra.name,
+      session: extra.session,
+      time: extra.time,
+      price: extra.price,
+    );
+  }
+  return null;
 }
 
 /// Menentukan tujuan alih rute berdasarkan status sesi; `null` bila tetap.

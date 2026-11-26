@@ -6,6 +6,7 @@ typedef Attendees = ({List<String> initials, int others});
 /// Lomba unggulan terdekat di kartu utama Beranda.
 class FeaturedContest extends Equatable {
   const FeaturedContest({
+    this.id = 0,
     required this.title,
     required this.schedule,
     required this.distance,
@@ -16,6 +17,7 @@ class FeaturedContest extends Equatable {
     this.longitude,
   });
 
+  final int id;
   final String title;
 
   /// Hari, tanggal, dan lokasi dalam satu baris (mis. "Minggu, 6 Des • ...").
@@ -31,6 +33,7 @@ class FeaturedContest extends Equatable {
 
   @override
   List<Object?> get props => [
+    id,
     title,
     schedule,
     distance,

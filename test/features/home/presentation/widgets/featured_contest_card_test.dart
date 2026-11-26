@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rumahkicau_mobile/core/constants/app_constants.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_colors.dart';
 import 'package:rumahkicau_mobile/core/widgets/icon_pill.dart';
-import 'package:rumahkicau_mobile/features/home/domain/entities/featured_contest.dart';
+import 'package:rumahkicau_mobile/features/event/domain/entities/featured_contest.dart';
+import 'package:rumahkicau_mobile/features/event/presentation/pages/contest_detail_page.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/home_strings.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/pages/venue_map_page.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/widgets/featured_contest_card.dart';
@@ -150,9 +152,7 @@ void main() {
     expect(text.style?.color, AppColors.textPrimary);
   });
 
-  testWidgets('taut Lihat Detail menampilkan pesan segera hadir', (
-    tester,
-  ) async {
+  testWidgets('taut Lihat Detail membuka halaman detail', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(body: FeaturedContestCard(contest: contest)),
@@ -162,8 +162,36 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('see_detail_link')));
     await tester.tap(find.byKey(const Key('see_detail_link')));
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
 
-    expect(find.text(AppConstants.comingSoon), findsOneWidget);
+    expect(find.byType(ContestDetailPage), findsOneWidget);
+    expect(find.text(contest.title), findsOneWidget);
+  });
+
+  testWidgets('taut Lihat Detail memakai router bila tersedia', (tester) async {
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) =>
+              const Scaffold(body: FeaturedContestCard(contest: contest)),
+        ),
+        GoRoute(
+          path: AppRoutes.eventDetail,
+          builder: (context, state) => const ContestDetailPage(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('see_detail_link')));
+    await tester.pumpAndSettle();
+
+    expect(router.state.uri.path, AppRoutes.eventDetail);
+    expect(find.byType(ContestDetailPage), findsOneWidget);
   });
 
   testWidgets('attendees sebaris dengan judul dan navigasi di paling bawah', (

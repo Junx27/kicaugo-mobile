@@ -8,6 +8,7 @@ import 'core/router/app_router.dart';
 import 'core/routing/route_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/event/domain/usecases/get_contest_detail.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
 import 'features/profile/domain/usecases/update_current_location.dart';
 
@@ -17,6 +18,7 @@ class KicauKuApp extends StatefulWidget {
     super.key,
     required this.authBloc,
     required this.getHomeContent,
+    required this.getContestDetail,
     required this.locationService,
     required this.routeService,
     required this.updateCurrentLocation,
@@ -24,6 +26,7 @@ class KicauKuApp extends StatefulWidget {
 
   final AuthBloc authBloc;
   final GetHomeContent getHomeContent;
+  final GetContestDetail getContestDetail;
   final LocationService locationService;
   final RouteService routeService;
   final UpdateCurrentLocation updateCurrentLocation;
@@ -43,6 +46,7 @@ class _KicauKuAppState extends State<KicauKuApp> {
     _router = createRouter(
       authBloc: widget.authBloc,
       getHomeContent: widget.getHomeContent,
+      getContestDetail: widget.getContestDetail,
       locationService: widget.locationService,
       routeService: widget.routeService,
       updateCurrentLocation: widget.updateCurrentLocation,

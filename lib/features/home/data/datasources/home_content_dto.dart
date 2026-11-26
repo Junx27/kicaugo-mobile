@@ -1,6 +1,6 @@
 import '../../../../core/network/json_mapper.dart';
+import '../../../event/domain/entities/featured_contest.dart';
 import '../../domain/entities/bird_category_item.dart';
-import '../../domain/entities/featured_contest.dart';
 import '../../domain/entities/home_profile.dart';
 import '../../domain/entities/upcoming_contest.dart';
 
@@ -29,6 +29,7 @@ abstract final class HomeContentDto {
   static FeaturedContest featuredFromJson(Map<String, dynamic> json) {
     final attendees = JsonMapper.object(json['attendees']);
     return FeaturedContest(
+      id: _intOrNull(json['id']) ?? 0,
       title: JsonMapper.string(json, 'title'),
       schedule: JsonMapper.string(json, 'schedule'),
       distance: JsonMapper.string(json, 'distance'),
@@ -75,6 +76,12 @@ abstract final class HomeContentDto {
 
   static double? _doubleOrNull(Object? value) {
     if (value is num) return value.toDouble();
+    return null;
+  }
+
+  static int? _intOrNull(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
     return null;
   }
 }

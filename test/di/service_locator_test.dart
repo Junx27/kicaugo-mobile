@@ -13,6 +13,11 @@ import 'package:rumahkicau_mobile/features/auth/domain/usecases/login_usecase.da
 import 'package:rumahkicau_mobile/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:rumahkicau_mobile/features/auth/domain/usecases/register_usecase.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:rumahkicau_mobile/features/event/data/datasources/api_contest_detail_data_source.dart';
+import 'package:rumahkicau_mobile/features/event/data/datasources/contest_detail_data_source.dart';
+import 'package:rumahkicau_mobile/features/event/data/datasources/fake_contest_detail_data_source.dart';
+import 'package:rumahkicau_mobile/features/event/domain/repositories/contest_detail_repository.dart';
+import 'package:rumahkicau_mobile/features/event/domain/usecases/get_contest_detail.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/api_home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
@@ -40,8 +45,14 @@ void main() {
     expect(getIt<LogoutUseCase>(), isNotNull);
     expect(getIt<AuthBloc>(), isA<AuthBloc>());
     expect(getIt<HomeDataSource>(), isA<HomeDemoDataSource>());
+    expect(
+      getIt<ContestDetailDataSource>(),
+      isA<FakeContestDetailDataSource>(),
+    );
     expect(getIt<HomeRepository>(), isNotNull);
+    expect(getIt<ContestDetailRepository>(), isNotNull);
     expect(getIt<GetHomeContent>(), isNotNull);
+    expect(getIt<GetContestDetail>(), isNotNull);
     expect(getIt<LocationService>(), isA<NoLocationService>());
     expect(
       getIt<CurrentLocationDataSource>(),
@@ -59,6 +70,7 @@ void main() {
 
     expect(getIt<AuthRemoteDataSource>(), isA<ApiAuthRemoteDataSource>());
     expect(getIt<HomeDataSource>(), isA<ApiHomeDataSource>());
+    expect(getIt<ContestDetailDataSource>(), isA<ApiContestDetailDataSource>());
     expect(getIt<ApiClient>(), isNotNull);
     expect(getIt<LocationService>(), isA<GeolocatorLocationService>());
     expect(

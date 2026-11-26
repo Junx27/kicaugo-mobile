@@ -10,6 +10,7 @@ import 'package:rumahkicau_mobile/core/location/location_service.dart';
 import 'package:rumahkicau_mobile/core/router/app_routes.dart';
 import 'package:rumahkicau_mobile/core/theme/app_theme.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_event.dart';
+import 'package:rumahkicau_mobile/features/event/presentation/pages/contest_detail_page.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_content.dart';
 import 'package:rumahkicau_mobile/features/home/domain/entities/home_profile.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
@@ -84,6 +85,10 @@ Future<void> _pumpHome(
       GoRoute(
         path: AppRoutes.profile,
         builder: (context, state) => const Text(_profileMarker),
+      ),
+      GoRoute(
+        path: AppRoutes.eventDetail,
+        builder: (context, state) => const ContestDetailPage(),
       ),
     ],
   );
@@ -317,8 +322,16 @@ void main() {
     expect(find.text('Halo, Nama API 👋'), findsOneWidget);
   });
 
+  testWidgets('ketuk Lihat Detail membuka detail event', (tester) async {
+    await _pumpHome(tester);
+
+    await tester.tap(find.byKey(const Key('see_detail_link')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ContestDetailPage), findsOneWidget);
+  });
+
   final comingSoonTargets = <String, Finder Function()>{
-    'detail': () => find.text(HomeStrings.seeDetail),
     'e-tiket': () => find.text(HomeStrings.openTicket),
     'lihat semua': () => find.text(HomeStrings.seeAll),
     'pesan': () => find.text(HomeStrings.book).first,
