@@ -14,6 +14,4 @@ abstract final class ChatStrings {
   static const String emptyTitle = 'Percakapan tidak ditemukan';
   static const String emptyHint =
       'Coba kata kunci lain atau pilih filter Semua.';
-
-  static String newMessages(int count) => '$count baru';
 }

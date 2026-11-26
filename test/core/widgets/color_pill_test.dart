@@ -30,4 +30,14 @@ void main() {
 
     expect(size, const Size(6, 6));
   });
+
+  testWidgets('konstruktor utama dapat dipakai tanpa const', (tester) async {
+    const createPill = ColorPill.new;
+    final size = await _pumpPill(
+      tester,
+      createPill(width: 4, height: 2, color: AppColors.lime),
+    );
+
+    expect(size, const Size(4, 2));
+  });
 }

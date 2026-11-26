@@ -57,7 +57,8 @@ void main() {
   testWidgets('TitleTopBar menampilkan judul dan avatar membuka Profil', (
     tester,
   ) async {
-    await _pump(tester, const TitleTopBar(title: 'Tiket Saya'));
+    const createBar = TitleTopBar.new;
+    await _pump(tester, createBar(title: 'Tiket Saya'));
 
     expect(find.text('Tiket Saya'), findsOneWidget);
     await tester.tap(find.byTooltip(profileTooltip));
