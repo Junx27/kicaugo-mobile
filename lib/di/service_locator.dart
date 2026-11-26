@@ -20,6 +20,12 @@ import '../features/auth/domain/usecases/login_usecase.dart';
 import '../features/auth/domain/usecases/logout_usecase.dart';
 import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/event/data/datasources/api_contest_detail_data_source.dart';
+import '../features/event/data/datasources/contest_detail_data_source.dart';
+import '../features/event/data/datasources/fake_contest_detail_data_source.dart';
+import '../features/event/data/repositories/contest_detail_repository_impl.dart';
+import '../features/event/domain/repositories/contest_detail_repository.dart';
+import '../features/event/domain/usecases/get_contest_detail.dart';
 import '../features/home/data/datasources/api_home_data_source.dart';
 import '../features/home/data/datasources/home_data_source.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
@@ -64,6 +70,9 @@ Future<void> configureDependencies({bool? useApi}) async {
         () => ApiAuthRemoteDataSource(getIt()),
       )
       ..registerLazySingleton<HomeDataSource>(() => ApiHomeDataSource(getIt()))
+      ..registerLazySingleton<ContestDetailDataSource>(
+        () => ApiContestDetailDataSource(getIt()),
+      )
       ..registerLazySingleton<LocationService>(
         () => const GeolocatorLocationService(),
       )
@@ -76,6 +85,9 @@ Future<void> configureDependencies({bool? useApi}) async {
         () => FakeAuthRemoteDataSource(),
       )
       ..registerLazySingleton<HomeDataSource>(() => const HomeDemoDataSource())
+      ..registerLazySingleton<ContestDetailDataSource>(
+        () => const FakeContestDetailDataSource(),
+      )
       ..registerLazySingleton<LocationService>(() => const NoLocationService())
       ..registerLazySingleton<CurrentLocationDataSource>(
         () => const NoOpCurrentLocationDataSource(),
@@ -102,6 +114,10 @@ Future<void> configureDependencies({bool? useApi}) async {
     )
     ..registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(getIt()))
     ..registerLazySingleton(() => GetHomeContent(getIt()))
+    ..registerLazySingleton<ContestDetailRepository>(
+      () => ContestDetailRepositoryImpl(getIt()),
+    )
+    ..registerLazySingleton(() => GetContestDetail(getIt()))
     ..registerLazySingleton<CurrentLocationRepository>(
       () => CurrentLocationRepositoryImpl(getIt()),
     )

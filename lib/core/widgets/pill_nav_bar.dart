@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_glass.dart';
 
 /// Satu tujuan di [PillNavBar].
 @immutable
@@ -37,12 +38,7 @@ class PillNavBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         child: LiquidGlassLayer(
-          settings: const LiquidGlassSettings(
-            thickness: 20,
-            blur: 8,
-            refractiveIndex: 1.5,
-            glassColor: Color(0x1AFFFFFF),
-          ),
+          settings: AppGlass.settings,
           child: LiquidGlass(
             shape: const LiquidRoundedSuperellipse(borderRadius: 40),
             child: Container(

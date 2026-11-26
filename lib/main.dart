@@ -10,6 +10,7 @@ import 'core/logging/app_logger.dart';
 import 'core/routing/route_service.dart';
 import 'di/service_locator.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/event/domain/usecases/get_contest_detail.dart';
 import 'features/home/domain/usecases/get_home_content.dart';
 import 'features/profile/domain/usecases/update_current_location.dart';
 
@@ -29,6 +30,7 @@ Future<void> main() async {
     KicauKuApp(
       authBloc: getIt<AuthBloc>(),
       getHomeContent: getIt<GetHomeContent>(),
+      getContestDetail: getIt<GetContestDetail>(),
       locationService: getIt<LocationService>(),
       routeService: getIt<RouteService>(),
       updateCurrentLocation: getIt<UpdateCurrentLocation>(),

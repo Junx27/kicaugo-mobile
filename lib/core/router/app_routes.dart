@@ -42,6 +42,16 @@ abstract final class AppRoutes {
   /// Halaman peta penuh lokasi venue lomba.
   static const String venueMap = '/venue-map';
 
+  /// Halaman detail event/lomba, dipakai oleh semua trigger detail.
+  static const String eventDetail = '/event-detail';
+
+  /// Alih nama lama; mengarah ke rute detail yang sama.
+  @Deprecated('Gunakan AppRoutes.eventDetail.')
+  static const String contestDetail = eventDetail;
+
+  /// Halaman pilih tiket dan nomor gantangan dari detail event.
+  static const String ticketSelection = '/ticket-selection';
+
   /// Rute yang boleh dibuka tanpa sesi.
   static const Set<String> publicRoutes = <String>{
     splash,

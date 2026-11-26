@@ -6,9 +6,9 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_tones.dart';
 import '../../../../core/utils/external_navigation.dart';
-import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/icon_pill.dart';
-import '../../domain/entities/featured_contest.dart';
+import '../../../event/domain/entities/featured_contest.dart';
+import '../../../event/presentation/event_detail_navigation.dart';
 import '../home_strings.dart';
 import 'venue_map_preview.dart';
 
@@ -49,7 +49,7 @@ class FeaturedContestCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 10,
                   children: [
-                    _Header(distance: contest.distance),
+                    _Header(distance: contest.distance, contest: contest),
                     _TitleRow(contest: contest),
                     _IconLine(
                       icon: Icons.location_on_rounded,
@@ -148,9 +148,10 @@ class _NavigationButton extends StatelessWidget {
 
 /// Baris badge: TERDEKAT di kiri, Lihat Detail di kanan.
 class _Header extends StatelessWidget {
-  const _Header({required this.distance});
+  const _Header({required this.distance, required this.contest});
 
   final String distance;
+  final FeaturedContest contest;
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +190,7 @@ class _Header extends StatelessWidget {
             ),
           ),
         ),
-        const _DetailLink(),
+        _DetailLink(contest: contest),
       ],
     );
   }
@@ -296,13 +297,15 @@ class _InfoTile extends StatelessWidget {
 
 /// Badge "Lihat Detail" di header, menggantikan Kategori Utama.
 class _DetailLink extends StatelessWidget {
-  const _DetailLink();
+  const _DetailLink({required this.contest});
+
+  final FeaturedContest contest;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       key: const Key('see_detail_link'),
-      onTap: () => showComingSoon(context),
+      onTap: () => pushEventDetail(context, contest),
       child: const IconPill(
         label: HomeStrings.seeDetail,
         trailingIcon: Icons.arrow_forward_rounded,

@@ -1,8 +1,8 @@
 import '../../../../core/entities/bird_category.dart';
 import '../../../../core/entities/ticket_status.dart';
+import '../../../event/domain/entities/featured_contest.dart';
 import '../../domain/entities/active_ticket.dart';
 import '../../domain/entities/bird_category_item.dart';
-import '../../domain/entities/featured_contest.dart';
 import '../../domain/entities/home_content.dart';
 import '../../domain/entities/home_profile.dart';
 import '../../domain/entities/home_stats.dart';

@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../event/domain/entities/featured_contest.dart';
 import 'active_ticket.dart';
 import 'bird_category_item.dart';
-import 'featured_contest.dart';
 import 'home_profile.dart';
 import 'home_stats.dart';
 import 'schedule_item.dart';
