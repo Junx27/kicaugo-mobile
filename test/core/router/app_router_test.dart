@@ -12,6 +12,9 @@ import 'package:rumahkicau_mobile/features/auth/presentation/pages/login_page.da
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/register_page.dart';
 import 'package:rumahkicau_mobile/features/chat/presentation/pages/chat_page.dart';
 import 'package:rumahkicau_mobile/features/community/presentation/pages/community_page.dart';
+import 'package:rumahkicau_mobile/features/event/domain/entities/contest_detail.dart';
+import 'package:rumahkicau_mobile/features/event/domain/entities/featured_contest.dart';
+import 'package:rumahkicau_mobile/features/event/presentation/pages/contest_detail_page.dart';
 import 'package:rumahkicau_mobile/features/help_center/presentation/help_center_strings.dart';
 import 'package:rumahkicau_mobile/features/help_center/presentation/pages/help_center_page.dart';
 import 'package:rumahkicau_mobile/features/home/presentation/home_strings.dart';
@@ -22,7 +25,9 @@ import 'package:rumahkicau_mobile/features/onboarding/presentation/pages/onboard
 import 'package:rumahkicau_mobile/features/reminders/presentation/pages/reminders_page.dart';
 import 'package:rumahkicau_mobile/features/reminders/presentation/reminders_strings.dart';
 import 'package:rumahkicau_mobile/features/schedule/presentation/pages/schedule_page.dart';
+import 'package:rumahkicau_mobile/features/tickets/domain/entities/ticket_selection_item.dart';
 import 'package:rumahkicau_mobile/features/tickets/presentation/pages/ticket_history_page.dart';
+import 'package:rumahkicau_mobile/features/tickets/presentation/pages/ticket_selection_page.dart';
 import 'package:rumahkicau_mobile/features/tickets/presentation/pages/tickets_page.dart';
 import 'package:rumahkicau_mobile/features/tickets/presentation/ticket_history_strings.dart';
 
@@ -241,5 +246,118 @@ void main() {
     await pumpNavigation(tester);
 
     expect(find.byType(VenueMapPage), findsOneWidget);
+  });
+
+  testWidgets('rute pilih tiket menerima kelas yang diketuk', (tester) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    unawaited(
+      GoRouter.of(tester.element(find.byType(HomePage))).push(
+        AppRoutes.ticketSelection,
+        extra: const ContestClass(
+          id: 3,
+          name: 'Kacer Ring',
+          session: 'Sesi 02',
+          time: '09:15 WIB',
+          price: 'Rp 150.000',
+          prizeHighlight: 'Juara 1',
+        ),
+      ),
+    );
+    await pumpNavigation(tester);
+
+    expect(find.byType(TicketSelectionPage), findsOneWidget);
+    expect(find.text('Kacer Ring • Sesi 02'), findsOneWidget);
+    expect(find.text('Total Pembayaran (1 Tiket Umum)'), findsOneWidget);
+  });
+
+  testWidgets('rute pilih tiket tanpa extra memakai kelas dummy', (
+    tester,
+  ) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    unawaited(
+      GoRouter.of(
+        tester.element(find.byType(HomePage)),
+      ).push(AppRoutes.ticketSelection),
+    );
+    await pumpNavigation(tester);
+
+    expect(find.byType(TicketSelectionPage), findsOneWidget);
+    expect(
+      find.text('Murai Batu Utama - Raja Batavia • Sesi 04'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('rute pilih tiket menerima entitas domain tiket', (tester) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    unawaited(
+      GoRouter.of(tester.element(find.byType(HomePage))).push(
+        AppRoutes.ticketSelection,
+        extra: const TicketSelectionItem(
+          id: 4,
+          name: 'Kacer Ring',
+          session: 'Sesi 02',
+          time: '09:15 WIB',
+          price: 'Rp 150.000',
+        ),
+      ),
+    );
+    await pumpNavigation(tester);
+
+    expect(find.byType(TicketSelectionPage), findsOneWidget);
+    expect(find.text('Kacer Ring • Sesi 02'), findsOneWidget);
+  });
+
+  testWidgets('rute detail event menerima kartu dari Beranda', (tester) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    unawaited(
+      GoRouter.of(tester.element(find.byType(HomePage))).push(
+        AppRoutes.eventDetail,
+        extra: const FeaturedContest(
+          title: 'Lomba dari Beranda',
+          schedule: 'Minggu, 18 Mei 2025',
+          distance: '5 km',
+          prize: 'Rp 20.000.000',
+          slots: '4 Gantangan',
+          attendees: (initials: <String>['BS'], others: 2),
+        ),
+      ),
+    );
+    await pumpNavigation(tester);
+
+    expect(find.byType(ContestDetailPage), findsOneWidget);
+    expect(find.text('Lomba dari Beranda'), findsOneWidget);
+  });
+
+  testWidgets('rute detail event menerima id lomba', (tester) async {
+    await pumpKicauKuApp(tester);
+    await _toLogin(tester);
+    await submitLogin(tester);
+    await pumpNavigation(tester);
+
+    unawaited(
+      GoRouter.of(
+        tester.element(find.byType(HomePage)),
+      ).push(AppRoutes.eventDetail, extra: 101),
+    );
+    await pumpNavigation(tester);
+
+    expect(find.byType(ContestDetailPage), findsOneWidget);
   });
 }

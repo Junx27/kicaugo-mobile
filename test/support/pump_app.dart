@@ -17,6 +17,9 @@ import 'package:rumahkicau_mobile/features/auth/domain/usecases/register_usecase
 import 'package:rumahkicau_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:rumahkicau_mobile/features/auth/presentation/pages/register_page.dart';
+import 'package:rumahkicau_mobile/features/event/data/datasources/fake_contest_detail_data_source.dart';
+import 'package:rumahkicau_mobile/features/event/data/repositories/contest_detail_repository_impl.dart';
+import 'package:rumahkicau_mobile/features/event/domain/usecases/get_contest_detail.dart';
 import 'package:rumahkicau_mobile/features/home/data/datasources/home_data_source.dart';
 import 'package:rumahkicau_mobile/features/home/data/repositories/home_repository_impl.dart';
 import 'package:rumahkicau_mobile/features/home/domain/repositories/home_repository.dart';
@@ -86,6 +89,9 @@ Future<AuthBloc> pumpKicauKuApp(
     KicauKuApp(
       authBloc: authBloc,
       getHomeContent: homeUseCase,
+      getContestDetail: const GetContestDetail(
+        ContestDetailRepositoryImpl(FakeContestDetailDataSource()),
+      ),
       locationService: const NoLocationService(),
       routeService: FakeRouteService(),
       updateCurrentLocation: defaultUpdateCurrentLocation(),
