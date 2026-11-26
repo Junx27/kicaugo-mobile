@@ -17,24 +17,29 @@ Alur utama: **Splash → Login → Beranda** dengan bottom navigation 4 tab
 
 Badge di atas langsung dari SonarCloud. Snapshot metrik per **24 Nov 2026**:
 
-| Metrik | Nilai | Target (direncanakan) |
-| --- | --- | --- |
-| Quality Gate | `Not computed` | Passed |
-| Security | **C** — 7 isu | A |
-| Reliability | **C** — 1 isu | A |
-| Maintainability | **A** — 0 isu | A |
-| Hotspots reviewed | **100%** | 100% |
-| Coverage | **62,8%** | 100% |
-| Duplication | **1,2%** | ≤ 3% |
+| Metrik | Analisis PR #26 | Baseline `master` | Target (dipaksa CI) |
+| --- | --- | --- | --- |
+| Quality Gate | lolos (CI, konteks PR) | gagal (CI, konteks `master`) | Passed |
+| Security | **A** — 0 isu | **C** — 7 isu | A |
+| Reliability | **A** — 0 isu | **C** — 1 isu | A |
+| Maintainability | **A** — 0 isu | **A** — 0 isu | A |
+| Hotspots reviewed | **100%** | **100%** | 100% |
+| Coverage | **100%** (6.475/6.475 baris) | 62,8% | 100% |
+| Duplication | **1,2%** | 1,2% | ≤ 3% |
 
-`Not computed` berarti SonarCloud belum punya baseline analisis `master`;
-detailnya di bagian [CI & Quality Gate](#ci--quality-gate). Kolom target
-merujuk pada aturan ketat yang direncanakan, bukan gate bawaan SonarCloud.
+Gate bawaan SonarCloud melaporkan `Passed` karena hanya menilai *New Code*
+dan mengabaikan coverage/duplication bila baris baru sedikit. Gate CI
+mengevaluasi Overall **dan** New Code untuk PR maupun `master`. Semua ambang
+sudah terpenuhi pada analisis PR; kegagalan CI yang tersisa berasal dari
+baseline `master` yang belum dianalisis ulang. Detailnya di bagian
+[CI & Quality Gate](#ci--quality-gate).
 
-Sebagai pembanding, verifikasi lokal `flutter test --coverage` menghasilkan
-**582 test lulus**, `flutter analyze` bersih, dan lcov mencatat **99,8%**
-(6.461/6.477 baris). Perbedaan dengan angka SonarCloud perlu ditelusuri lebih
-lanjut karena cakupan file tiap laporan coverage tidak selalu sama.
+Coverage lokal `flutter test --coverage` menghasilkan **587 test lulus**,
+`flutter analyze` bersih, dan lcov **100%** (6.475/6.475 baris). Sebelumnya
+SonarCloud hanya melaporkan 62,8% karena `test/**`, kode native, dan
+`lib/main.dart` ikut dihitung sebagai production coverage. Ketiganya kini
+dikecualikan melalui `sonar.coverage.exclusions`, sementara baris produk yang
+tersisa ditutup dengan test scoped.
 
 ## Prasyarat
 
@@ -366,7 +371,7 @@ form memakai data dummy, jadi yang tampil hanya baris `[BOOT]` dan `[NAV]`.
 ```bash
 dart format --set-exit-if-changed lib test integration_test test_driver
 flutter analyze
-flutter test                     # 66 unit/widget test
+flutter test                     # 587 unit/widget test
 flutter test --coverage          # lcov: coverage/lcov.info
 ```
 
@@ -383,8 +388,8 @@ flutter drive \
 Status verifikasi terakhir:
 
 - `flutter analyze` bersih (no issues).
-- 66 test lulus.
-- Line coverage **100%** (604/604 baris) untuk seluruh file `lib/` yang
+- 587 test lulus.
+- Line coverage **100%** (6.475/6.475 baris) untuk seluruh file `lib/` yang
   tercatat di lcov (`main.dart` adalah entrypoint dan tidak dihitung).
 - Integration test alur Splash → Login → 4 tab → Keluar lulus di
   **iPhone 16 Pro, iOS 18.6**.
@@ -407,7 +412,8 @@ pada pull request (`opened`, `synchronize`, `reopened`). Urutan pemeriksaannya:
 2. `flutter analyze`
 3. `flutter test --coverage` → menghasilkan `coverage/lcov.info`
 4. `diff-cover coverage/lcov.info --compare-branch=origin/master --fail-under=100`
-5. SonarCloud Scan → Quality Gate
+5. SonarCloud Scan
+6. `scripts/check_sonar_thresholds.sh` → cek ambang via Web API
 
 Gate yang harus lolos sebelum PR di-merge:
 
@@ -417,7 +423,10 @@ Gate yang harus lolos sebelum PR di-merge:
 | Analyze | `No issues found!` |
 | Test | Semua unit/widget test lulus |
 | Coverage baris baru | **100%** terhadap `origin/master` (`diff-cover`) |
-| SonarCloud Quality Gate | **Security Rating on New Code ≥ A** |
+| Sonar rating (overall + new code) | Security, Reliability, Maintainability = **A** |
+| Hotspots reviewed | **100%** (overall + new code) |
+| Sonar coverage | **≥ 100%** (overall + new code) |
+| Duplication | **≤ 3%** (overall + new code) |
 
 ### Konfigurasi SonarCloud
 
@@ -427,6 +436,8 @@ Tersimpan di `sonar-project.properties` dan di workflow:
 - Organization: `junx27`
 - Project key: `Junx27_kicaugo-mobile`
 - Sumber `lib`, test `test`, laporan coverage `coverage/lcov.info`
+- Coverage tidak menghitung `test/**`, `test_driver/**`, `ios/**`, dan
+  `lib/main.dart` (`sonar.coverage.exclusions`)
 - File generated (`*.g.dart`, `*.freezed.dart`, `generated/`) dikecualikan
 
 Secret GitHub Actions yang dipakai:
@@ -434,9 +445,33 @@ Secret GitHub Actions yang dipakai:
 - `SONAR_TOKEN` — token autentikasi SonarCloud (wajib)
 - `GITHUB_TOKEN` — disediakan otomatis oleh GitHub
 
-Action `SonarSource/sonarcloud-github-action` di-pin ke full commit SHA, bukan
-tag `@master`, karena SonarCloud menandai tag floating sebagai temuan security
-pada kode CI.
+Action pihak ketiga (`subosito/flutter-action`) dan action SonarCloud di-pin ke
+full commit SHA. Action resmi GitHub memakai tag versi mayor. Dependensi CI juga
+terkunci: `flutter pub get --enforce-lockfile` memakai `pubspec.lock`, dan
+`pip install --require-hashes --only-binary :all: -r requirements-ci.txt`
+memakai hash wheel untuk Python 3.12 di Linux. Ini menghilangkan temuan
+supply-chain pada kode CI.
+
+### Ambang kualitas yang dipaksa CI
+
+Gate bawaan SonarCloud hanya menilai *New Code* saat analisis PR, sehingga
+temuan di kode lama tetap bisa lolos. Ada pula *fudge factor* yang mengabaikan
+coverage dan duplication bila baris baru kurang dari 20. Untuk menghindari itu,
+`scripts/check_sonar_thresholds.sh` memanggil `/api/measures/component` dan
+menggagalkan job bila syarat pada tabel di atas tidak terpenuhi — untuk
+**Overall code maupun New Code**. Build PR menilai analisis PR tersebut;
+build `master` menilai baseline `master`. Script menunggu status task CE
+`SUCCESS` lewat `/api/ce/component` sebelum membaca metrik, supaya tidak
+mengambil hasil analisis lama saat server masih memproses laporan.
+
+Aturan bisa diubah lewat environment variable `SONAR_MIN_COVERAGE`,
+`SONAR_MAX_DUPLICATION`, dan `SONAR_PROJECT_KEY`. Script membutuhkan `jq`
+(tersedia di runner GitHub) dan `SONAR_TOKEN` dari GitHub Secrets.
+
+Analisis PR #26 memenuhi seluruh ambang: coverage 100% dan rating A untuk
+Security, Reliability, dan Maintainability. Gate pada build PR kini hijau.
+Baseline `master` dinilai terpisah saat workflow berjalan di `master` setelah
+merge.
 
 ### Warning baseline `master`
 
@@ -446,14 +481,15 @@ Pada project yang baru terhubung, SonarCloud bisa menampilkan:
 Warning: 'master' branch has not been analyzed yet.
 ```
 
-Ini **bukan kegagalan scan** — analisis PR tetap berjalan dan check tetap pass.
-Artinya SonarCloud belum punya baseline branch `master` sebagai pembanding
-*New Code*, karena workflow baru pernah jalan di branch PR. Baseline terbentuk
-setelah PR di-merge: push ke `master` memicu workflow, lalu warning hilang.
+Ini **bukan kegagalan scan** — analisis PR tetap berjalan. Artinya SonarCloud
+belum punya baseline branch `master` sebagai pembanding *New Code*, karena
+workflow baru pernah jalan di branch PR. Baseline terbentuk setelah PR
+di-merge: push ke `master` memicu workflow, lalu warning hilang.
 
-Catatan: pada analisis pertama `master`, SonarCloud dapat menganggap sebagian
-besar kode sebagai *New Code*. Pastikan tidak ada temuan security lain agar
-Quality Gate tetap lolos saat baseline dibentuk.
+Gate CI tidak lagi membaca metrik `master` pada build PR, karena nilainya
+masih mencerminkan hasil sebelum merge. Baseline `master` diperiksa saat
+workflow jalan di `master` setelah PR di-merge, bersamaan dengan hilangnya
+warning di atas.
 
 ## Di luar lingkup
 

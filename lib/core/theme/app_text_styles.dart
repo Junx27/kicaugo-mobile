@@ -115,12 +115,4 @@ abstract final class AppTextStyles {
     letterSpacing: 0.5,
     height: 1.4,
   );
-
-  /// Label chip kategori: 10 / Regular.
-  static final TextStyle chipLabel = GoogleFonts.inter(
-    fontSize: 10,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textSecondary,
-    height: 1.4,
-  );
 }
